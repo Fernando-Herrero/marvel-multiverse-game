@@ -1,16 +1,56 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	font-family: Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif,
+		"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd {
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	list-style-type: none;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
 :root {
 	--bg-color: linear-gradient(to bottom, #000000, #0a0f2c);
 	--contrast-color: #ffffff;
-    --primary-color: #1a1a2e;
+	--primary-color: #1a1a2e;
 	--primary-color-dark: #0f0f1f;
 
 	--text-color: #ffffff;
 	--text-light-color: #c0c0c0;
-	--text-secondary-color: #e62429; 
+	--text-secondary-color: #e62429;
 
-    --box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+	--box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
 	--accent-color: #e62429;
-	--hero-color: #0074e4; 
+	--hero-color: #0074e4;
 	--villain-color: #8b0000;
 	--neutral-color: #2f2f2f;
 
@@ -25,6 +65,64 @@ body {
 .container {
 	width: var(--container-width);
 	margin: 0 auto;
+}
+
+/* ===== Login Screen ===== */
+.login-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ===== Characters ===== */
+.cards-player-container {
+    display: grid;
+    grid-template-columns: repeat(1,1fr); 
+    justify-items: center;
+    gap: 20px; 
+}
+
+.character-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 200px; 
+    border-radius: 12px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+}
+
+.hero-border {
+    border: 1px solid var(--hero-color);
+}
+
+.villain-border {
+    border:1px solid var(--villain-color); 
+}
+
+.character-card img {
+    max-width: 100%;
+    max-height: 180px;
+    border-top-right-radius: 12px;
+    border-top-left-radius: 12px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.card-info-character {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+}
+
+.card-info-character h3 {
+    font-size: 18px;
+}
+
+.card-info-character p {
+    margin-top: 2px;
+    font-size: 12px;
 }
 
 /* ===== MAP ===== */
@@ -54,70 +152,69 @@ body {
 }
 
 .level {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80px;
-    height: 80px;
-    background-color: var(--villain-color);
-    border-radius: 50%;
-    cursor: pointer;
-    text-align: center;
-    font-size: 18px;
-    color: var(--contrast-color);
-    font-weight: bold;
-    transition: transform 0.3s ease;
-    box-shadow: var(--box-shadow);
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 80px;
+	height: 80px;
+	background-color: var(--villain-color);
+	border-radius: 50%;
+	cursor: pointer;
+	text-align: center;
+	font-size: 18px;
+	color: var(--contrast-color);
+	font-weight: bold;
+	transition: transform 0.3s ease;
+	box-shadow: var(--box-shadow);
 }
 
 .level[data-level="1"] {
-    top: 10%;
-    left: 15%;
-    transform: translateX(-50%);
+	top: 10%;
+	left: 15%;
+	transform: translateX(-50%);
 }
 
 .level[data-level="2"] {
-    top: 30%;
-    left: 50%;
-    transform: translateX(-50%);
+	top: 30%;
+	left: 50%;
+	transform: translateX(-50%);
 }
 
 .level[data-level="3"] {
-    top:40%;
-    left: 20%;
-    transform: translateX(-50%);
+	top: 40%;
+	left: 20%;
+	transform: translateX(-50%);
 }
 
 .level[data-level="4"] {
-    top: 50%;
-    left: 80%;
-    transform: translateX(-50%);
+	top: 50%;
+	left: 80%;
+	transform: translateX(-50%);
 }
 
 .level[data-level="5"] {
-    top: 70%;
-    left: 60%;
-    transform: translateX(-50%);
+	top: 70%;
+	left: 60%;
+	transform: translateX(-50%);
 }
 
 .level[data-level="6"] {
-    top: 85%;
-    left: 20%;
-    transform: translateX(-50%);
+	top: 85%;
+	left: 20%;
+	transform: translateX(-50%);
 }
 
 #map-path {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; 
-    z-index: 1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 1;
 }
 
 #player {
-    transition: cx 0.5s, cy 0.5s; 
+	transition: cx 0.5s, cy 0.5s;
 }
-

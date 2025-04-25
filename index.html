@@ -26,22 +26,20 @@
 		</header>
 
 		<main>
-			<section id="login-screen" class="login-screen">
-
+			<section id="login-screen" class="login-screen container">
 				<div id="user-login" class="user-login"></div>
 
-				<div id="cards-player-container" class="cards-player-container">
-                    <select name="characters-selector" id="characters-selector">
-                        <option value="heroes"></option>
-                        <option value="villians"></option>
-                    </select>
-                </div>
+				<select name="characters-selector" id="characters-selector">
+					<option value="heroes">Heroes</option>
+					<option value="villians">Villians</option>
+				</select>
+
+				<div id="cards-player-container" class="cards-player-container"></div>
 
 				<div id="start-game-btn" class="start-game-btn"></div>
-
 			</section>
 
-			<section id="map-screen" class="map-screen" style="display: none;">
+			<section id="map-screen" class="map-screen" style="display: none">
 				<div id="map" class="map">
 					<div class="level" data-level="1">1</div>
 					<div class="level" data-level="2">2</div>

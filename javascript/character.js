@@ -1,6 +1,6 @@
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
 
-export const villains = ["Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Killmonger"];
+export const villains = ["Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Doctor Doom"];
 
 const apiKey = "eabf24a441ea28d7278fbc8d0be33589";
 
@@ -10,9 +10,9 @@ const fetchCharactersByName = async (name) => {
 		const response = await fetch(`https://superheroapi.com/api/${apiKey}/search/${name}`);
 		const data = await response.json();
 
-        if (name === 'Thor' && data.results.length > 1) {
-            return data.results[1];
-        }
+		if (name === "Thor" && data.results.length > 1) {
+			return data.results[1];
+		}
 
 		return data.results[0];
 	} catch (error) {
@@ -23,11 +23,14 @@ const fetchCharactersByName = async (name) => {
 /* ==== Card Characters ==== */
 const createCharacterCard = (character) => {
 	const card = document.createElement("div");
-	card.classList.add("character-card");
+	card.classList.add("character-card", "hero-border");
 
 	const imgCard = document.createElement("img");
 	imgCard.src = character.image.url;
 	imgCard.alt = character.name;
+
+	const infoCharacter = document.createElement("div");
+	infoCharacter.classList.add("card-info-character");
 
 	const nameCharacter = document.createElement("h3");
 	nameCharacter.textContent = character.name;
@@ -37,13 +40,15 @@ const createCharacterCard = (character) => {
 
 	for (let stat in character.powerstats) {
 		const statsP = document.createElement("p");
-		statsP.textContent = `${stat.toUpperCase()}: ${character.powerstats[stat]}`;
+		statsP.textContent = `${stat.charAt(0).toUpperCase() + stat.slice(1)}: ${character.powerstats[stat]}`;
 		statsCharacter.appendChild(statsP);
 	}
 
+	infoCharacter.appendChild(nameCharacter);
+	infoCharacter.appendChild(statsCharacter);
+
 	card.appendChild(imgCard);
-	card.appendChild(nameCharacter);
-	card.appendChild(statsCharacter);
+	card.appendChild(infoCharacter);
 
 	return card;
 };
@@ -66,11 +71,19 @@ export const renderCharacters = async (namesArray) => {
 /* ==== Select Characters ==== */
 export const handleCharacterSelection = () => {
 	const charactersSelect = document.getElementById("characters-selector");
-    const selectedValue = charactersSelect.value;
+	const selectedValue = charactersSelect.value;
+    const cards = document.querySelectorAll(".character-card");
 
-    if (selectedValue === 'heroes') { 
-        renderCharacters(heroes);
-    } else if (selectedValue === 'villians') {
-        renderCharacters(villains);
-    }
+	const containerCharacters = document.getElementById("cards-player-container");
+	containerCharacters.innerHTML = "";
+
+	if (selectedValue === "heroes") {
+		renderCharacters(heroes);
+	} else if (selectedValue === "villians") {
+		renderCharacters(villains);
+        cards.forEach(card => {
+            card.classList.remove("hero-border");
+            card.classList.add("villain-border");
+        })
+	}
 };
