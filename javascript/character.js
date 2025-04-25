@@ -1,3 +1,5 @@
+import { saveToStorage } from "./storage.js";
+
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
 
 export const villains = ["Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Doctor Doom"];
@@ -73,12 +75,14 @@ export const handleCharacterSelection = () => {
 	const charactersSelect = document.getElementById("characters-selector");
 	const selectedValue = charactersSelect.value;
 
+    saveToStorage("characterType", selectedValue);
+
 	const containerCharacters = document.getElementById("cards-player-container");
 	containerCharacters.innerHTML = "";
 
 	if (selectedValue === "heroes") {
 		renderCharacters(heroes, "hero");
-	} else if (selectedValue === "villians") {
+	} else if (selectedValue === "villains") {
 		renderCharacters(villains, "villain");
 	}
 };

@@ -1,5 +1,5 @@
 // Guardar datos (ej: tema, visitas, formulario)
-const saveToStorage = (key, value) => {
+export const saveToStorage = (key, value) => {
 	try {
 		localStorage.setItem(key, JSON.stringify(value));
 		return true;
@@ -10,7 +10,7 @@ const saveToStorage = (key, value) => {
 };
 
 // Cargar datos
-const loadFromStorage = (key) => {
+export const loadFromStorage = (key) => {
 	try {
 		const data = localStorage.getItem(key);
 		return data ? JSON.parse(data) : null;
@@ -21,6 +21,6 @@ const loadFromStorage = (key) => {
 };
 
 // Borrar datos específicos
-const clearStorageKey = (key) => {
+export const clearStorageKey = (key) => {
 	localStorage.removeItem(key);
 };
