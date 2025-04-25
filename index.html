@@ -3,9 +3,11 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<script src="/index.js" defer type="module"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/core.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/md5.min.js"></script>
+		<script src="/javascript/index.js" defer type="module"></script>
 		<link rel="stylesheet" href="/styles/index.css" />
-		<link rel="shortcut icon" href="/media/images /icons/marvel-favicon.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="/media/images/icons/marvel-favicon.png" type="image/x-icon" />
 		<title>Marvel-Multiverse</title>
 	</head>
 	<body>
@@ -25,12 +27,21 @@
 
 		<main>
 			<section id="login-screen" class="login-screen">
+
 				<div id="user-login" class="user-login"></div>
-				<div id="cards-player-container" class="cards-player-container"></div>
+
+				<div id="cards-player-container" class="cards-player-container">
+                    <select name="characters-selector" id="characters-selector">
+                        <option value="heroes"></option>
+                        <option value="villians"></option>
+                    </select>
+                </div>
+
 				<div id="start-game-btn" class="start-game-btn"></div>
+
 			</section>
 
-			<section id="map-screen" class="map-screen">
+			<section id="map-screen" class="map-screen" style="display: none;">
 				<div id="map" class="map">
 					<div class="level" data-level="1">1</div>
 					<div class="level" data-level="2">2</div>
@@ -38,8 +49,6 @@
 					<div class="level" data-level="4">4</div>
 					<div class="level" data-level="5">5</div>
 					<div class="level" data-level="6">6</div>
-					<div class="level" data-level="7">7</div>
-					<div class="level" data-level="8">8</div>
 				</div>
 				<div id="level-info" class="level-info">
 					<p id="level-title">e.g. Level 2: New York 2099</p>

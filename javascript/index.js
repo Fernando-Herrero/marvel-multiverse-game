@@ -1,13 +1,9 @@
-import { fetchMarvelData } from "./utils";
+import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
 
-// const displayCharacters = async () => {
-// 	const characters = await fetchMarvelData("characters");
-// 	if (characters) {
-// 		console.log(characters); 
-// 	} else {
-// 		console.log("Error fetching characters.");
-// 	}
-// };
+const setupEventListeners = () => {
+	const charactersSelect = document.getElementById("characters-selector").addEventListener("change", handleCharacterSelection)
+};
 
-// displayCharacters();
-
+document.addEventListener("DOMContentLoaded", () => {
+	renderCharacters(heroes);
+});
