@@ -21,9 +21,9 @@ const fetchCharactersByName = async (name) => {
 };
 
 /* ==== Card Characters ==== */
-const createCharacterCard = (character) => {
+const createCharacterCard = (character, type) => {
 	const card = document.createElement("div");
-	card.classList.add("character-card", "hero-border");
+	card.classList.add("character-card", `${type}-border`);
 
 	const imgCard = document.createElement("img");
 	imgCard.src = character.image.url;
@@ -54,7 +54,7 @@ const createCharacterCard = (character) => {
 };
 
 /* ==== Render Characters ==== */
-export const renderCharacters = async (namesArray) => {
+export const renderCharacters = async (namesArray, type = "hero") => {
 	const containerCharacters = document.getElementById("cards-player-container");
 	containerCharacters.innerHTML = "";
 
@@ -62,7 +62,7 @@ export const renderCharacters = async (namesArray) => {
 		const character = await fetchCharactersByName(name);
 
 		if (character) {
-			const card = createCharacterCard(character);
+			const card = createCharacterCard(character, type);
 			containerCharacters.appendChild(card);
 		}
 	}
@@ -72,18 +72,13 @@ export const renderCharacters = async (namesArray) => {
 export const handleCharacterSelection = () => {
 	const charactersSelect = document.getElementById("characters-selector");
 	const selectedValue = charactersSelect.value;
-    const cards = document.querySelectorAll(".character-card");
 
 	const containerCharacters = document.getElementById("cards-player-container");
 	containerCharacters.innerHTML = "";
 
 	if (selectedValue === "heroes") {
-		renderCharacters(heroes);
+		renderCharacters(heroes, "hero");
 	} else if (selectedValue === "villians") {
-		renderCharacters(villains);
-        cards.forEach(card => {
-            card.classList.remove("hero-border");
-            card.classList.add("villain-border");
-        })
+		renderCharacters(villains, "villain");
 	}
 };
