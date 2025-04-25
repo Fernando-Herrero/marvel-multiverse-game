@@ -11,36 +11,49 @@
 		<header>
 			<nav>
 				<div class="logo"></div>
-				<div class="info-player">
+				<div id="info-player" class="info-player">
 					<p class="name-player"></p>
 					<img class="img-player" src="" alt="" />
-					<button class="close-session"></button>
+					<button id="close-session" class="close-session"></button>
 				</div>
-                <div class="game-title"></div>
-				<div class="music-icon"></div>
-				<div class="settings"></div>
+                <div id="game-title" class="game-title"></div>
+				<div id="music-icon" class="music-icon"></div>
+				<div id="settings" class="settings"></div>
 			</nav>
 		</header>
 
 		<main>
-			<section class="login-screen">
+			<section id="login-screen" class="login-screen">
+                <div id="user-login" class="user-login"></div>
+                <div id="cards-player-container" class="cards-player-container"></div>
+                <div id="start-game-btn" class="start-game-btn"></div>
+            </section>
+
+			<section id="map-screen" class="map-screen">
+                <div id="map-grid" class="map-grid"></div>
+                <div id="level-info" class="level-info">
+                    <p id="level-title">
+                        e.g. Level 2: New York 2099
+                    </p>
+                    <p id="description-multiverse"></p>
+                    <button id="enter-battle-btn"></button>
+                </div>
 
             </section>
-			<section class="map-page"></section>
-			<section class="battle-page"></section>
-			<section class="win-loose-page"></section>
+			<section id="battle-screen" class="battle-screen"></section>
+			<section id="win-loose-screen" class="win-loose-screen"></section>
 		</main>
 
-		<aside>
-			<button class="delete-progress"></button>
-			<div class="info-hero">
+		<aside id="aside">
+			<button id="delete-progress" class="delete-progress"></button>
+			<div id="info-hero" class="info-hero">
 				<img src="" alt="" class="img-player-hero" />
 				<p class="name-hero"></p>
 			</div>
 			<div class="about"></div>
 		</aside>
 
-		<footer>
+		<footer id="footer">
 			<div class="author-credits">
 				<p>© 2025 Fernando Herrero - Educational Project. Marvel: Multiversal Challenge.</p>
 			</div>

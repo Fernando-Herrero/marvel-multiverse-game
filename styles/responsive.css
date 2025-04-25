@@ -1,0 +1,23 @@
+/* Media query para dispositivos tablet (mayores a 480px y hasta 1023px) */
+@media (min-width: 481px) {
+    :root {
+        --bg-color: lightcoral;
+        --container-width: 85%;
+    }
+}
+
+/* Media query para dispositivos de escritorio (mayores a 1024px y hasta 1439px) */
+@media (min-width: 1024px) {
+    :root {
+        --bg-color: beige;
+        --container-width: 75%;
+    }
+}
+
+/* Media query para dispositivos de escritorio XXL (mayores a 1440px) */
+@media (min-width: 1440px) {
+	:root {
+        --bg-color: aquamarine;
+        --container-width: 75%;
+    }
+}
