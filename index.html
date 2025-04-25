@@ -26,17 +26,31 @@
 		</header>
 
 		<main>
+            <h1>Welcome to Marvel: Multiverse Challenge!</h1>
 			<section id="login-screen" class="login-screen container">
-				<div id="user-login" class="user-login"></div>
+				<div id="user-login" class="user-login">
+					<form id="login-form" class="login-form">
+						<label for="username">Name:</label>
+						<input
+							type="text"
+							id="username"
+							name="username"
+							placeholder="Enter your name"
+							required
+							class="login-input"
+						/>
+					</form>
+				</div>
 
-				<select name="characters-selector" id="characters-selector">
-					<option value="heroes">Heroes</option>
-					<option value="villains">Villains</option>
-				</select>
+                <select name="characters-selector" id="characters-selector" class="characters-selector">
+                    <option value="" disabled selected>Select your side</option>
+                    <option value="heroes">Heroes</option>
+                    <option value="villains">Villains</option>
+                </select>
 
 				<div id="cards-player-container" class="cards-player-container"></div>
 
-				<div id="start-game-btn" class="start-game-btn"></div>
+				<div id="start-game-btn" class="start-game-btn">Start Game</div>
 			</section>
 
 			<section id="map-screen" class="map-screen" style="display: none">
