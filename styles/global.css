@@ -1,12 +1,12 @@
 :root {
-    --accent-bg-color: #f4ede4;
+	--accent-bg-color: #f4ede4;
 	--title-color: #000;
-	--contrast-color: #FFF;
-    --text-color: #1d1d1d;
-    --text-light-color: #696969;
-    --text-secondary-color: #1264a3;
-    --primary-color: #400d40;
-    --primary-color-dark: #4a154b;
+	--contrast-color: #fff;
+	--text-color: #1d1d1d;
+	--text-light-color: #696969;
+	--text-secondary-color: #1264a3;
+	--primary-color: #400d40;
+	--primary-color-dark: #4a154b;
 
 	--container-width: 95%;
 }
@@ -18,4 +18,18 @@ body {
 .container {
 	width: var(--container-width);
 	margin: 0 auto;
+}
+
+/* ===== MAP ===== */
+#map {
+	position: relative;
+	width: 100%;
+	height: 100vh;
+	background-image: url("/media/images\ /backgrounds/map-bacground.webp");
+	background-size: cover;
+	background-position: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
 }

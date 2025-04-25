@@ -4,7 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<script src="/index.js" defer type="module"></script>
-		<link rel="shortcut icon" href="/media/images /marvel-favicon.png" type="image/x-icon" />
+		<link rel="stylesheet" href="/styles/index.css" />
+		<link rel="shortcut icon" href="/media/images /icons/marvel-favicon.png" type="image/x-icon" />
 		<title>Marvel-Multiverse</title>
 	</head>
 	<body>
@@ -16,7 +17,7 @@
 					<img class="img-player" src="" alt="" />
 					<button id="close-session" class="close-session"></button>
 				</div>
-                <div id="game-title" class="game-title"></div>
+				<div id="game-title" class="game-title"></div>
 				<div id="music-icon" class="music-icon"></div>
 				<div id="settings" class="settings"></div>
 			</nav>
@@ -24,22 +25,28 @@
 
 		<main>
 			<section id="login-screen" class="login-screen">
-                <div id="user-login" class="user-login"></div>
-                <div id="cards-player-container" class="cards-player-container"></div>
-                <div id="start-game-btn" class="start-game-btn"></div>
-            </section>
+				<div id="user-login" class="user-login"></div>
+				<div id="cards-player-container" class="cards-player-container"></div>
+				<div id="start-game-btn" class="start-game-btn"></div>
+			</section>
 
 			<section id="map-screen" class="map-screen">
-                <div id="map-grid" class="map-grid"></div>
-                <div id="level-info" class="level-info">
-                    <p id="level-title">
-                        e.g. Level 2: New York 2099
-                    </p>
-                    <p id="description-multiverse"></p>
-                    <button id="enter-battle-btn"></button>
-                </div>
-
-            </section>
+				<div id="map" class="map">
+					<div class="level" data-level="1">1</div>
+					<div class="level" data-level="2">2</div>
+					<div class="level" data-level="3">3</div>
+					<div class="level" data-level="4">4</div>
+					<div class="level" data-level="5">5</div>
+					<div class="level" data-level="6">6</div>
+					<div class="level" data-level="7">7</div>
+					<div class="level" data-level="8">8</div>
+				</div>
+				<div id="level-info" class="level-info">
+					<p id="level-title">e.g. Level 2: New York 2099</p>
+					<p id="description-multiverse"></p>
+					<button id="enter-battle-btn"></button>
+				</div>
+			</section>
 			<section id="battle-screen" class="battle-screen"></section>
 			<section id="win-loose-screen" class="win-loose-screen"></section>
 		</main>
