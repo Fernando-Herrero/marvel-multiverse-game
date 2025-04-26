@@ -13,4 +13,3 @@ export const hideModal = () => {
     document.body.style.overflow = "auto";
 };
 
-

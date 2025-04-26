@@ -13,6 +13,8 @@ export let imgPlayer = document.getElementById("img-player");
 const settingsIcon = document.getElementById("navbar-settings");
 const aside = document.getElementById("aside");
 const infoHeroContainer = document.getElementById("info-hero");
+const volumeIcon = document.getElementById("volume-icon");
+const volumeSlider = document.getElementById("volume-slider")
 
 //Btn Start Game disability till fill name and select character
 export const checkFormValidity = () => {
@@ -82,24 +84,35 @@ const setupEventListeners = () => {
 	});
 
 	document.addEventListener("keydown", (e) => {
-		if (e.key === "Escape" && modalBackdrop.style.display === "flex") {
-			hideModal();
+		if (e.key === "Escape") {
+			if (modalBackdrop.style.display === "flex") {
+				hideModal();
+			}
+			if ((aside.style.display = "flex")) {
+				aside.style.display = "none";
+			}
 		}
 	});
 
 	settingsIcon.addEventListener("click", () => {
-		aside.style.display = "flex";
 
-		const selectedCard = document.querySelector(".character-card.selected-card");
-		if (selectedCard) {
-			const cardClone = selectedCard.cloneNode(true);
+		aside.classList.toggle("show");
 
-			cardClone.classList.remove("selected-card");
-
-			infoHeroContainer.innerHTML = "";
-			infoHeroContainer.appendChild(cardClone);
+		if (aside.classList.contains("show")) {
+			const selectedCard = document.querySelector(".character-card.selected-card");
+			if (selectedCard) {
+				const cardClone = selectedCard.cloneNode(true);
+				cardClone.classList.remove("selected-card");
+				cardClone.style.pointerEvents = "none";
+				infoHeroContainer.innerHTML = "";
+				infoHeroContainer.appendChild(cardClone);
+			}
 		}
 	});
+
+	volumeIcon.addEventListener("click", () => {
+		volumeSlider.classList.toggle("show-slider");
+	})
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
