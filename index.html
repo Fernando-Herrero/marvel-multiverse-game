@@ -13,17 +13,22 @@
 	</head>
 	<body>
 		<header>
-			<nav id="navbar" class="navbar container" style="display: none;">
+			<nav id="navbar" class="navbar" style="display: none">
 				<div class="logo">
 					<img src="/media/images/icons/marvel-favicon.png" alt="Logo de Marvel" />
 				</div>
-				<div id="info-player" class="info-player">
-					<p id="name-player" class="name-player"></p>
-					<img id="img-player" class="img-player" />
-					<button id="close-session" class="close-session">Close session</button>
+				<div id="navbar-settings" class="navbar-settings">
+					<img src="/media/images/icons/settings.webp" alt="settings icon" />
 				</div>
-				<div id="music-icon" class="music-icon"></div>
-				<div id="settings" class="settings"></div>
+				<div id="navbar-menu" style="display: none">
+					<div id="info-player" class="info-player">
+						<p id="name-player" class="name-player"></p>
+						<img id="img-player" class="img-player" />
+						<button id="close-session" class="close-session">Logout</button>
+					</div>
+					<div id="music-icon" class="music-icon"></div>
+					<div id="settings" class="settings"></div>
+				</div>
 			</nav>
 		</header>
 
@@ -77,13 +82,12 @@
 			<section id="win-loose-screen" class="win-loose-screen"></section>
 		</main>
 
-		<aside id="aside" style="display: none">
-			<button id="delete-progress" class="delete-progress"></button>
-			<div id="info-hero" class="info-hero">
-				<img src="" alt="" class="img-player-hero" />
-				<p class="name-hero"></p>
+		<aside id="aside" class="aside" style="display: none">
+			<div id="info-hero" class="info-hero"></div>
+			<button id="reset" class="reset">Reset</button>
+			<div class="about">
+				<a href="#">About</a>
 			</div>
-			<div class="about"></div>
 		</aside>
 
 		<footer id="footer" class="footer">

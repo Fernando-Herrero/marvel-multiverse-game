@@ -10,6 +10,9 @@ const mapScreen = document.getElementById("map-screen");
 export const navbar = document.getElementById("navbar");
 let namePlayer = document.getElementById("name-player");
 export let imgPlayer = document.getElementById("img-player");
+const settingsIcon = document.getElementById("navbar-settings");
+const aside = document.getElementById("aside");
+const infoHeroContainer = document.getElementById("info-hero");
 
 //Btn Start Game disability till fill name and select character
 export const checkFormValidity = () => {
@@ -48,23 +51,26 @@ const setupEventListeners = () => {
 			return;
 		}
 
-		loginScreen.style.display = "none";
-		mapScreen.style.display = "block";
-		navbar.style.display = "flex";
-
 		const selectedCard = document.querySelector(".character-card.selected-card");
-		if (selectedCard) {
-			const imgElement = selectedCard.querySelector("img");
-			saveToStorage("playerImg", imgElement.src);
+		if (!selectedCard) {
+			showModal("No se ha seleccionado ningún personaje");
+			return;
 		}
 
 		saveToStorage("gameStarted", true);
 		saveToStorage("playerName", inputUserName.value);
+		saveToStorage("playerImg", imgElement.src);
+
+		loginScreen.style.display = "none";
+		mapScreen.style.display = "block";
+		navbar.style.display = "flex";
 
 		namePlayer.textContent = inputUserName.value;
-		if (selectedCard) {
-			imgPlayer.src = selectedCard.querySelector("img").src;
-		}
+		imgPlayer.src = selectedCard.querySelector("img").src;
+
+		const cardClone = selectedCard.cloneNode(true);
+		infoHeroContainer.innerHTML = "";
+		infoHeroContainer.appendChild(cardClone);
 	});
 
 	modalCloseBtn.addEventListener("click", hideModal);
@@ -78,6 +84,20 @@ const setupEventListeners = () => {
 	document.addEventListener("keydown", (e) => {
 		if (e.key === "Escape" && modalBackdrop.style.display === "flex") {
 			hideModal();
+		}
+	});
+
+	settingsIcon.addEventListener("click", () => {
+		aside.style.display = "flex";
+
+		const selectedCard = document.querySelector(".character-card.selected-card");
+		if (selectedCard) {
+			const cardClone = selectedCard.cloneNode(true);
+
+			cardClone.classList.remove("selected-card");
+
+			infoHeroContainer.innerHTML = "";
+			infoHeroContainer.appendChild(cardClone);
 		}
 	});
 };
@@ -115,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		const savedPlayerName = loadFromStorage("playerName");
 		const savedPlayerImg = loadFromStorage("playerImg");
 
-		if(savedPlayerName) namePlayer.textContent = savedPlayerName;
+		if (savedPlayerName) namePlayer.textContent = savedPlayerName;
 		if (savedPlayerImg) imgPlayer.src = savedPlayerImg;
 	} else {
 		loginScreen.style.display = "flex";
