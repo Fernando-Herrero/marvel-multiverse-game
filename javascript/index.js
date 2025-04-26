@@ -1,6 +1,6 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
-import { loadFromStorage, saveToStorage } from "./storage.js";
-import { hideModal, modalBackdrop, modalCloseBtn, showModal } from "./utils.js";
+import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
+import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showModal } from "./utils.js";
 
 const inputUserName = document.getElementById("username");
 const charactersSelect = document.getElementById("characters-selector");
@@ -14,7 +14,9 @@ const settingsIcon = document.getElementById("navbar-settings");
 const aside = document.getElementById("aside");
 const infoHeroContainer = document.getElementById("info-hero");
 const volumeIcon = document.getElementById("volume-icon");
-const volumeSlider = document.getElementById("volume-slider")
+const volumeSlider = document.getElementById("volume-slider");
+const logout = document.getElementById("close-session");
+const reset = document.getElementById("reset");
 
 //Btn Start Game disability till fill name and select character
 export const checkFormValidity = () => {
@@ -59,23 +61,24 @@ const setupEventListeners = () => {
 			return;
 		}
 
-		saveToStorage("gameStarted", true);
-		saveToStorage("playerName", inputUserName.value);
-		saveToStorage("playerImg", imgElement.src);
-
 		loginScreen.style.display = "none";
 		mapScreen.style.display = "block";
 		navbar.style.display = "flex";
 
 		namePlayer.textContent = inputUserName.value;
-		imgPlayer.src = selectedCard.querySelector("img").src;
+		const imgElement = selectedCard.querySelector("img");
+		imgPlayer.src = imgElement.src;
+
+		saveToStorage("gameStarted", true);
+		saveToStorage("playerName", inputUserName.value);
+		saveToStorage("playerImg", imgElement.src);
 
 		const cardClone = selectedCard.cloneNode(true);
 		infoHeroContainer.innerHTML = "";
 		infoHeroContainer.appendChild(cardClone);
 	});
 
-	modalCloseBtn.addEventListener("click", hideModal);
+	modalAcceptBtn.addEventListener("click", hideModal);
 
 	modalBackdrop.addEventListener("click", (e) => {
 		if (e.target === modalBackdrop) {
@@ -95,7 +98,6 @@ const setupEventListeners = () => {
 	});
 
 	settingsIcon.addEventListener("click", () => {
-
 		aside.classList.toggle("show");
 
 		if (aside.classList.contains("show")) {
@@ -112,7 +114,45 @@ const setupEventListeners = () => {
 
 	volumeIcon.addEventListener("click", () => {
 		volumeSlider.classList.toggle("show-slider");
-	})
+	});
+
+	logout.addEventListener("click", () => {
+		clearStorageKey("userName");
+		clearStorageKey("selectedCharacter");
+		clearStorageKey("gameStarted");
+
+		loginScreen.style.display = "flex";
+		mapScreen.style.display = "none";
+		navbar.style.display = "none";
+
+		inputUserName.value = " ";
+		const selectedCard = document.querySelector(".character-card.selected-card");
+		selectedCard?.classList.remove("selected-card");
+
+		aside.style.display = "none";
+
+		showModal("Has cerrado sesión correctamente");
+	});
+
+	reset.addEventListener("click", () => {
+		aside.style.display = "none";
+
+		showModal("Are you sure you want to reset the game? You will lose all your progress", {
+			isConfirmation: true,
+			confirmText: "Yes, reset",
+			cancelText: "Keep playing",
+		});
+
+		modalAcceptBtn.onclick = () => {
+
+			localStorage.clear();
+			window.location.reload();
+			mapScreen.style.display = "none";
+			loginScreen.style.display = "flex";
+		};
+
+		modalCloseBtn.onclick = hideModal;
+	});
 };
 
 document.addEventListener("DOMContentLoaded", async () => {

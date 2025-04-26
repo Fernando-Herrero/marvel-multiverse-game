@@ -424,12 +424,32 @@ h1 {
     min-width: 180px;
 }
 
+.close-session {
+    background-color: var(--text-light-color);
+    color: var(--neutral-color);
+    border: none;
+    border-radius: 12px;
+    padding: 6px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.close-session:hover {
+    transform: translateY(-2px);
+}
+
 .reset-btn {
     background-color: var(--text-secondary-color);
     color: var(--text-color);
     border: none;
     border-radius: 12px;
     padding: 6px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
 }
 
 .volume-control {
@@ -549,7 +569,7 @@ h1 {
 	font-size: 16px;
 }
 
-#modal-close-btn {
+#modal-accept-btn {
 	background-color: var(--accent-color);
 	color: var(--text-color);
 	border: none;
@@ -563,8 +583,22 @@ h1 {
 	font-size: 14px;
 }
 
-#modal-close-btn:hover {
-	background-color: var(--text-secondary-color);
+#modal-close-btn {
+    background-color: var(--neutral-color);
+    color: var(--text-color);
+    border: none;
+    padding: 11px 32px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+#modal-accept-btn:hover, #modal-close-btn:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
