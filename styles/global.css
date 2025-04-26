@@ -125,6 +125,14 @@ h1 {
 	background-color: var(--primary-color);
 }
 
+.choose-text {
+	font-size: 24px;
+	font-weight: bold;
+	color: var(--hero-color);
+	text-shadow: 1px 1px 2px #000000;
+	letter-spacing: 1px;
+}
+
 .start-game-btn {
 	padding: 12px 24px;
 	background-color: var(--hero-color);
@@ -171,9 +179,8 @@ h1 {
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.character-card:hover {
+.character-card:hover:not(.selected-card) {
 	transform: translateY(-6px);
-	box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.6);
 }
 
 .hero-border {
@@ -229,6 +236,39 @@ h1 {
 .character-select:focus {
 	outline: none;
 	border-color: var(--text-secondary-color);
+}
+
+.selected-card {
+	transform: scale(1.05);
+	box-shadow: 0 0 15px gold;
+	border: 3px solid gold;
+}
+
+#cards-player-container.loading {
+	position: relative;
+	min-height: 200px;
+}
+
+#cards-player-container.loading::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	border: 4px solid var(--contrast-color);
+	border-top: 4px solid var(--hero-color);
+	border-radius: 50%;
+	width: 30px;
+	height: 30px;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: translate(-50%, -50%) rotate(0deg);
+	}
+	100% {
+		transform: translate(-50%, -50%) rotate(360deg);
+	}
 }
 
 /* ===== MAP ===== */
@@ -311,16 +351,73 @@ h1 {
 	transform: translateX(-50%);
 }
 
-#map-path {
-	position: absolute;
+/* ===== Modal Message ===== */
+.modal-backdrop {
+	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-	pointer-events: none;
-	z-index: 1;
+	background-color: rgba(0, 0, 0, 0.85);
+	display: none;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	backdrop-filter: blur(3px);
 }
 
-#player {
-	transition: cx 0.5s, cy 0.5s;
+.modal-card {
+	background: var(--primary-color);
+	padding: 32px;
+	border-radius: 10px;
+	width: 95%; /* Mantenemos el porcentaje para responsividad */
+	max-width: 400px;
+	text-align: center;
+	box-shadow: var(--box-shadow);
+	animation: modalFadeIn 0.3s ease-out;
+	border: 1px solid var(--accent-color);
+}
+
+.modal-card h3 {
+	color: var(--text-secondary-color);
+	margin-bottom: 16px;
+	font-size: 24px;
+}
+
+.modal-card p {
+	color: var(--text-light-color);
+	margin-bottom: 24px;
+	line-height: 24px;
+	font-size: 16px;
+}
+
+#modal-close-btn {
+	background-color: var(--accent-color);
+	color: var(--text-color);
+	border: none;
+	padding: 11px 32px;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: all 0.3s;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 14px;
+}
+
+#modal-close-btn:hover {
+	background-color: var(--text-secondary-color);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }

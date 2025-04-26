@@ -1,4 +1,5 @@
-import { saveToStorage } from "./storage.js";
+import { checkFormValidity } from "./index.js";
+import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
 
@@ -26,6 +27,7 @@ const fetchCharactersByName = async (name) => {
 const createCharacterCard = (character, type) => {
 	const card = document.createElement("div");
 	card.classList.add("character-card", `${type}-border`);
+	card.dataset.id = character.id;
 
 	const imgCard = document.createElement("img");
 	imgCard.src = character.image.url;
@@ -59,6 +61,7 @@ const createCharacterCard = (character, type) => {
 export const renderCharacters = async (namesArray, type = "hero") => {
 	const containerCharacters = document.getElementById("cards-player-container");
 	containerCharacters.innerHTML = "";
+    containerCharacters.classList.add("loading");
 
 	for (const name of namesArray) {
 		const character = await fetchCharactersByName(name);
@@ -68,21 +71,39 @@ export const renderCharacters = async (namesArray, type = "hero") => {
 			containerCharacters.appendChild(card);
 		}
 	}
+
+    containerCharacters.classList.remove("loading");
 };
 
 /* ==== Select Characters ==== */
-export const handleCharacterSelection = () => {
+export const handleCharacterSelection = async (initialLoad = false) => {
 	const charactersSelect = document.getElementById("characters-selector");
 	const selectedValue = charactersSelect.value;
 
-    saveToStorage("characterType", selectedValue);
+	saveToStorage("characterType", selectedValue);
 
 	const containerCharacters = document.getElementById("cards-player-container");
 	containerCharacters.innerHTML = "";
 
 	if (selectedValue === "heroes") {
-		renderCharacters(heroes, "hero");
+		await renderCharacters(heroes, "hero");
 	} else if (selectedValue === "villains") {
-		renderCharacters(villains, "villain");
+		await renderCharacters(villains, "villain");
+	}
+
+	if (initialLoad) {
+		const savedCharacterId = loadFromStorage("selectedCharacter");
+
+		if (savedCharacterId) {
+			const card = document.querySelector(`.character-card[data-id="${savedCharacterId}"]`);
+
+			if (card) {
+				card.classList.add("selected-card");
+				checkFormValidity();
+			}
+		}
+	} else {
+		clearStorageKey("selectedCharacter");
+		checkFormValidity();
 	}
 };

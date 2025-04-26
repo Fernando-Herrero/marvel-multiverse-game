@@ -26,7 +26,7 @@
 		</header>
 
 		<main>
-            <h1>Welcome to Marvel: Multiverse Challenge!</h1>
+			<h1>Welcome to Marvel: Multiverse Challenge!</h1>
 			<section id="login-screen" class="login-screen container">
 				<div id="user-login" class="user-login">
 					<form id="login-form" class="login-form">
@@ -42,15 +42,18 @@
 					</form>
 				</div>
 
-                <select name="characters-selector" id="characters-selector" class="characters-selector">
-                    <option value="" disabled selected>Select your side</option>
-                    <option value="heroes">Heroes</option>
-                    <option value="villains">Villains</option>
-                </select>
+				<p class="choose-text">Assemble your Fighter!</p>
+
+				<select name="characters-selector" id="characters-selector" class="characters-selector">
+					<option value="" disabled selected>Select your side</option>
+					<option value="heroes">Heroes</option>
+					<option value="villains">Villains</option>
+				</select>
 
 				<div id="cards-player-container" class="cards-player-container"></div>
 
 				<div id="start-game-btn" class="start-game-btn">Start Game</div>
+				<p id="error-message" class="error-message" style="display: none">Please fill in all fields</p>
 			</section>
 
 			<section id="map-screen" class="map-screen" style="display: none">
@@ -90,5 +93,12 @@
 				<p>Beta 0.1</p>
 			</div>
 		</footer>
+		<div id="modal-backdrop" class="modal-backdrop">
+			<div class="modal-card">
+				<h3>Atención</h3>
+				<p id="modal-message"></p>
+				<button id="modal-close-btn">Aceptar</button>
+			</div>
+		</div>
 	</body>
 </html>
