@@ -1,4 +1,4 @@
-import { checkFormValidity } from "./index.js";
+import { checkFormValidity, imgPlayer, navbar } from "./index.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
@@ -87,8 +87,10 @@ export const handleCharacterSelection = async (initialLoad = false) => {
 
 	if (selectedValue === "heroes") {
 		await renderCharacters(heroes, "hero");
+        navbar.style.background = "var(--hero-color)";
 	} else if (selectedValue === "villains") {
 		await renderCharacters(villains, "villain");
+        navbar.style.background = "var(--villain-color)";
 	}
 
 	if (initialLoad) {

@@ -90,6 +90,41 @@ h1 {
 	}
 }
 
+/* ===== Navbar ===== */
+.navbar {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--contrast-color);
+}
+
+.logo {
+    max-width: 80px;
+}
+
+.logo img {
+    width: 100%;
+}
+
+.info-player {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.name-player {
+    color: var(--text-color);
+}
+
+.img-player {
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
 /* ===== Login Screen ===== */
 .login-screen {
 	display: flex;
@@ -451,6 +486,7 @@ h1 {
 	order: 2;
 	display: flex;
 	gap: 15px;
+    cursor: pointer;
 }
 
 .game-version {

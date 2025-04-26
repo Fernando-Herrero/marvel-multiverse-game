@@ -7,9 +7,11 @@ const charactersSelect = document.getElementById("characters-selector");
 const startGameBtn = document.getElementById("start-game-btn");
 const loginScreen = document.getElementById("login-screen");
 const mapScreen = document.getElementById("map-screen");
+export const navbar = document.getElementById("navbar");
+let namePlayer = document.getElementById("name-player");
+export let imgPlayer = document.getElementById("img-player");
 
-
-//Funcion para mantener el boton de empezar desabilitado hasta que no se rellene login y character
+//Btn Start Game disability till fill name and select character
 export const checkFormValidity = () => {
 	const name = inputUserName.value.trim();
 	const selectedCard = document.querySelector(".character-card.selected-card");
@@ -43,11 +45,26 @@ const setupEventListeners = () => {
 		if (startGameBtn.disabled) {
 			e.preventDefault();
 			showModal("Por favor, introduce un nombre de usuario y selecciona un personaje");
-        return;
+			return;
 		}
 
 		loginScreen.style.display = "none";
 		mapScreen.style.display = "block";
+		navbar.style.display = "flex";
+
+		const selectedCard = document.querySelector(".character-card.selected-card");
+		if (selectedCard) {
+			const imgElement = selectedCard.querySelector("img");
+			saveToStorage("playerImg", imgElement.src);
+		}
+
+		saveToStorage("gameStarted", true);
+		saveToStorage("playerName", inputUserName.value);
+
+		namePlayer.textContent = inputUserName.value;
+		if (selectedCard) {
+			imgPlayer.src = selectedCard.querySelector("img").src;
+		}
 	});
 
 	modalCloseBtn.addEventListener("click", hideModal);
@@ -58,12 +75,11 @@ const setupEventListeners = () => {
 		}
 	});
 
-	document.addEventListener("keydown", () => {
+	document.addEventListener("keydown", (e) => {
 		if (e.key === "Escape" && modalBackdrop.style.display === "flex") {
 			hideModal();
 		}
 	});
-
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -75,18 +91,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const savedCharacterType = loadFromStorage("characterType") || "heroes";
 	charactersSelect.value = savedCharacterType;
 
-await new Promise(resolve => {
-        charactersSelect.addEventListener("change", resolve, { once: true });
-        charactersSelect.dispatchEvent(new Event("change"));
-    });
-
+	await new Promise((resolve) => {
+		charactersSelect.addEventListener("change", resolve, { once: true });
+		charactersSelect.dispatchEvent(new Event("change"));
+	});
 
 	const savedCharacterId = loadFromStorage("selectedCharacter");
-    if (savedCharacterId) {
-        const selectedCard = document.querySelector(`.character-card[data-id="${savedCharacterId}"]`);
-        if (selectedCard) {
-            selectedCard.classList.add("selected-card");
-            checkFormValidity();
-        }
-    }
+	if (savedCharacterId) {
+		const selectedCard = document.querySelector(`.character-card[data-id="${savedCharacterId}"]`);
+		if (selectedCard) {
+			selectedCard.classList.add("selected-card");
+			checkFormValidity();
+		}
+	}
+
+	const gameStarted = loadFromStorage("gameStarted");
+
+	if (gameStarted) {
+		loginScreen.style.display = "none";
+		mapScreen.style.display = "block";
+		navbar.style.display = "flex";
+
+		const savedPlayerName = loadFromStorage("playerName");
+		const savedPlayerImg = loadFromStorage("playerImg");
+
+		if(savedPlayerName) namePlayer.textContent = savedPlayerName;
+		if (savedPlayerImg) imgPlayer.src = savedPlayerImg;
+	} else {
+		loginScreen.style.display = "flex";
+		mapScreen.style.display = "none";
+	}
 });

@@ -7,19 +7,21 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/md5.min.js"></script>
 		<script src="/javascript/index.js" defer type="module"></script>
 		<link rel="stylesheet" href="/styles/index.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 		<link rel="shortcut icon" href="/media/images/icons/marvel-favicon.png" type="image/x-icon" />
 		<title>Marvel-Multiverse</title>
 	</head>
 	<body>
 		<header>
-			<nav>
-				<div class="logo"></div>
-				<div id="info-player" class="info-player">
-					<p class="name-player"></p>
-					<img class="img-player" src="" alt="" />
-					<button id="close-session" class="close-session"></button>
+			<nav id="navbar" class="navbar container" style="display: none;">
+				<div class="logo">
+					<img src="/media/images/icons/marvel-favicon.png" alt="Logo de Marvel" />
 				</div>
-				<div id="game-title" class="game-title"></div>
+				<div id="info-player" class="info-player">
+					<p id="name-player" class="name-player"></p>
+					<img id="img-player" class="img-player" />
+					<button id="close-session" class="close-session">Close session</button>
+				</div>
 				<div id="music-icon" class="music-icon"></div>
 				<div id="settings" class="settings"></div>
 			</nav>
@@ -75,7 +77,7 @@
 			<section id="win-loose-screen" class="win-loose-screen"></section>
 		</main>
 
-		<aside id="aside" style="display: none;">
+		<aside id="aside" style="display: none">
 			<button id="delete-progress" class="delete-progress"></button>
 			<div id="info-hero" class="info-hero">
 				<img src="" alt="" class="img-player-hero" />
@@ -88,7 +90,17 @@
 			<div class="author-credits">
 				<p>© 2025 Fernando Herrero - Educational Project. Marvel: Multiversal Challenge.</p>
 			</div>
-			<div class="icons"></div>
+			<div class="icons">
+				<a href="https://github.com/Fernando-Herrero">
+					<i class="contact-icons fa-brands fa-github animate"></i>
+				</a>
+				<a href="https://www.linkedin.com/in/fernando-herrero-nunez/">
+					<i class="contact-icons fa-brands fa-linkedin animate"></i>
+				</a>
+				<a href="mailto: herrerofernando@gmail.com">
+					<i class="contact-icons fa-solid fa-envelope animate"></i>
+				</a>
+			</div>
 			<div class="game-version">
 				<p>Beta 0.1</p>
 			</div>
