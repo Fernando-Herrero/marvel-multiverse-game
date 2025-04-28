@@ -301,6 +301,22 @@ h1 {
 }
 
 /* ===== MAP ===== */
+.player {
+	position: absolute;
+	top: 0%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.img-player {
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+
 #map {
 	position: relative;
 	width: 100%;
@@ -409,14 +425,6 @@ h1 {
 .name-player {
     color: var(--text-color);
     font-family: 'Cinzel', serif;
-}
-
-.img-player {
-    width: 30px;
-    height: 30px;
-    border-radius: 100%;
-    object-fit: cover;
-    object-position: center;
 }
 
 .info-hero {
