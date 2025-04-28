@@ -88,9 +88,11 @@ export const handleCharacterSelection = async (initialLoad = false) => {
 	if (selectedValue === "heroes") {
 		await renderCharacters(heroes, "hero");
         navbar.style.background = "var(--hero-color)";
+		imgPlayer.style.border = "2px solid var(--hero-color)";
 	} else if (selectedValue === "villains") {
 		await renderCharacters(villains, "villain");
         navbar.style.background = "var(--villain-color)";
+		imgPlayer.style.border = "2px solid var(--villain-color)";
 	}
 
 	if (initialLoad) {
