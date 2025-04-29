@@ -395,6 +395,14 @@ h1 {
 	transform: translateX(-50%);
 }
 
+.enemy-character {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	object-fit: cover;
+	object-position: center;
+}
+
 /* ===== Aside ===== */
 .aside {
 	display: none;

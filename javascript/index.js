@@ -1,5 +1,5 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
-import { imageEnemies } from "./map.js";
+import { enemiesInLevel, imageEnemies } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
@@ -119,7 +119,7 @@ const setupEventListeners = () => {
 			if (modalBackdrop.style.display === "flex") {
 				hideModal();
 			}
-			if ((aside.style.display = "flex")) {
+			if ((aside.style.display === "flex")) {
 				aside.style.display = "none";
 			}
 		}
@@ -152,6 +152,7 @@ const setupEventListeners = () => {
 		loginScreen.style.display = "flex";
 		mapScreen.style.display = "none";
 		navbar.style.display = "none";
+		title.style.display = "flex";
 
 		inputUserName.value = " ";
 		const selectedCard = document.querySelector(".character-card.selected-card");
@@ -176,6 +177,7 @@ const setupEventListeners = () => {
 			window.location.reload();
 			mapScreen.style.display = "none";
 			loginScreen.style.display = "flex";
+			title.style.display = "flex";
 		};
 
 		modalCloseBtn.onclick = hideModal;
@@ -184,6 +186,7 @@ const setupEventListeners = () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
 	setupEventListeners();
+	enemiesInLevel();
 
 	const savedUserName = loadFromStorage("userName") || "";
 	inputUserName.value = savedUserName;

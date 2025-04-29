@@ -1,4 +1,5 @@
-import { createCharacterCard, fetchCharactersByName } from "./character.js";
+import { fetchCharactersByName } from "./character.js";
+import { selectedValue } from "./utils.js";
 
 export const levelEnemies = {
 	heroes: [
@@ -103,6 +104,8 @@ export const levelEnemies = {
 	],
 };
 
+const levels = document.querySelectorAll(".level");
+
 export const imageEnemies = async () => {
 	for (const enemy of levelEnemies.heroes) {
 		const characterData = await fetchCharactersByName(enemy.name);
@@ -119,4 +122,33 @@ export const imageEnemies = async () => {
 	}
 
 	return levelEnemies;
+};
+
+export const enemiesInLevel = async () => {
+	await imageEnemies();
+
+	const enemiesToUse = selectedValue === "heroes" ? levelEnemies.villains : levelEnemies.heroes;
+
+	levels.forEach((level) => {
+		const levelNumber = parseInt(level.dataset.level);
+
+		const enemiesForThisLevel = enemiesToUse.find((enemy) => enemy.level === levelNumber);
+
+		if (enemiesForThisLevel && enemiesForThisLevel.imageUrl) {
+			const imgEnemie = document.createElement("img");
+			imgEnemie.src = enemiesForThisLevel.imageUrl;
+			imgEnemie.alt = enemiesForThisLevel.name;
+			imgEnemie.classList.add("enemy-character");
+
+			level.appendChild(imgEnemie);
+		}
+
+		// if (levelNumber < currentLevel) {
+		// 	level.classList.add("unlocked");
+		// } else if (levelNumber === currentLevel) {
+		// 	level.classList.add("level-current");
+		// } else {
+		// 	level.classList.add("locked");
+		// }
+	});
 };
