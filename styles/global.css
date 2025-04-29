@@ -60,7 +60,7 @@ a {
 body {
 	background: var(--bg-color);
 	color: var(--text-color);
-    margin: 0;
+	margin: 0;
 }
 
 .container {
@@ -92,30 +92,30 @@ h1 {
 
 /* ===== Navbar ===== */
 .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px;
-    border-bottom: 1px solid var(--contrast-color);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 6px;
+	border-bottom: 1px solid var(--contrast-color);
 }
 
 .logo {
-    max-width: 80px;
+	max-width: 80px;
 }
 
 .logo img {
-    width: 100%;
-    border: 1px solid var(--contrast-color);
+	width: 100%;
+	border: 1px solid var(--contrast-color);
 }
 
 .navbar-settings {
-    width: 40px;
-    height: 40px;
+	width: 40px;
+	height: 40px;
 }
 
 .navbar-settings img {
-    width: 100%;
-    cursor: pointer;
+	width: 100%;
+	cursor: pointer;
 }
 
 /* ===== Login Screen ===== */
@@ -303,24 +303,24 @@ h1 {
 /* ===== MAP ===== */
 .player {
 	position: absolute;
-	top: 0%;
+	top: 1%;
 	left: 50%;
 	transform: translateX(-50%);
 }
 
 .img-player {
-    width: 80px;
-    height: 80px;
-    border-radius: 100%;
-    object-fit: cover;
-    object-position: center;
+	width: 80px;
+	height: 80px;
+	border-radius: 100%;
+	object-fit: cover;
+	object-position: center;
 }
 
 #map {
 	position: relative;
 	width: 100%;
 	height: 100vh;
-	background-image: url("/media/images/backgrounds/map-background.webp");
+	background-image: url("/media/images/backgrounds/background-endgame.jpg");
 	background-size: cover;
 	background-position: center;
 	overflow: hidden;
@@ -333,7 +333,7 @@ h1 {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 0, 0, 0.6);
+	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 1;
 }
 
@@ -397,104 +397,104 @@ h1 {
 
 /* ===== Aside ===== */
 .aside {
-    display: none;
-    position: absolute;
-    flex-direction: column;
-    background-color: var(--primary-color-dark);
-    color: var(--text-color);
-    padding: 12px;
-    z-index: 10000;
-    top: 60px;
-    right: 0px;
-    width: 100%;
-    gap: 8px;
+	display: none;
+	position: absolute;
+	flex-direction: column;
+	background-color: var(--primary-color-dark);
+	color: var(--text-color);
+	padding: 12px;
+	z-index: 10000;
+	top: 60px;
+	right: 0px;
+	width: 100%;
+	gap: 8px;
 }
 
 .aside.show {
-    display: flex;
+	display: flex;
 }
 
 .info-player {
-    display: flex;
-    align-items: center;
-    align-self: center;
-    gap: 12px;
+	display: flex;
+	align-items: center;
+	align-self: center;
+	gap: 12px;
 }
 
 .name-player {
-    color: var(--text-color);
-    font-family: 'Cinzel', serif;
+	color: var(--text-color);
+	font-family: "Cinzel", serif;
 }
 
 .info-hero {
-    align-self: center;
-    min-width: 180px;
+	align-self: center;
+	min-width: 180px;
 }
 
 .close-session {
-    background-color: var(--text-light-color);
-    color: var(--neutral-color);
-    border: none;
-    border-radius: 12px;
-    padding: 6px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
+	background-color: var(--text-light-color);
+	color: var(--neutral-color);
+	border: none;
+	border-radius: 12px;
+	padding: 6px;
+	cursor: pointer;
+	transition: transform 0.3s ease;
 }
 
 .close-session:hover {
-    transform: translateY(-2px);
+	transform: translateY(-2px);
 }
 
 .reset-btn {
-    background-color: var(--text-secondary-color);
-    color: var(--text-color);
-    border: none;
-    border-radius: 12px;
-    padding: 6px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
+	background-color: var(--text-secondary-color);
+	color: var(--text-color);
+	border: none;
+	border-radius: 12px;
+	padding: 6px;
+	cursor: pointer;
+	transition: transform 0.3s ease;
 }
 
 .reset-btn:hover {
-    transform: translateY(-2px);
+	transform: translateY(-2px);
 }
 
 .volume-control {
-    display: flex;
-    align-self: center;   
+	display: flex;
+	align-self: center;
 }
 
 .volume-control img {
-    width: 100%;
-    width: 30px;
-    height: 30px;
-    background-color: var(--contrast-color);
-    border: 1px solid var(--contrast-color);
-    border-radius: 50%;
-    cursor: pointer;
+	width: 100%;
+	width: 30px;
+	height: 30px;
+	background-color: var(--contrast-color);
+	border: 1px solid var(--contrast-color);
+	border-radius: 50%;
+	cursor: pointer;
 }
 
 .volume-slider {
-    display: none;
-    cursor: pointer;
-    opacity: 0;
+	display: none;
+	cursor: pointer;
+	opacity: 0;
 }
 
 .volume-slider:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 .show-slider {
-    display: block;
-    width: 100%;
-    opacity: 1;
+	display: block;
+	width: 100%;
+	opacity: 1;
 }
 
 .about {
-    align-self: center;
-    font-weight: lighter;
-    font-size: 12px;
-    text-decoration: underline;
+	align-self: center;
+	font-weight: lighter;
+	font-size: 12px;
+	text-decoration: underline;
 }
 
 /* ===== Footer ===== */
@@ -503,11 +503,11 @@ h1 {
 	color: var(--text-light-color);
 	border-top: 1px solid var(--accent-color);
 	font-size: 12px;
-    display: flex;
+	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: 15px;
-    margin-top: 50px;
+	margin-top: 50px;
 	padding: 10px 0;
 }
 
@@ -525,7 +525,7 @@ h1 {
 	order: 2;
 	display: flex;
 	gap: 15px;
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .game-version {
@@ -552,6 +552,7 @@ h1 {
 }
 
 .modal-card {
+	flex-direction: column;
 	background: var(--primary-color);
 	padding: 32px;
 	border-radius: 10px;
@@ -591,21 +592,22 @@ h1 {
 }
 
 #modal-close-btn {
-    background-color: var(--neutral-color);
-    color: var(--text-color);
-    border: none;
-    padding: 11px 32px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 14px;
-    margin-top: 10px;
+	background-color: var(--neutral-color);
+	color: var(--text-color);
+	border: none;
+	padding: 11px 32px;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: all 0.3s;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 14px;
+	margin-top: 10px;
 }
 
-#modal-accept-btn:hover, #modal-close-btn:hover {
+#modal-accept-btn:hover,
+#modal-close-btn:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
@@ -621,3 +623,46 @@ h1 {
 	}
 }
 
+/* ===== Briefing Message ===== */
+.briefing-card {
+	flex-direction: column;
+	background: var(--primary-color);
+	padding: 32px;
+	border-radius: 10px;
+	width: 95%;
+	max-width: 400px;
+	text-align: center;
+	box-shadow: var(--box-shadow);
+	animation: modalFadeIn 0.3s ease-out;
+	border: 1px solid var(--accent-color);
+}
+
+.briefing-card h3 {
+	color: var(--text-secondary-color);
+	margin-bottom: 16px;
+	font-size: 24px;
+}
+
+.briefing-card p {
+	color: var(--text-light-color);
+	margin-bottom: 24px;
+	line-height: 24px;
+	font-size: 16px;
+}
+
+#briefing-before-btn,
+#briefing-after-btn {
+	background-color: var(--neutral-color);
+	color: var(--text-color);
+	border: none;
+	padding: 11px 32px;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: all 0.3s;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 14px;
+	margin-top: 10px;
+	align-self: center;
+}

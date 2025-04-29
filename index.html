@@ -31,7 +31,7 @@
 		</header>
 
 		<main>
-			<h1>Welcome to Marvel: Multiverse Challenge!</h1>
+			<h1 id="h1">Welcome to Marvel: Multiverse Challenge!</h1>
 			<section id="login-screen" class="login-screen container">
 				<div id="user-login" class="user-login">
 					<form id="login-form" class="login-form">
@@ -119,11 +119,18 @@
 			</div>
 		</footer>
 		<div id="modal-backdrop" class="modal-backdrop">
-			<div class="modal-card">
+			<div id="modal-card" class="modal-card">
 				<h3>Atención</h3>
 				<p id="modal-message"></p>
 				<button id="modal-accept-btn">Aceptar</button>
-                <button id="modal-close-btn"></button>
+				<button id="modal-close-btn"></button>
+			</div>
+
+			<div id="briefing-card" class="briefing-card">
+				<h3 id="briefing-title"></h3>
+				<p id="briefing-text"></p>
+				<button id="briefing-before-btn">Before</button>
+				<button id="briefing-after-btn">Next</button>
 			</div>
 		</div>
 	</body>

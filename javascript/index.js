@@ -1,6 +1,6 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
-import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showModal } from "./utils.js";
+import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
 const inputUserName = document.getElementById("username");
 const charactersSelect = document.getElementById("characters-selector");
@@ -17,6 +17,8 @@ const volumeIcon = document.getElementById("volume-icon");
 const volumeSlider = document.getElementById("volume-slider");
 const logout = document.getElementById("close-session");
 const reset = document.getElementById("reset");
+const title = document.getElementById("h1");
+const selectedValue = charactersSelect.value;
 
 //Btn Start Game disability till fill name and select character
 export const checkFormValidity = () => {
@@ -64,6 +66,7 @@ const setupEventListeners = () => {
 		loginScreen.style.display = "none";
 		mapScreen.style.display = "block";
 		navbar.style.display = "flex";
+		title.style.display = "none";
 
 		namePlayer.textContent = inputUserName.value;
 		const imgElement = selectedCard.querySelector("img");
@@ -76,6 +79,26 @@ const setupEventListeners = () => {
 		const cardClone = selectedCard.cloneNode(true);
 		infoHeroContainer.innerHTML = "";
 		infoHeroContainer.appendChild(cardClone);
+
+		
+		showBriefing(
+			`Welcome ${inputUserName.value} to the Multiverse Challenge`,
+			`As Earth's ${selectedValue === 'heroes' ? 'newest protector' : 'most feared conqueror'}, you must face 6 formidable opponents across fractured realities.\n\n` +
+			`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
+			`Choose wisely - your ${selectedValue === 'heroes' ? 'heroic actions' : 'villainous schemes'} will echo through eternity.`, 
+			{
+				after: {
+					text: "Enter the Multiverse",
+					action: () => hideModal()
+				}
+			}
+		);
+
+		saveToStorage("mainBriefing", {
+			briefingShow: true,
+			playerName: inputUserName.value,
+			playerType: selectedValue
+		});
 	});
 
 	modalAcceptBtn.addEventListener("click", hideModal);
@@ -144,7 +167,6 @@ const setupEventListeners = () => {
 		});
 
 		modalAcceptBtn.onclick = () => {
-
 			localStorage.clear();
 			window.location.reload();
 			mapScreen.style.display = "none";
@@ -184,6 +206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		loginScreen.style.display = "none";
 		mapScreen.style.display = "block";
 		navbar.style.display = "flex";
+		title.style.display = "none";
 
 		const savedPlayerName = loadFromStorage("playerName");
 		const savedPlayerImg = loadFromStorage("playerImg");
@@ -193,5 +216,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 	} else {
 		loginScreen.style.display = "flex";
 		mapScreen.style.display = "none";
+	}
+	
+	const mainBriefing = loadFromStorage("mainBriefing");
+
+	if (mainBriefing && mainBriefing.briefingShow) { 
+		showBriefing(
+			`Welcome ${inputUserName.value} to the Multiverse Challenge`,
+			`As Earth's ${selectedValue === 'heroes' ? 'newest protector' : 'most feared conqueror'}, you must face 6 formidable opponents across fractured realities.\n\n` +
+			`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
+			`Choose wisely - your ${selectedValue === 'heroes' ? 'heroic actions' : 'villainous schemes'} will echo through eternity.`, 
+			{
+				after: {
+					text: "Enter the Multiverse",
+					action: () => hideModal()
+				}
+			}
+		);
 	}
 });

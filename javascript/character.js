@@ -61,7 +61,7 @@ const createCharacterCard = (character, type) => {
 export const renderCharacters = async (namesArray, type = "hero") => {
 	const containerCharacters = document.getElementById("cards-player-container");
 	containerCharacters.innerHTML = "";
-    containerCharacters.classList.add("loading");
+	containerCharacters.classList.add("loading");
 
 	for (const name of namesArray) {
 		const character = await fetchCharactersByName(name);
@@ -72,7 +72,7 @@ export const renderCharacters = async (namesArray, type = "hero") => {
 		}
 	}
 
-    containerCharacters.classList.remove("loading");
+	containerCharacters.classList.remove("loading");
 };
 
 /* ==== Select Characters ==== */
@@ -87,11 +87,11 @@ export const handleCharacterSelection = async (initialLoad = false) => {
 
 	if (selectedValue === "heroes") {
 		await renderCharacters(heroes, "hero");
-        navbar.style.background = "var(--hero-color)";
+		navbar.style.background = "var(--hero-color)";
 		imgPlayer.style.border = "2px solid var(--hero-color)";
 	} else if (selectedValue === "villains") {
 		await renderCharacters(villains, "villain");
-        navbar.style.background = "var(--villain-color)";
+		navbar.style.background = "var(--villain-color)";
 		imgPlayer.style.border = "2px solid var(--villain-color)";
 	}
 
