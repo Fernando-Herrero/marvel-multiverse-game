@@ -8,7 +8,7 @@ export const villains = ["Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Docto
 const apiKey = "eabf24a441ea28d7278fbc8d0be33589";
 
 /* ==== Fetch Characters ==== */
-const fetchCharactersByName = async (name) => {
+export const fetchCharactersByName = async (name) => {
 	try {
 		const response = await fetch(`https://superheroapi.com/api/${apiKey}/search/${name}`);
 		const data = await response.json();

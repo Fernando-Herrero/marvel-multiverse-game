@@ -1,3 +1,5 @@
+import { loadFromStorage, saveToStorage } from "./storage.js";
+
 export const modalCard = document.getElementById("modal-card");
 export const modalBackdrop = document.getElementById("modal-backdrop");
 export const modalMessage = document.getElementById("modal-message");
@@ -30,14 +32,22 @@ export const showModal = (message, options = {}) => {
 export const hideModal = () => {
 	modalBackdrop.style.display = "none";
 	document.body.style.overflow = "auto";
+
+	const mainBriefing = loadFromStorage("mainBriefing");
+	if (mainBriefing) {
+		saveToStorage("mainBriefing", { ...mainBriefing, briefingShow: false });
+	}
 };
 
+export const charactersSelect = document.getElementById("characters-selector");
+export const selectedValue = charactersSelect.value;
 export const showBriefing = (title, message, buttons = {}) => {
 	const charactersSelect = document.getElementById("characters-selector");
 	const selectedValue = charactersSelect.value;
-	
+
 	briefingCard.style.display = "flex";
-	briefingCard.style.border = selectedValue === "heroes" ? "1px solid var(--hero-color)" : "1px solid var(--villain-color)";
+	briefingCard.style.border =
+		selectedValue === "heroes" ? "1px solid var(--hero-color)" : "1px solid var(--villain-color)";
 	modalCard.style.display = "none";
 
 	briefingTitle.textContent = title;
@@ -47,6 +57,7 @@ export const showBriefing = (title, message, buttons = {}) => {
 	document.body.style.overflow = "hidden";
 
 	if (buttons.before) {
+		briefingBeforeBtn.textContent = buttons.after.text || "Before";
 		briefingBeforeBtn.onclick = buttons.before.action;
 		briefingBeforeBtn.style.display = "flex";
 	} else {
@@ -54,9 +65,10 @@ export const showBriefing = (title, message, buttons = {}) => {
 	}
 
 	if (buttons.after) {
+		briefingNextBtn.textContent = buttons.after.text || "Next";
 		briefingNextBtn.onclick = buttons.after.action;
 		briefingNextBtn.style.display = "flex";
 	} else {
-		briefingNextBtn.style.display = "none"
+		briefingNextBtn.style.display = "none";
 	}
 };

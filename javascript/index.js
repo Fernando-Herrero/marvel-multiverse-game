@@ -80,24 +80,28 @@ const setupEventListeners = () => {
 		infoHeroContainer.innerHTML = "";
 		infoHeroContainer.appendChild(cardClone);
 
-		
 		showBriefing(
-			`Welcome ${inputUserName.value} to the Multiverse Challenge`,
-			`As Earth's ${selectedValue === 'heroes' ? 'newest protector' : 'most feared conqueror'}, you must face 6 formidable opponents across fractured realities.\n\n` +
-			`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
-			`Choose wisely - your ${selectedValue === 'heroes' ? 'heroic actions' : 'villainous schemes'} will echo through eternity.`, 
+			`Welcome ${charactersSelect.value} to the Multiverse Challenge`,
+			`As Earth's ${
+				selectedValue === "heroes" ? "newest protector" : "most feared conqueror"
+			}, you must face 6 formidable opponents across fractured realities.\n\n` +
+				`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
+				`Choose wisely - your ${
+					selectedValue === "heroes" ? "heroic actions" : "villainous schemes"
+				} will echo through eternity.`,
 			{
 				after: {
 					text: "Enter the Multiverse",
-					action: () => hideModal()
-				}
+					action: () => hideModal(),
+				},
 			}
 		);
 
 		saveToStorage("mainBriefing", {
 			briefingShow: true,
+			briefingCompleted: false,
 			playerName: inputUserName.value,
-			playerType: selectedValue
+			playerType: selectedValue,
 		});
 	});
 
@@ -217,20 +221,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 		loginScreen.style.display = "flex";
 		mapScreen.style.display = "none";
 	}
-	
+
 	const mainBriefing = loadFromStorage("mainBriefing");
 
-	if (mainBriefing && mainBriefing.briefingShow) { 
+	if (mainBriefing && mainBriefing.briefingShow && !mainBriefing.briefingCompleted) {
 		showBriefing(
 			`Welcome ${inputUserName.value} to the Multiverse Challenge`,
-			`As Earth's ${selectedValue === 'heroes' ? 'newest protector' : 'most feared conqueror'}, you must face 6 formidable opponents across fractured realities.\n\n` +
-			`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
-			`Choose wisely - your ${selectedValue === 'heroes' ? 'heroic actions' : 'villainous schemes'} will echo through eternity.`, 
+			`As Earth's ${
+				selectedValue === "heroes" ? "newest protector" : "most feared conqueror"
+			}, you must face 6 formidable opponents across fractured realities.\n\n` +
+				`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
+				`Choose wisely - your ${
+					selectedValue === "heroes" ? "heroic actions" : "villainous schemes"
+				} will echo through eternity.`,
 			{
 				after: {
 					text: "Enter the Multiverse",
-					action: () => hideModal()
-				}
+					action: () => {
+						hideModal();
+						saveToStorage("mainBriefign", { ...mainBriefing, briefingCompleted: true });
+					},
+				},
 			}
 		);
 	}
