@@ -1,4 +1,5 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
+import { imageEnemies } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 

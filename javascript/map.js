@@ -1,8 +1,10 @@
+import { createCharacterCard, fetchCharactersByName } from "./character.js";
+
 export const levelEnemies = {
 	heroes: [
 		{
 			name: "Loki",
-            imageUrl: "",
+			imageUrl: "",
 			level: 1,
 			description: "Dios de las Mentiras - Nivel 1: Nueva York",
 			powers: "Ilusiones, Dagas Mágicas",
@@ -10,7 +12,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Red Skull",
-            imageUrl: "",
+			imageUrl: "",
 			level: 2,
 			description: "Cráneo Rojo - Nivel 2: Europa 1945",
 			powers: "Fuerza Mejorada, Pistolas de Energía",
@@ -18,7 +20,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Ultron",
-            imageUrl: "",
+			imageUrl: "",
 			level: 3,
 			description: "IA Despiadada - Nivel 3: Sokovia",
 			powers: "Ejército de Drones, Vuelo",
@@ -26,7 +28,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Hela",
-            imageUrl: "",
+			imageUrl: "",
 			level: 4,
 			description: "Diosa de la Muerte - Nivel 4: Asgard",
 			powers: "Espadas Infinitas, Inmortalidad",
@@ -34,7 +36,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Thanos",
-            imageUrl: "",
+			imageUrl: "",
 			level: 5,
 			description: "El Titán Loco - Nivel 5: Titán",
 			powers: "Fuerza Cósmica, Guantelete",
@@ -42,7 +44,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Doctor Doom",
-            imageUrl: "",
+			imageUrl: "",
 			level: 6,
 			description: "Señor de Latveria - Nivel 6: Dimensión Oscura",
 			powers: "Magia y Tecnología, Armadura",
@@ -52,7 +54,7 @@ export const levelEnemies = {
 	villains: [
 		{
 			name: "Black Widow",
-            imageUrl: "",
+			imageUrl: "",
 			level: 1,
 			description: "Espía Letal - Nivel 1: Budapest",
 			powers: "Combate cuerpo a cuerpo, Sigilo",
@@ -60,7 +62,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Spider-Man",
-            imageUrl: "",
+			imageUrl: "",
 			level: 2,
 			description: "El Hombre Araña - Nivel 2: Queens",
 			powers: "Sentido arácnido, Telarañas",
@@ -68,7 +70,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Iron Man",
-            imageUrl: "",
+			imageUrl: "",
 			level: 3,
 			description: "Genio, Millonario - Nivel 3: Torre Stark",
 			powers: "Armadura MK-50, IA Friday",
@@ -76,7 +78,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Captain America",
-            imageUrl: "",
+			imageUrl: "",
 			level: 4,
 			description: "El Primer Vengador - Nivel 4: Washington",
 			powers: "Escudo de Vibranium, Liderazgo",
@@ -84,7 +86,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Thor",
-            imageUrl: "",
+			imageUrl: "",
 			level: 5,
 			description: "Dios del Trueno - Nivel 5: Asgard",
 			powers: "Mjolnir, Control del Clima",
@@ -92,7 +94,7 @@ export const levelEnemies = {
 		},
 		{
 			name: "Hulk",
-            imageUrl: "",
+			imageUrl: "",
 			level: 6,
 			description: "Furia Imparable - Nivel 6: Laboratorio Gamma",
 			powers: "Fuerza Bruta, Regeneración",
@@ -101,5 +103,20 @@ export const levelEnemies = {
 	],
 };
 
+export const imageEnemies = async () => {
+	for (const enemy of levelEnemies.heroes) {
+		const characterData = await fetchCharactersByName(enemy.name);
+		if (characterData) {
+			enemy.imageUrl = characterData.image.url;
+		}
+	}
 
+	for (const enemy of levelEnemies.villains) {
+		const characterData = await fetchCharactersByName(enemy.name);
+		if (characterData) {
+			enemy.imageUrl = characterData.image.url;
+		}
+	}
 
+	return levelEnemies;
+};

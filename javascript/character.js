@@ -24,7 +24,7 @@ export const fetchCharactersByName = async (name) => {
 };
 
 /* ==== Card Characters ==== */
-const createCharacterCard = (character, type) => {
+export const createCharacterCard = (character, type) => {
 	const card = document.createElement("div");
 	card.classList.add("character-card", `${type}-border`);
 	card.dataset.id = character.id;
