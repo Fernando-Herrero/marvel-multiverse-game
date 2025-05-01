@@ -1,5 +1,5 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
-import { enemiesInLevel, imageEnemies, levels, showFirstLevel } from "./map.js";
+import { enemiesInLevel, imageEnemies, levels, showFirstLevel, showLeveleInfo } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
@@ -20,7 +20,7 @@ const logout = document.getElementById("close-session");
 const reset = document.getElementById("reset");
 const title = document.getElementById("h1");
 const selectedValue = charactersSelect.value;
-const levelsLocked = document.querySelectorAll(".level.locked");
+// const levelsLocked = document.querySelectorAll(".level.locked");
 
 //Btn Start Game disability till fill name and select character
 export const checkFormValidity = () => {
@@ -88,7 +88,7 @@ const setupEventListeners = () => {
 			`Welcome ${charactersSelect.value} to the Multiverse Challenge`,
 			`As Earth's ${
 				selectedValue === "heroes" ? "newest protector" : "most feared conqueror"
-			}, you must face 6 formidable opponents across fractured realities.\n\n` +
+			}, you must face 6 formidable opponents across fractured realities.\n` +
 				`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
 				`Choose wisely - your ${
 					selectedValue === "heroes" ? "heroic actions" : "villainous schemes"
@@ -100,6 +100,7 @@ const setupEventListeners = () => {
 				},
 			}
 		);
+		showLeveleInfo();
 
 		saveToStorage("mainBriefing", {
 			briefingShow: true,
@@ -186,20 +187,36 @@ const setupEventListeners = () => {
 		modalCloseBtn.onclick = hideModal;
 	});
 
-	levelsLocked.forEach((level) => {
-		level.addEventListener("click", () => {
-			showBriefing("This Level is not available", "This level is still blocked", {
-				after: {
-					text: "Accept",
-					action: () => hideModal(),
-				},
+	levels.forEach((level) => {
+		if (level.classList.contains("locked")) {
+			level.addEventListener("click", () => {
+				showBriefing("This Level is not available", "This level is still blocked", {
+					after: {
+						text: "Accept",
+						action: () => hideModal(),
+					},
+				});
 			});
-		});
+		}
 	});
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
+
+	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
+
+	if (levelOneUnlocked) {
+		for (let i = 0; i < levels.length; i++) {
+			if (levels[i].dataset.level === "1") {
+				levels[i].classList.remove("locked");
+				levels[i].classList.add("unlocked");
+				break;
+			}
+		}
+	}
+
 	setupEventListeners();
+	
 	enemiesInLevel();
 
 	const savedUserName = loadFromStorage("userName") || "";
@@ -264,15 +281,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 		);
 	}
 
-	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
-
-	if (levelOneUnlocked) {
-		for (let i = 0; i < levels.length; i++) {
-			if (levels[i].dataset.level === "1") {
-				levels[i].classList.remove("locked");
-				levels[i].classList.add("unlocked");
-				break;
-			}
-		}
-	}
+	showLeveleInfo();
 });

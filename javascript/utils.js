@@ -39,11 +39,11 @@ export const hideModal = () => {
 	}
 };
 
-export const charactersSelect = document.getElementById("characters-selector");
-export const selectedValue = charactersSelect.value;
 export const showBriefing = (title, message, buttons = {}) => {
 	const charactersSelect = document.getElementById("characters-selector");
 	const selectedValue = charactersSelect.value;
+
+	message = message.replace(/\n/g, "<br>");
 
 	briefingCard.style.display = "flex";
 	briefingCard.style.border =
@@ -52,7 +52,7 @@ export const showBriefing = (title, message, buttons = {}) => {
 
 	briefingTitle.textContent = title;
 	briefingTitle.style.color = selectedValue === "heroes" ? "var(--hero-color)" : "var(--villain-color)";
-	briefingMessage.textContent = message;
+	briefingMessage.innerHTML = message;
 	modalBackdrop.style.display = "flex";
 	document.body.style.overflow = "hidden";
 

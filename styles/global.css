@@ -410,6 +410,10 @@ h1 {
 	transform: translateX(-2px);
 }
 
+.level-info {
+	display: none;
+}
+
 .enemy-character {
 	width: 80px;
 	height: 80px;
