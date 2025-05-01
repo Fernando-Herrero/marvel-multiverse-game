@@ -10,7 +10,7 @@ const apiKey = "eabf24a441ea28d7278fbc8d0be33589";
 /* ==== Fetch Characters ==== */
 export const fetchCharactersByName = async (name) => {
 	try {
-		const response = await fetch(`https://superheroapi.com/api/${apiKey}/search/${name}`);
+		const response = await fetch(`https://superheroapi.com/api.php/${apiKey}/search/${name}`);
 		const data = await response.json();
 
 		if (name === "Thor" && data.results.length > 1) {
