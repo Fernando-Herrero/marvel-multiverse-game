@@ -1,4 +1,5 @@
 import { checkFormValidity, imgPlayer, navbar } from "./index.js";
+import { enemiesInLevel } from "./map.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
@@ -94,6 +95,8 @@ export const handleCharacterSelection = async (initialLoad = false) => {
 		navbar.style.background = "var(--villain-color)";
 		imgPlayer.style.border = "2px solid var(--villain-color)";
 	}
+
+	await enemiesInLevel();
 
 	if (initialLoad) {
 		const savedCharacterId = loadFromStorage("selectedCharacter");

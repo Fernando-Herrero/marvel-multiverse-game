@@ -1,5 +1,5 @@
 import { fetchCharactersByName } from "./character.js";
-import { selectedValue } from "./utils.js";
+
 
 export const levelEnemies = {
 	heroes: [
@@ -127,9 +127,13 @@ export const imageEnemies = async () => {
 export const enemiesInLevel = async () => {
 	await imageEnemies();
 
-	const enemiesToUse = selectedValue === "heroes" ? levelEnemies.villains : levelEnemies.heroes;
+    const charactersSelect = document.getElementById("characters-selector");
+    const currentSelection = charactersSelect.value;
+	const enemiesToUse = currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
 
 	levels.forEach((level) => {
+        level.innerHTML = ''; 
+
 		const levelNumber = parseInt(level.dataset.level);
 
 		const enemiesForThisLevel = enemiesToUse.find((enemy) => enemy.level === levelNumber);
