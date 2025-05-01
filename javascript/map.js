@@ -209,6 +209,8 @@ export const movePlayerToLevel = (targetLevel) => {
 		const targetX = targetRect.left - mapRect.left + targetRect.width / 2 - playerRect.width / 2;
 		const targetY = targetRect.top - mapRect.top + targetRect.height / 2 - playerRect.height / 2;
 
+		saveToStorage("playerPosition", { x: targetX, y: targetY, level: targetLevel.dataset.level });
+
 		// Guardar posición inicial para la transición
 		const initialX = playerRect.left - mapRect.left;
 		const initialY = playerRect.top - mapRect.top;
@@ -238,4 +240,39 @@ export const movePlayerToLevel = (targetLevel) => {
 			{ once: true }
 		);
 	});
+};
+
+// Función para cargar posición guardada
+export const loadPlayerPosition = () => {
+    const savedPosition = loadFromStorage('playerPosition');
+    const player = document.getElementById('player');
+    
+    if (savedPosition) {
+        player.style.left = `${savedPosition.x}px`;
+        player.style.top = `${savedPosition.y}px`;
+        player.style.transform = 'none';
+        
+        // Marcar nivel como visitado
+        const level = document.querySelector(`.level[data-level="${savedPosition.level}"]`);
+        if (level) {
+            level.classList.remove('locked');
+            level.classList.add('unlocked');
+        }
+    }
+};
+
+export const resetPlayerPosition = () => {
+    const player = document.getElementById('player');
+    
+    // Restablecer estilos a la posición inicial
+    player.style.transition = 'none'; // Desactivar transición para cambio instantáneo
+    player.style.left = '50%';
+    player.style.top = '1%';
+    player.style.transform = 'translateX(-50%)';
+    
+    // Forzar reflow para asegurar que los cambios se aplican
+    void player.offsetHeight;
+    
+    // Restaurar transición para futuros movimientos
+    player.style.transition = 'transform 0.5s ease-out';
 };

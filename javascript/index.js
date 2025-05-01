@@ -1,5 +1,5 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
-import { enemiesInLevel, imageEnemies, levels, showFirstLevel, showLeveleInfo } from "./map.js";
+import { enemiesInLevel, imageEnemies, levels, loadPlayerPosition, resetPlayerPosition, showFirstLevel, showLeveleInfo } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
@@ -152,6 +152,9 @@ const setupEventListeners = () => {
 		clearStorageKey("userName");
 		clearStorageKey("selectedCharacter");
 		clearStorageKey("gameStarted");
+		clearStorageKey("playerPosition");
+
+		resetPlayerPosition();
 
 		loginScreen.style.display = "flex";
 		mapScreen.style.display = "none";
@@ -178,10 +181,15 @@ const setupEventListeners = () => {
 
 		modalAcceptBtn.onclick = () => {
 			localStorage.clear();
-			window.location.reload();
+			resetPlayerPosition();
+			
 			mapScreen.style.display = "none";
 			loginScreen.style.display = "flex";
 			title.style.display = "flex";
+
+			setTimeout(() => {
+				window.location.reload();
+			}, 100);
 		};
 
 		modalCloseBtn.onclick = hideModal;
@@ -202,6 +210,7 @@ const setupEventListeners = () => {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
+	loadPlayerPosition();
 
 	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
 
@@ -280,6 +289,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 			}
 		);
 	}
+
+
 
 	showLeveleInfo();
 });
