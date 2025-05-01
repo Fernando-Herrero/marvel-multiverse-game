@@ -1,5 +1,6 @@
 import { fetchCharactersByName } from "./character.js";
-
+import { mapScreen } from "./index.js";
+import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const levelEnemies = {
 	heroes: [
@@ -104,7 +105,9 @@ export const levelEnemies = {
 	],
 };
 
-const levels = document.querySelectorAll(".level");
+export const levels = document.querySelectorAll(".level");
+export const player = document.getElementById("player");
+export const map = document.getElementById("map");
 
 export const imageEnemies = async () => {
 	for (const enemy of levelEnemies.heroes) {
@@ -127,12 +130,12 @@ export const imageEnemies = async () => {
 export const enemiesInLevel = async () => {
 	await imageEnemies();
 
-    const charactersSelect = document.getElementById("characters-selector");
-    const currentSelection = charactersSelect.value;
+	const charactersSelect = document.getElementById("characters-selector");
+	const currentSelection = charactersSelect.value;
 	const enemiesToUse = currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
 
 	levels.forEach((level) => {
-        level.innerHTML = ''; 
+		level.innerHTML = "";
 
 		const levelNumber = parseInt(level.dataset.level);
 
@@ -146,13 +149,16 @@ export const enemiesInLevel = async () => {
 
 			level.appendChild(imgEnemie);
 		}
-
-		// if (levelNumber < currentLevel) {
-		// 	level.classList.add("unlocked");
-		// } else if (levelNumber === currentLevel) {
-		// 	level.classList.add("level-current");
-		// } else {
-		// 	level.classList.add("locked");
-		// }
 	});
+};
+
+export const showFirstLevel = () => {
+        for (let i = 0; i < levels.length; i++) {
+            if (levels[i].dataset.level === "1") {
+                levels[i].classList.remove("locked");
+                levels[i].classList.add("unlocked");
+                break;
+            }
+        }
+        saveToStorage("levelOneUnlocked", true)
 };

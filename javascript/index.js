@@ -1,5 +1,5 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
-import { enemiesInLevel, imageEnemies } from "./map.js";
+import { enemiesInLevel, imageEnemies, levels, showFirstLevel } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
@@ -7,7 +7,7 @@ const inputUserName = document.getElementById("username");
 const charactersSelect = document.getElementById("characters-selector");
 const startGameBtn = document.getElementById("start-game-btn");
 const loginScreen = document.getElementById("login-screen");
-const mapScreen = document.getElementById("map-screen");
+export const mapScreen = document.getElementById("map-screen");
 export const navbar = document.getElementById("navbar");
 let namePlayer = document.getElementById("name-player");
 export let imgPlayer = document.getElementById("img-player");
@@ -20,6 +20,7 @@ const logout = document.getElementById("close-session");
 const reset = document.getElementById("reset");
 const title = document.getElementById("h1");
 const selectedValue = charactersSelect.value;
+const levelsLocked = document.querySelectorAll(".level.locked");
 
 //Btn Start Game disability till fill name and select character
 export const checkFormValidity = () => {
@@ -68,6 +69,8 @@ const setupEventListeners = () => {
 		mapScreen.style.display = "block";
 		navbar.style.display = "flex";
 		title.style.display = "none";
+
+		showFirstLevel();
 
 		namePlayer.textContent = inputUserName.value;
 		const imgElement = selectedCard.querySelector("img");
@@ -119,7 +122,7 @@ const setupEventListeners = () => {
 			if (modalBackdrop.style.display === "flex") {
 				hideModal();
 			}
-			if ((aside.style.display === "flex")) {
+			if (aside.style.display === "flex") {
 				aside.style.display = "none";
 			}
 		}
@@ -181,6 +184,17 @@ const setupEventListeners = () => {
 		};
 
 		modalCloseBtn.onclick = hideModal;
+	});
+
+	levelsLocked.forEach((level) => {
+		level.addEventListener("click", () => {
+			showBriefing("This Level is not available", "This level is still blocked", {
+				after: {
+					text: "Accept",
+					action: () => hideModal(),
+				},
+			});
+		});
 	});
 };
 
@@ -248,5 +262,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 				},
 			}
 		);
+	}
+
+	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
+
+	if (levelOneUnlocked) {
+		for (let i = 0; i < levels.length; i++) {
+			if (levels[i].dataset.level === "1") {
+				levels[i].classList.remove("locked");
+				levels[i].classList.add("unlocked");
+				break;
+			}
+		}
 	}
 });

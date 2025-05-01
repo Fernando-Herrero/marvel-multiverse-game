@@ -395,6 +395,21 @@ h1 {
 	transform: translateX(-50%);
 }
 
+.level.locked {
+	filter: grayscale(100%);
+	cursor: pointer;
+}
+
+.level.unlocked {
+	opacity: 1;
+	cursor: pointer;
+	filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+}
+
+.level.unlocked:hover {
+	transform: translateX(-2px);
+}
+
 .enemy-character {
 	width: 80px;
 	height: 80px;
