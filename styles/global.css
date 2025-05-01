@@ -306,6 +306,9 @@ h1 {
 	top: 1%;
 	left: 50%;
 	transform: translateX(-50%);
+	transition: transform 0.5s ease-out;
+	will-change: transform;
+	z-index: 10;
 }
 
 .img-player {
@@ -314,6 +317,14 @@ h1 {
 	border-radius: 100%;
 	object-fit: cover;
 	object-position: center;
+	transition: all 0.3s ease;
+}
+
+.player-at-level {
+	transform: none !important;
+	top: var(--player-pos-y);
+	left: var(--player-pos-x);
+	transition: none;
 }
 
 #map {

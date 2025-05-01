@@ -172,9 +172,11 @@ export const showLeveleInfo = () => {
 
 	levels.forEach((level) => {
 		if (level.classList.contains("unlocked")) {
-			level.addEventListener("click", () => {
+			level.addEventListener("click", async () => {
 				const levelNumber = parseInt(level.dataset.level);
 				const enemy = enemiesToUse.find((enemy) => enemy.level === levelNumber);
+
+				await movePlayerToLevel(level);
 
 				if (enemy) {
 					showBriefing(
@@ -192,5 +194,48 @@ export const showLeveleInfo = () => {
 				}
 			});
 		}
+	});
+};
+
+//Absolutamente no se como coño va esto de las coordenadas me gustaria una clase rapida:)
+export const movePlayerToLevel = (targetLevel) => {
+	return new Promise((resolve) => {
+		const player = document.getElementById("player");
+		const targetRect = targetLevel.getBoundingClientRect();
+		const mapRect = map.getBoundingClientRect();
+		const playerRect = player.getBoundingClientRect();
+
+		// Calcular la posición relativa dentro del mapa
+		const targetX = targetRect.left - mapRect.left + targetRect.width / 2 - playerRect.width / 2;
+		const targetY = targetRect.top - mapRect.top + targetRect.height / 2 - playerRect.height / 2;
+
+		// Guardar posición inicial para la transición
+		const initialX = playerRect.left - mapRect.left;
+		const initialY = playerRect.top - mapRect.top;
+
+		// Calcular el desplazamiento necesario
+		const offsetX = targetX - initialX;
+		const offsetY = targetY - initialY;
+
+		// Aplicar la transformación
+		player.style.transition = "transform 0.5s ease-out";
+		player.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+
+		// Actualizar la posición absoluta después de la animación
+		player.addEventListener(
+			"transitionend",
+			function onTransitionEnd() {
+				player.removeEventListener("transitionend", onTransitionEnd);
+
+				// Establecer posición absoluta y quitar transformación
+				player.style.transition = "none";
+				player.style.transform = "none";
+				player.style.left = `${targetX}px`;
+				player.style.top = `${targetY}px`;
+
+				resolve();
+			},
+			{ once: true }
+		);
 	});
 };
