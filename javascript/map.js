@@ -1,3 +1,4 @@
+import { renderBattleCards } from "./battle.js";
 import { fetchCharactersByName } from "./character.js";
 import { mapScreen } from "./index.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
@@ -186,12 +187,15 @@ export const showLeveleInfo = () => {
 						{
 							after: {
 								text: "Start Battle",
-								action: () => {
+								action: async () => {
 									hideModal();
                                     mapScreen.style.display = "none";
                                     battleScreen.style.display = "flex";
 
-                                    saveToStorage("currentScreen", "battle");
+                                    saveToStorage("currentScreen", "battle")
+                                    await renderBattleCards(enemy.name);
+
+                                    saveToStorage("currentLevel", levelNumber);
 								},
 							},
 						}

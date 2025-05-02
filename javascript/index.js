@@ -1,5 +1,13 @@
-import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
-import { battleScreen, enemiesInLevel, imageEnemies, levels, loadPlayerPosition, resetPlayerPosition, showFirstLevel, showLeveleInfo } from "./map.js";
+import { handleCharacterSelection, renderCharacters } from "./character.js";
+import {
+	battleScreen,
+	enemiesInLevel,
+	levels,
+	loadPlayerPosition,
+	resetPlayerPosition,
+	showFirstLevel,
+	showLeveleInfo,
+} from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
@@ -60,9 +68,15 @@ const setupEventListeners = () => {
 		}
 
 		const selectedCard = document.querySelector(".character-card.selected-card");
-		if (!selectedCard) {
-			showModal("No se ha seleccionado ningún personaje");
-			return;
+		if (selectedCard) {
+			const characterData = {
+				id: selectedCard.dataset.id,
+				name: selectedCard.querySelector("h3").textContent,
+				imageUrl: selectedCard.querySelector("img").src,
+				stats: Array.from(selectedCard.querySelectorAll(".character-stats p")).map((p) => p.textContent),
+			};
+
+			saveToStorage("playerCharacter", characterData);
 		}
 
 		loginScreen.style.display = "none";
@@ -123,7 +137,7 @@ const setupEventListeners = () => {
 			if (modalBackdrop.style.display === "flex") {
 				hideModal();
 			}
-			if (aside.style.display === "flex") {
+			if (getComputedStyle(aside).display === "flex") {
 				aside.style.display = "none";
 			}
 		}
@@ -182,17 +196,20 @@ const setupEventListeners = () => {
 		modalAcceptBtn.onclick = () => {
 			localStorage.clear();
 			resetPlayerPosition();
-			
+
 			mapScreen.style.display = "none";
 			loginScreen.style.display = "flex";
-			title.style.display = "flex";
+			navbar.style.display = "none";
+			title.style.display = "block";
 
-			setTimeout(() => {
-				window.location.reload();
-			}, 100);
+			inputUserName.value = "";
+			charactersSelect.value = "" || "heroes";
+			document.querySelectorAll(".character-card.selected-card").forEach((card) => {
+				card.classList.remove("selected-card");
+			});
+
+			hideModal();
 		};
-
-		modalCloseBtn.onclick = hideModal;
 	});
 
 	levels.forEach((level) => {
@@ -225,7 +242,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 
 	setupEventListeners();
-	
+
 	enemiesInLevel();
 
 	const savedUserName = loadFromStorage("userName") || "";
@@ -268,9 +285,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	const currentScreen = loadFromStorage("currentScreen");
 
-	if(currentScreen === "battle") {
+	if (currentScreen === "battle") {
 		mapScreen.style.display = "none";
 		battleScreen.style.display = "flex";
+
+		const battleState = loadFromStorage("battleState");
+		if (battleState) {
+			await renderCharacters(battleState.enemyName);
+		} else {
+			mapScreen.style.display = "flex";
+			battleScreen.style.display = "none";
+			saveToStorage("currentScren", "map");
+		}
 	} else {
 		mapScreen.style.display = "flex";
 		battleScreen.style.display = "none";
@@ -299,6 +325,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 			}
 		);
 	}
-
-	// showLeveleInfo();
 });
