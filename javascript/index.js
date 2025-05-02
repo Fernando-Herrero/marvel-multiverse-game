@@ -137,8 +137,8 @@ const setupEventListeners = () => {
 			if (modalBackdrop.style.display === "flex") {
 				hideModal();
 			}
-			if (getComputedStyle(aside).display === "flex") {
-				aside.style.display = "none";
+			if (aside.classList.contains("show")) {
+				aside.classList.remove("show");
 			}
 		}
 	});
@@ -174,17 +174,19 @@ const setupEventListeners = () => {
 		mapScreen.style.display = "none";
 		navbar.style.display = "none";
 		title.style.display = "flex";
+		aside.classList.remove("show");
+		aside.style.display = "none";
+		battleScreen.style.display = "none";
 
 		inputUserName.value = " ";
 		const selectedCard = document.querySelector(".character-card.selected-card");
 		selectedCard?.classList.remove("selected-card");
 
-		aside.style.display = "none";
-
 		showModal("Has cerrado sesión correctamente");
 	});
 
 	reset.addEventListener("click", () => {
+		aside.classList.remove("show");
 		aside.style.display = "none";
 
 		showModal("Are you sure you want to reset the game? You will lose all your progress", {
@@ -201,6 +203,7 @@ const setupEventListeners = () => {
 			loginScreen.style.display = "flex";
 			navbar.style.display = "none";
 			title.style.display = "block";
+			battleScreen.style.display = "none";
 
 			inputUserName.value = "";
 			charactersSelect.value = "" || "heroes";

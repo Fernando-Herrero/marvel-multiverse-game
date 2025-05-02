@@ -52,6 +52,7 @@ export const renderBattleCards = async (enemyName) => {
 			loadFromStorage("characterType") === "heroes" ? "villain" : "hero"
 		);
 
+        enemyCard.style.pointerEvents = "none";
         enemyCard.dataset.context = "battle";
         enemyCard.dataset.role = "enemy";
 
