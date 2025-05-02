@@ -1,5 +1,5 @@
 import { handleCharacterSelection, heroes, renderCharacters, villains } from "./character.js";
-import { enemiesInLevel, imageEnemies, levels, loadPlayerPosition, resetPlayerPosition, showFirstLevel, showLeveleInfo } from "./map.js";
+import { battleScreen, enemiesInLevel, imageEnemies, levels, loadPlayerPosition, resetPlayerPosition, showFirstLevel, showLeveleInfo } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
@@ -266,6 +266,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 		mapScreen.style.display = "none";
 	}
 
+	const currentScreen = loadFromStorage("currentScreen");
+
+	if(currentScreen === "battle") {
+		mapScreen.style.display = "none";
+		battleScreen.style.display = "flex";
+	} else {
+		mapScreen.style.display = "flex";
+		battleScreen.style.display = "none";
+	}
+
 	const mainBriefing = loadFromStorage("mainBriefing");
 
 	if (mainBriefing && mainBriefing.briefingShow && !mainBriefing.briefingCompleted) {
@@ -290,7 +300,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 		);
 	}
 
-
-
-	showLeveleInfo();
+	// showLeveleInfo();
 });

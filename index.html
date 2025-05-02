@@ -20,13 +20,6 @@
 				<div id="navbar-settings" class="navbar-settings">
 					<img src="/media/images/icons/settings.webp" alt="settings icon" />
 				</div>
-				<div id="navbar-menu" style="display: none">
-					<!-- <div id="info-player" class="info-player">
-						<p id="name-player" class="name-player"></p>
-						<img id="img-player" class="img-player" />
-						<button id="close-session" class="close-session">Logout</button>
-					</div> -->
-				</div>
 			</nav>
 		</header>
 
@@ -80,9 +73,20 @@
 				</div>
 			</section>
 			<section id="battle-screen" class="battle-screen" style="display: none;">
-				<h1>BATTLE SCREEN</h1>
+				<div class="player-enemy">
+					<div class="player-div"></div>
+					<h3 class="vs-logo">VS</h3>
+					<div class="enemy-div"></div>
+				</div>
+				<div class="buttons-battle">
+					<button class="attack">Attack</button>
+					<button class="defence">Defence</button>
+					<button class="special-skill">S.Skill</button>
+					<button class="dodge">Dodge</button>
+				</div>
+				<div class="battle-text"></div>
 			</section>
-			<section id="win-loose-screen" class="win-loose-screen"></section>
+			<section id="win-loose-screen" class="win-loose-screen" style="display: none;"></section>
 		</main>
 
 		<aside id="aside" class="aside">

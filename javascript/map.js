@@ -110,6 +110,7 @@ export const levels = document.querySelectorAll(".level");
 export const player = document.getElementById("player");
 export const map = document.getElementById("map");
 export const levelInfo = document.getElementById("level-info");
+export const battleScreen = document.getElementById("battle-screen");
 
 export const imageEnemies = async () => {
 	for (const enemy of levelEnemies.heroes) {
@@ -187,6 +188,10 @@ export const showLeveleInfo = () => {
 								text: "Start Battle",
 								action: () => {
 									hideModal();
+                                    mapScreen.style.display = "none";
+                                    battleScreen.style.display = "flex";
+
+                                    saveToStorage("currentScreen", "battle");
 								},
 							},
 						}
