@@ -1,4 +1,5 @@
-import { handleCharacterSelection, renderCharacters } from "./character.js";
+import { renderBattleCards } from "./battle.js";
+import { handleCharacterSelection } from "./character.js";
 import {
 	battleScreen,
 	enemiesInLevel,
@@ -10,6 +11,22 @@ import {
 } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
+
+export const localCharacterImage = {
+	"Black Widow": "/media/images/characters/black-widow.jpeg",
+	"Spider-Man": "/media/images/characters/spider-man.webp",
+	"Iron Man": "/media/images/characters/iron-man.avif",
+	"Captain America": "/media/images/characters/captain-america.webp",
+	"Thor": "/media/images/characters/thor.webp",
+	"Hulk": "/media/images/characters/hulk.avif",
+
+	"Thanos": "/media/images/characters/thanos.webp",
+	"Loki": "/media/images/characters/loki.webp",
+	"Ultron": "/media/images/characters/ultron.jpeg",
+	"Red Skull": "/media/images/characters/red-skull.webp",
+	"Hela": "/media/images/characters/hela.webp",
+	"Doctor Doom": "/media/images/characters/doctor-doom.jpeg",
+};
 
 const inputUserName = document.getElementById("username");
 const charactersSelect = document.getElementById("characters-selector");
@@ -293,8 +310,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 		battleScreen.style.display = "flex";
 
 		const battleState = loadFromStorage("battleState");
-		if (battleState) {
-			await renderCharacters(battleState.enemyName);
+		if (battleState?.enemyName) {
+			await renderBattleCards(battleState.enemyName);
 		} else {
 			mapScreen.style.display = "flex";
 			battleScreen.style.display = "none";

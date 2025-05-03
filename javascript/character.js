@@ -1,24 +1,60 @@
-import { checkFormValidity, imgPlayer, navbar } from "./index.js";
+import { checkFormValidity, imgPlayer, localCharacterImage, navbar } from "./index.js";
 import { enemiesInLevel } from "./map.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
-
 export const villains = ["Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Doctor Doom"];
 
 const apiKey = "eabf24a441ea28d7278fbc8d0be33589";
+
+const testImage = (url) => {
+	return new Promise((resolve) => {
+		if (!url) {
+			resolve(false);
+			return;
+		}
+
+		const img = new Image();
+		img.onload = () => resolve(true);
+		img.onerror = () => resolve(false);
+		img.src = url;
+
+		setTimeout(() => resolve(false), 4000);
+	});
+};
+
+const MAX_RETRIES = 3;
 
 /* ==== Fetch Characters ==== */
 export const fetchCharactersByName = async (name) => {
 	try {
 		const response = await fetch(`https://superheroapi.com/api.php/${apiKey}/search/${name}`);
-		const data = await response.json();
 
-		if (name === "Thor" && data.results.length > 1) {
-			return data.results[1];
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
 		}
 
-		return data.results[0];
+		const data = await response.json();
+
+		if (!data.results || data.results.length === 0) {
+			throw new Error("Character not found in API");
+		}
+
+		const character = name === "Thor" && data.results.length > 1 ? data.results[1] : data.results[0];
+
+		const imgValid = await testImage(character.image?.url);
+		if (!imgValid) {
+			const localImageValid = await testImage(localCharacterImage[name]);
+			character.image.url = localImageValid ? localCharacterImage[name] : "/media/images/backgrounds/img-back.jpg";
+
+			const finalCheck = await testImage(character.image.url);
+			if (!finalCheck) {
+				console.error(`All image sources failed for ${name}`);
+				character.image.url = "/media/images/backgrounds/img-back.jpg";
+			}
+		}
+
+		return character;
 	} catch (error) {
 		console.error(`Error al obtener datos del personaje ${name}:`, error);
 	}
@@ -33,6 +69,27 @@ export const createCharacterCard = (character, type) => {
 	const imgCard = document.createElement("img");
 	imgCard.src = character.image.url;
 	imgCard.alt = character.name;
+
+	let retryCount = 0;
+
+	imgCard.onerror = async () => {
+		retryCount++;
+
+		if (retryCount >= MAX_RETRIES) {
+			console.warn(`Max retries reached for ${character.name}`);
+			imgCard.src = "/media/images/backgrounds/img-back.jpg";
+			imgCard.onerror = null;
+			return;
+		}
+
+		const imgBack = await testImage(localCharacterImage[character.name]);
+		if (imgBack) {
+			imgCard.src = localCharacterImage[character.name];
+		} else {
+			imgCard.src = "/media/images/backgrounds/img-back.jpg";
+			imgCard.onerror = null;
+		}
+	};
 
 	const infoCharacter = document.createElement("div");
 	infoCharacter.classList.add("card-info-character");

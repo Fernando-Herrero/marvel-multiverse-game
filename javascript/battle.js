@@ -7,6 +7,11 @@ export const renderBattleCards = async (enemyName) => {
 
 	const enemyData = await fetchCharactersByName(enemyName);
 
+    saveToStorage("currentEnemy", {
+        name:enemyData.name,
+        imageUrl: enemyData.image.url,
+    })
+
 	const playerBattleCardContainer = document.getElementById("player-battle-card");
 	playerBattleCardContainer.innerHTML = "";
 

@@ -203,6 +203,7 @@ h1 {
 	flex-direction: column;
 	width: 100%;
 	max-width: 200px;
+	height: 300px;
 	border-radius: 12px;
 	box-shadow: var(--box-shadow);
 	overflow: hidden;
@@ -224,7 +225,8 @@ h1 {
 
 .character-card img {
 	max-width: 100%;
-	max-height: 180px;
+	height: 150px;
+	flex: 1;
 	border-top-right-radius: 12px;
 	border-top-left-radius: 12px;
 	object-fit: cover;
@@ -240,6 +242,7 @@ h1 {
 .card-info-character {
 	display: flex;
 	flex-direction: column;
+	flex: 1;
 	gap: 6px;
 	padding: 12px;
 }
