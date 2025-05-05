@@ -1,4 +1,5 @@
-import { checkFormValidity, imgPlayer, navbar } from "./index.js";
+import { navbar } from "./index.js";
+import { checkValidStartGame, imgPlayer } from "./login.js";
 import { enemiesInLevel } from "./map.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
@@ -10,14 +11,14 @@ const localCharacterImage = {
 	"Spider-Man": "/media/images/characters/spider-man.webp",
 	"Iron Man": "/media/images/characters/iron-man.avif",
 	"Captain America": "/media/images/characters/captain-america.webp",
-	"Thor": "/media/images/characters/thor.webp",
-	"Hulk": "/media/images/characters/hulk.avif",
+	Thor: "/media/images/characters/thor.webp",
+	Hulk: "/media/images/characters/hulk.avif",
 
-	"Thanos": "/media/images/characters/thanos.webp",
-	"Loki": "/media/images/characters/loki.webp",
-	"Ultron": "/media/images/characters/ultron.jpeg",
+	Thanos: "/media/images/characters/thanos.webp",
+	Loki: "/media/images/characters/loki.webp",
+	Ultron: "/media/images/characters/ultron.jpeg",
 	"Red Skull": "/media/images/characters/red-skull.webp",
-	"Hela": "/media/images/characters/hela.webp",
+	Hela: "/media/images/characters/hela.webp",
 	"Doctor Doom": "/media/images/characters/doctor-doom.jpeg",
 };
 
@@ -61,7 +62,9 @@ export const fetchCharactersByName = async (name) => {
 		const imgValid = await testImage(character.image?.url);
 		if (!imgValid) {
 			const localImageValid = await testImage(localCharacterImage[name]);
-			character.image.url = localImageValid ? localCharacterImage[name] : "/media/images/backgrounds/img-back.jpg";
+			character.image.url = localImageValid
+				? localCharacterImage[name]
+				: "/media/images/backgrounds/img-back.jpg";
 
 			const finalCheck = await testImage(character.image.url);
 			if (!finalCheck) {
@@ -179,7 +182,7 @@ export const handleCharacterSelection = async (initialLoad = false) => {
 
 			if (card) {
 				card.classList.add("selected-card");
-				checkFormValidity();
+				checkValidStartGame();
 			}
 		}
 	} else {

@@ -189,13 +189,13 @@ export const showLeveleInfo = () => {
 								text: "Start Battle",
 								action: async () => {
 									hideModal();
-                                    mapScreen.style.display = "none";
-                                    battleScreen.style.display = "flex";
+									mapScreen.style.display = "none";
+									battleScreen.style.display = "flex";
 
-                                    saveToStorage("currentScreen", "battle")
-                                    await renderBattleCards(enemy.name);
+									saveToStorage("currentScreen", "battle");
+									await renderBattleCards(enemy.name);
 
-                                    saveToStorage("currentLevel", levelNumber);
+									saveToStorage("currentLevel", levelNumber);
 								},
 							},
 						}
@@ -253,35 +253,35 @@ export const movePlayerToLevel = (targetLevel) => {
 
 // Función para cargar posición guardada
 export const loadPlayerPosition = () => {
-    const savedPosition = loadFromStorage('playerPosition');
-    const player = document.getElementById('player');
-    
-    if (savedPosition) {
-        player.style.left = `${savedPosition.x}px`;
-        player.style.top = `${savedPosition.y}px`;
-        player.style.transform = 'none';
-        
-        // Marcar nivel como visitado
-        const level = document.querySelector(`.level[data-level="${savedPosition.level}"]`);
-        if (level) {
-            level.classList.remove('locked');
-            level.classList.add('unlocked');
-        }
-    }
+	const savedPosition = loadFromStorage("playerPosition");
+	const player = document.getElementById("player");
+
+	if (savedPosition) {
+		player.style.left = `${savedPosition.x}px`;
+		player.style.top = `${savedPosition.y}px`;
+		player.style.transform = "none";
+
+		// Marcar nivel como visitado
+		const level = document.querySelector(`.level[data-level="${savedPosition.level}"]`);
+		if (level) {
+			level.classList.remove("locked");
+			level.classList.add("unlocked");
+		}
+	}
 };
 
 export const resetPlayerPosition = () => {
-    const player = document.getElementById('player');
-    
-    // Restablecer estilos a la posición inicial
-    player.style.transition = 'none'; // Desactivar transición para cambio instantáneo
-    player.style.left = '50%';
-    player.style.top = '1%';
-    player.style.transform = 'translateX(-50%)';
-    
-    // Forzar reflow para asegurar que los cambios se aplican
-    void player.offsetHeight;
-    
-    // Restaurar transición para futuros movimientos
-    player.style.transition = 'transform 0.5s ease-out';
+	const player = document.getElementById("player");
+
+	// Restablecer estilos a la posición inicial
+	player.style.transition = "none"; // Desactivar transición para cambio instantáneo
+	player.style.left = "50%";
+	player.style.top = "1%";
+	player.style.transform = "translateX(-50%)";
+
+	// Forzar reflow para asegurar que los cambios se aplican
+	void player.offsetHeight;
+
+	// Restaurar transición para futuros movimientos
+	player.style.transition = "transform 0.5s ease-out";
 };
