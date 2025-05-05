@@ -510,7 +510,7 @@ h1 {
 .player-battle-card-content img {
 	display: flex;
 	object-fit: cover;
-	object-position: center 30%;
+	object-position: center 20%;
 	height: 50%;
 	flex: 1;
 }
@@ -550,7 +550,7 @@ h1 {
 .character-card[data-context="battle"] img {
 	display: flex;
 	object-fit: cover;
-	object-position: center 30%;
+	object-position: center 20%;
 	height: 50%;
 	flex: 1;
 }
