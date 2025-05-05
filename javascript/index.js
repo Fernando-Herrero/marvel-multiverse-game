@@ -12,22 +12,6 @@ import {
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
-export const localCharacterImage = {
-	"Black Widow": "/media/images/characters/black-widow.jpeg",
-	"Spider-Man": "/media/images/characters/spider-man.webp",
-	"Iron Man": "/media/images/characters/iron-man.avif",
-	"Captain America": "/media/images/characters/captain-america.webp",
-	"Thor": "/media/images/characters/thor.webp",
-	"Hulk": "/media/images/characters/hulk.avif",
-
-	"Thanos": "/media/images/characters/thanos.webp",
-	"Loki": "/media/images/characters/loki.webp",
-	"Ultron": "/media/images/characters/ultron.jpeg",
-	"Red Skull": "/media/images/characters/red-skull.webp",
-	"Hela": "/media/images/characters/hela.webp",
-	"Doctor Doom": "/media/images/characters/doctor-doom.jpeg",
-};
-
 const inputUserName = document.getElementById("username");
 const charactersSelect = document.getElementById("characters-selector");
 const startGameBtn = document.getElementById("start-game-btn");
@@ -97,7 +81,7 @@ const setupEventListeners = () => {
 		}
 
 		loginScreen.style.display = "none";
-		mapScreen.style.display = "block";
+		mapScreen.style.display = "flex";
 		navbar.style.display = "flex";
 		title.style.display = "none";
 
@@ -188,6 +172,7 @@ const setupEventListeners = () => {
 		resetPlayerPosition();
 
 		loginScreen.style.display = "flex";
+		mapScreen.classList.remove("active");
 		mapScreen.style.display = "none";
 		navbar.style.display = "none";
 		title.style.display = "flex";
@@ -199,7 +184,7 @@ const setupEventListeners = () => {
 		const selectedCard = document.querySelector(".character-card.selected-card");
 		selectedCard?.classList.remove("selected-card");
 
-		showModal("Has cerrado sesión correctamente");
+		showModal("You've succesfully logout.");
 	});
 
 	reset.addEventListener("click", () => {
@@ -289,7 +274,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	if (gameStarted) {
 		loginScreen.style.display = "none";
-		mapScreen.style.display = "block";
+		mapScreen.style.display = "flex";
 		navbar.style.display = "flex";
 		title.style.display = "none";
 
@@ -300,6 +285,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		if (savedPlayerImg) imgPlayer.src = savedPlayerImg;
 	} else {
 		loginScreen.style.display = "flex";
+		mapScreen.classList.remove("active");
 		mapScreen.style.display = "none";
 	}
 
@@ -310,15 +296,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 		battleScreen.style.display = "flex";
 
 		const battleState = loadFromStorage("battleState");
-		if (battleState?.enemyName) {
-			await renderBattleCards(battleState.enemyName);
+		if (battleState?.enemy) {
+			await renderBattleCards(battleState.enemy.name);
 		} else {
-			mapScreen.style.display = "flex";
+			// mapScreen.style.display = "flex";
 			battleScreen.style.display = "none";
-			saveToStorage("currentScren", "map");
+			saveToStorage("currentScreen", "map");
 		}
 	} else {
-		mapScreen.style.display = "flex";
+		// mapScreen.style.display = "flex";
 		battleScreen.style.display = "none";
 	}
 

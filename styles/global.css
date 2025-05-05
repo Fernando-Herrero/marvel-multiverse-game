@@ -332,6 +332,14 @@ h1 {
 	transition: none;
 }
 
+.map-screen {
+	display: none;
+}
+
+.map-screen.active {
+	display: flex;
+}
+
 #map {
 	position: relative;
 	width: 100%;
@@ -487,7 +495,7 @@ h1 {
 	flex-direction: column;
 	height: 100%;
 	width: 80%;
-	border: 2px solid var(--contrast-color);
+	border: 1px solid var(--contrast-color);
 	border-radius: 12px;
 	background-color: var(--primary-color-dark);
 	overflow: hidden;
@@ -521,15 +529,18 @@ h1 {
 }
 
 #enemy-battle-card {
+	display: flex;
+	flex-direction: column;
 	width: 80%;
 	height: 100%;
 	background-color: var(--primary-color-dark);
+	overflow: hidden;
 }
 
 .character-card[data-context="battle"] {
 	max-width: none;
+	height: 100%;
 	cursor: default !important;
-	pointer-events: none;
 }
 
 .character-card[data-context="battle"]:hover {

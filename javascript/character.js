@@ -1,9 +1,25 @@
-import { checkFormValidity, imgPlayer, localCharacterImage, navbar } from "./index.js";
+import { checkFormValidity, imgPlayer, navbar } from "./index.js";
 import { enemiesInLevel } from "./map.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
 export const villains = ["Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Doctor Doom"];
+
+const localCharacterImage = {
+	"Black Widow": "/media/images/characters/black-widow.jpeg",
+	"Spider-Man": "/media/images/characters/spider-man.webp",
+	"Iron Man": "/media/images/characters/iron-man.avif",
+	"Captain America": "/media/images/characters/captain-america.webp",
+	"Thor": "/media/images/characters/thor.webp",
+	"Hulk": "/media/images/characters/hulk.avif",
+
+	"Thanos": "/media/images/characters/thanos.webp",
+	"Loki": "/media/images/characters/loki.webp",
+	"Ultron": "/media/images/characters/ultron.jpeg",
+	"Red Skull": "/media/images/characters/red-skull.webp",
+	"Hela": "/media/images/characters/hela.webp",
+	"Doctor Doom": "/media/images/characters/doctor-doom.jpeg",
+};
 
 const apiKey = "eabf24a441ea28d7278fbc8d0be33589";
 
@@ -19,7 +35,7 @@ const testImage = (url) => {
 		img.onerror = () => resolve(false);
 		img.src = url;
 
-		setTimeout(() => resolve(false), 4000);
+		setTimeout(() => resolve(false), 2000);
 	});
 };
 

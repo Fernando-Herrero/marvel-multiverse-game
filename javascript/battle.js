@@ -2,16 +2,35 @@ import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const renderBattleCards = async (enemyName) => {
+	const existingBattle = loadFromStorage("battleState");
 
 	const playerData = loadFromStorage("playerCharacter");
+	let enemyData;
 
-	const enemyData = await fetchCharactersByName(enemyName);
+	if (existingBattle && existingBattle.enemy) {
+		enemyData = existingBattle.enemy;
+	} else {
+		enemyData = await fetchCharactersByName(enemyName);
 
-    saveToStorage("currentEnemy", {
-        name:enemyData.name,
-        imageUrl: enemyData.image.url,
-    })
+		saveToStorage("battleState", {
+			enemy: enemyData,
+			playerHP: 100,
+			enemyHP: 100,
+			currentTurn: "player",
+		});
+	}
 
+	saveToStorage("currentScreen", "battle");
+
+	renderPlayerCard(playerData);
+	renderEnemyCard(enemyData);
+
+	if (existingBattle) {
+		restoreBattleState(existingBattle);
+	}
+};
+
+const renderPlayerCard = (playerData) => {
 	const playerBattleCardContainer = document.getElementById("player-battle-card");
 	playerBattleCardContainer.innerHTML = "";
 
@@ -47,7 +66,9 @@ export const renderBattleCards = async (enemyName) => {
 
 		playerBattleCardContainer.appendChild(playerBattleCard);
 	}
+};
 
+const renderEnemyCard = (enemyData) => {
 	const enemyCardBattleContainer = document.getElementById("enemy-battle-card");
 	enemyCardBattleContainer.innerHTML = "";
 
@@ -57,13 +78,21 @@ export const renderBattleCards = async (enemyName) => {
 			loadFromStorage("characterType") === "heroes" ? "villain" : "hero"
 		);
 
-        enemyCard.style.pointerEvents = "none";
-        enemyCard.dataset.context = "battle";
-        enemyCard.dataset.role = "enemy";
+		enemyCard.style.pointerEvents = "none";
+		enemyCard.dataset.context = "battle";
+		enemyCard.dataset.role = "enemy";
 
-        const hijos = enemyCard.querySelectorAll(".card-info-character");
-        hijos.forEach(hijo => hijo.dataset.context = "battle");
+		const hijos = enemyCard.querySelectorAll(".card-info-character");
+		hijos.forEach((hijo) => (hijo.dataset.context = "battle"));
 
 		enemyCardBattleContainer.appendChild(enemyCard);
 	}
+};
+
+const restoreBattleState = (battleState) => {
+	const playerHealth = document.querySelector(".bar-ps-player");
+	const enemyHealth = document.querySelector(".bar-ps-enemy");
+
+	if (playerHealth) playerHealth.style.width = `${battleState.playerHP}%`;
+	if (enemyHealth) enemyHealth.style.width = `${battleState.enemyHP}%`;
 };
