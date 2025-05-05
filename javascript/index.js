@@ -189,6 +189,7 @@ const setupEventListeners = () => {
 
 		showModal("You've succesfully logout.", {
 			confirmText: "Accept",
+			isConfirmation:false
 		});
 	});
 

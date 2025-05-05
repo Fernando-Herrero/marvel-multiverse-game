@@ -20,8 +20,9 @@ export const showModal = (message, options = {}) => {
 	modalBackdrop.style.display = "flex";
 	document.body.style.overflow = "hidden";
 
+	modalAcceptBtn.textContent = options.confirmText || "Accept";
+
 	if (options.isConfirmation) {
-		modalAcceptBtn.textContent = options.confirmText || "Accept";
 		modalCloseBtn.textContent = options.cancelText || "Cancel";
 		modalCloseBtn.style.display = "inline-block";
 	} else {
