@@ -168,8 +168,11 @@ const setupEventListeners = () => {
 		clearStorageKey("selectedCharacter");
 		clearStorageKey("gameStarted");
 		clearStorageKey("playerPosition");
+		clearStorageKey("currentScreen");
 
 		resetPlayerPosition();
+
+		saveToStorage("currentScreen", "login");
 
 		loginScreen.style.display = "flex";
 		mapScreen.classList.remove("active");
@@ -184,7 +187,9 @@ const setupEventListeners = () => {
 		const selectedCard = document.querySelector(".character-card.selected-card");
 		selectedCard?.classList.remove("selected-card");
 
-		showModal("You've succesfully logout.");
+		showModal("You've succesfully logout.", {
+			confirmText: "Accept",
+		});
 	});
 
 	reset.addEventListener("click", () => {
@@ -234,7 +239,42 @@ const setupEventListeners = () => {
 document.addEventListener("DOMContentLoaded", async () => {
 	loadPlayerPosition();
 
+	const currentScreen = loadFromStorage("currentScreen") || "login";
+	const gameStarted = loadFromStorage("gameStarted");
 	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
+
+	loginScreen.style.display = "flex";
+	title.style.display = "flex";
+	navbar.style.display = "none";
+	mapScreen.style.display = "none";
+	battleScreen.style.display = "none";
+	aside.style.display = "none";
+
+	if (currentScreen && gameStarted) {
+		loginScreen.style.display = "none";
+		title.style.display = "none";
+
+		switch (currentScreen) {
+			case "map":
+				navbar.style.display = "flex";
+				mapScreen.style.display = "flex";
+				break;
+
+			case "battle":
+				navbar.style.display = "flex";
+				battleScreen.style.display = "flex";
+
+				const battleState = loadFromStorage("battleState");
+				if (battleState?.enemy) {
+					await renderBattleCards(battleState.enemy.name);
+				} else {
+					saveToStorage("currentScreen", "map");
+					mapScreen.style.display = "flex";
+					battleScreen.style.display = "none";
+				}
+				break;
+		}
+	}
 
 	if (levelOneUnlocked) {
 		for (let i = 0; i < levels.length; i++) {
@@ -247,7 +287,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 
 	setupEventListeners();
-
 	enemiesInLevel();
 
 	const savedUserName = loadFromStorage("userName") || "";
@@ -270,65 +309,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	}
 
-	const gameStarted = loadFromStorage("gameStarted");
-
-	if (gameStarted) {
-		loginScreen.style.display = "none";
-		mapScreen.style.display = "flex";
-		navbar.style.display = "flex";
-		title.style.display = "none";
-
-		const savedPlayerName = loadFromStorage("playerName");
-		const savedPlayerImg = loadFromStorage("playerImg");
-
-		if (savedPlayerName) namePlayer.textContent = savedPlayerName;
-		if (savedPlayerImg) imgPlayer.src = savedPlayerImg;
-	} else {
-		loginScreen.style.display = "flex";
-		mapScreen.classList.remove("active");
-		mapScreen.style.display = "none";
-	}
-
-	const currentScreen = loadFromStorage("currentScreen");
-
-	if (currentScreen === "battle") {
-		mapScreen.style.display = "none";
-		battleScreen.style.display = "flex";
-
-		const battleState = loadFromStorage("battleState");
-		if (battleState?.enemy) {
-			await renderBattleCards(battleState.enemy.name);
-		} else {
-			// mapScreen.style.display = "flex";
-			battleScreen.style.display = "none";
-			saveToStorage("currentScreen", "map");
-		}
-	} else {
-		// mapScreen.style.display = "flex";
-		battleScreen.style.display = "none";
-	}
-
-	const mainBriefing = loadFromStorage("mainBriefing");
-
-	if (mainBriefing && mainBriefing.briefingShow && !mainBriefing.briefingCompleted) {
-		showBriefing(
-			`Welcome ${inputUserName.value} to the Multiverse Challenge`,
-			`As Earth's ${
-				selectedValue === "heroes" ? "newest protector" : "most feared conqueror"
-			}, you must face 6 formidable opponents across fractured realities.\n\n` +
-				`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
-				`Choose wisely - your ${
-					selectedValue === "heroes" ? "heroic actions" : "villainous schemes"
-				} will echo through eternity.`,
-			{
-				after: {
-					text: "Enter the Multiverse",
-					action: () => {
-						hideModal();
-						saveToStorage("mainBriefign", { ...mainBriefing, briefingCompleted: true });
+	if (currentScreen === "map" && gameStarted) {
+		const mainBriefing = loadFromStorage("mainBriefing");
+		if (mainBriefing && mainBriefing.briefingShow && !mainBriefing.briefingCompleted) {
+			showBriefing(
+				`Welcome ${inputUserName.value} to the Multiverse Challenge`,
+				`As Earth's ${
+					selectedValue === "heroes" ? "newest protector" : "most feared conqueror"
+				}, you must face 6 formidable opponents across fractured realities.\n\n` +
+					`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
+					`Choose wisely - your ${
+						selectedValue === "heroes" ? "heroic actions" : "villainous schemes"
+					} will echo through eternity.`,
+				{
+					after: {
+						text: "Enter the Multiverse",
+						action: () => {
+							hideModal();
+							saveToStorage("mainBriefign", { ...mainBriefing, briefingCompleted: true });
+						},
 					},
-				},
-			}
-		);
+				}
+			);
+		}
 	}
 });
