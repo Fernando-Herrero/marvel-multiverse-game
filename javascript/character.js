@@ -1,7 +1,7 @@
 import { navbar } from "./index.js";
 import { checkValidStartGame, imgPlayer } from "./login.js";
 import { enemiesInLevel } from "./map.js";
-import { loadFromStorage, saveToStorage } from "./storage.js";
+import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 
 export const heroes = ["Black Widow", "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk"];
 export const villains = ["Thanos", "Loki", "Ultron", "Red Skull", "Hela", "Doctor Doom"];
@@ -187,6 +187,6 @@ export const handleCharacterSelection = async (initialLoad = false) => {
 		}
 	} else {
 		clearStorageKey("selectedCharacter");
-		checkFormValidity();
+		checkValidStartGame();
 	}
 };

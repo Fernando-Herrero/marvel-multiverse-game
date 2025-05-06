@@ -1,6 +1,7 @@
 import { renderBattleCards } from "./battle.js";
 import { fetchCharactersByName } from "./character.js";
 import { mapScreen } from "./index.js";
+import { charactersSelect } from "./login.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 import { hideModal, showBriefing } from "./utils.js";
 
@@ -132,10 +133,8 @@ export const imageEnemies = async () => {
 };
 
 export const enemiesInLevel = async () => {
-	await imageEnemies();
+	const currentSelection = charactersSelect?.value || loadFromStorage("characterType") || "heroes";
 
-	const charactersSelect = document.getElementById("characters-selector");
-	const currentSelection = charactersSelect.value;
 	const enemiesToUse = currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
 
 	levels.forEach((level) => {
@@ -143,12 +142,12 @@ export const enemiesInLevel = async () => {
 
 		const levelNumber = parseInt(level.dataset.level);
 
-		const enemiesForThisLevel = enemiesToUse.find((enemy) => enemy.level === levelNumber);
+		const enemy = enemiesToUse.find((enemy) => enemy.level === levelNumber);
 
-		if (enemiesForThisLevel && enemiesForThisLevel.imageUrl) {
+		if (enemy?.imageUrl) {
 			const imgEnemie = document.createElement("img");
-			imgEnemie.src = enemiesForThisLevel.imageUrl;
-			imgEnemie.alt = enemiesForThisLevel.name;
+			imgEnemie.src = enemy.imageUrl;
+			imgEnemie.alt = enemy.name;
 			imgEnemie.classList.add("enemy-character");
 
 			level.appendChild(imgEnemie);
@@ -168,40 +167,59 @@ export const showFirstLevel = () => {
 };
 
 export const showLeveleInfo = () => {
-	const charactersSelect = document.getElementById("characters-selector");
-	const currentSelection = charactersSelect.value;
-	const enemiesToUse = currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
+	const getCurrentEnemies = () => {
+		const charactersSelect = document.getElementById("characters-selector");
+		const currentSelection = charactersSelect.value;
+		return currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
+	};
+
+	const handleLevelClick = async (level, enemies) => {
+		const levelNumber = parseInt(level.dataset.level);
+		const enemy = enemies.find((enemy) => enemy.level === levelNumber);
+
+		if (!enemy) return;
+
+		await movePlayerToLevel(level);
+		await showBattleBriefing(enemy);
+	};
+
+	const showBattleBriefing = async (enemy) => {
+		return new Promise((resolve) => {
+			showBriefing(
+				`Level: ${enemy.level}. ${enemy.name}`,
+				`${enemy.description}<br>Powers: ${enemy.powers}<br>Reward: ${enemy.reward}`,
+				{
+					after: {
+						text: "Start Battle",
+						action: async () => {
+							await startBattleFlow(enemy);
+							resolve();
+						},
+					},
+				}
+			);
+		});
+	};
+
+	const startBattleFlow = async (enemy) => {
+		hideModal();
+		mapScreen.style.display = "none";
+		battleScreen.style.display = "flex";
+
+		saveToStorage("currentScreen", "battle");
+		await renderBattleCards(enemy.name);
+		saveToStorage("currentLevel", enemy.level);
+	};
 
 	levels.forEach((level) => {
-		if (level.classList.contains("unlocked")) {
-			level.addEventListener("click", async () => {
-				const levelNumber = parseInt(level.dataset.level);
-				const enemy = enemiesToUse.find((enemy) => enemy.level === levelNumber);
+		level.replaceWith(level.cloneNode(true));
+	});
 
-				await movePlayerToLevel(level);
+	const enemies = getCurrentEnemies();
 
-				if (enemy) {
-					showBriefing(
-						`Level: ${enemy.level}. ${enemy.name}`,
-						`${enemy.description}<br>Powers: ${enemy.powers}<br>Reward: ${enemy.reward}`,
-						{
-							after: {
-								text: "Start Battle",
-								action: async () => {
-									hideModal();
-									mapScreen.style.display = "none";
-									battleScreen.style.display = "flex";
-
-									saveToStorage("currentScreen", "battle");
-									await renderBattleCards(enemy.name);
-
-									saveToStorage("currentLevel", levelNumber);
-								},
-							},
-						}
-					);
-				}
-			});
+	document.querySelectorAll(".level.unlocked").forEach((level) => {
+		if (level.querySelector("img")) {
+			level.addEventListener("click", () => handleLevelClick(level, enemies));
 		}
 	});
 };
@@ -267,6 +285,7 @@ export const loadPlayerPosition = () => {
 			level.classList.remove("locked");
 			level.classList.add("unlocked");
 		}
+		showLeveleInfo();
 	}
 };
 

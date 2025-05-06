@@ -1,4 +1,5 @@
 import { renderBattleCards } from "./battle.js";
+import { handleCharacterSelection } from "./character.js";
 import {
 	aside,
 	charactersSelect,
@@ -10,7 +11,16 @@ import {
 	setupGameListeners,
 	setupLoginListeners,
 } from "./login.js";
-import { battleScreen, enemiesInLevel, levels, loadPlayerPosition, resetPlayerPosition } from "./map.js";
+import {
+	battleScreen,
+	enemiesInLevel,
+	imageEnemies,
+	levels,
+	loadPlayerPosition,
+	resetPlayerPosition,
+	showFirstLevel,
+	showLeveleInfo,
+} from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
@@ -156,43 +166,19 @@ const setupEventListeners = () => {
 	});
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
-	loginScreen.style.display = "flex";
-	title.style.display = "flex";
-	navbar.style.display = "none";
-	mapScreen.style.display = "none";
-	battleScreen.style.display = "none";
-	aside.style.display = "none";
-
-	const currentScreen = loadFromStorage("currentScreen") || "login";
-	const gameStarted = loadFromStorage("gameStarted");
-	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
-
-	if (currentScreen && gameStarted) {
-		loginScreen.style.display = "none";
-		title.style.display = "none";
-
-		switch (currentScreen) {
-			case "map":
-				navbar.style.display = "flex";
-				mapScreen.style.display = "flex";
-				break;
-
-			case "battle":
-				navbar.style.display = "flex";
-				battleScreen.style.display = "flex";
-
-				const battleState = loadFromStorage("battleState");
-				if (battleState?.enemy) {
-					await renderBattleCards(battleState.enemy.name);
-				} else {
-					saveToStorage("currentScreen", "map");
-					mapScreen.style.display = "flex";
-					battleScreen.style.display = "none";
-				}
-				break;
-		}
+const loadGameState = async (currentScreen) => {
+	switch (currentScreen) {
+		case "map":
+			await loadMapState();
+			break;
+		case "battle":
+			await loadbattleState();
+			break;
 	}
+};
+
+const loadMapState = async () => {
+	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
 
 	if (levelOneUnlocked) {
 		for (let i = 0; i < levels.length; i++) {
@@ -202,7 +188,34 @@ document.addEventListener("DOMContentLoaded", async () => {
 				break;
 			}
 		}
+		showFirstLevel();
 	}
+
+	await enemiesInLevel();
+	loadPlayerPosition();
+
+	navbar.style.display = "flex";
+	mapScreen.style.display = "flex";
+	showLeveleInfo();
+};
+
+const loadbattleState = async () => {
+	navbar.style.display = "flex";
+	battleScreen.style.display = "flex";
+
+	const battleState = loadFromStorage("battleState");
+	if (battleState?.enemy) {
+		await renderBattleCards(battleState.enemy.name);
+	} else {
+		saveToStorage("currentScreen", "map");
+		mapScreen.style.display = "flex";
+		battleScreen.style.display = "none";
+	}
+};
+
+const setupPlayerState = () => {
+	const savedUserName = loadFromStorage("userName") || "";
+	inputUserName.value = savedUserName;
 
 	const savedPlayerImg = loadFromStorage("playerImg");
 	if (savedPlayerImg) {
@@ -213,19 +226,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 	if (savedCharacter) {
 		infoHeroContainer.appendChild(renderCardInfohero(savedCharacter));
 	}
+};
 
-	loadPlayerPosition();
-	setupEventListeners();
-	enemiesInLevel();
-
-	const savedUserName = loadFromStorage("userName") || "";
-	inputUserName.value = savedUserName;
-
+const setupCharacterSelection = async () => {
 	const savedCharacterType = loadFromStorage("characterType") || "heroes";
 	charactersSelect.value = savedCharacterType;
 
+	await handleCharacterSelection();
+
 	await new Promise((resolve) => {
-		charactersSelect.addEventListener("change", resolve, { once: true });
+		charactersSelect.addEventListener(
+			"change",
+			async () => {
+				await handleCharacterSelection();
+				resolve();
+			},
+			{ once: true }
+		);
 		charactersSelect.dispatchEvent(new Event("change"));
 	});
 
@@ -237,30 +254,64 @@ document.addEventListener("DOMContentLoaded", async () => {
 			checkValidStartGame();
 		}
 	}
+};
 
-	if (currentScreen === "map" && gameStarted) {
-		const mainBriefing = loadFromStorage("mainBriefing");
-		if (mainBriefing && mainBriefing.briefingShow && !mainBriefing.briefingCompleted) {
-			const currentSelectedValue = charactersSelect.value;
-			showBriefing(
-				`Welcome ${inputUserName.value} to the Multiverse Challenge`,
-				`As Earth's ${
-					currentSelectedValue === "heroes" ? "newest protector" : "most feared conqueror"
-				}, you must face 6 formidable opponents across fractured realities.\n\n` +
-					`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
-					`Choose wisely - your ${
-						currentSelectedValue === "heroes" ? "heroic actions" : "villainous schemes"
-					} will echo through eternity.`,
-				{
-					after: {
-						text: "Enter the Multiverse",
-						action: () => {
-							hideModal();
-							saveToStorage("mainBriefing", { ...mainBriefing, briefingCompleted: true });
-						},
-					},
-				}
-			);
+const showInitialBriefing = () => {
+	if (loadFromStorage("currentScreen") !== "map" || !loadFromStorage("gameStarted")) return;
+
+	const mainBriefing = loadFromStorage("mainBriefing");
+	if (!mainBriefing?.briefingShow || mainBriefing.briefingCompleted) return;
+
+	const currentSelectedValue = charactersSelect.value;
+	showBriefing(
+		`Welcome ${inputUserName.value} to the Multiverse Challenge`,
+		`As Earth's ${
+			currentSelectedValue === "heroes" ? "newest protector" : "most feared conqueror"
+		}, you must face 6 formidable opponents across fractured realities.\n\n` +
+			`Each victory brings you closer to controlling the Nexus of All Realities.\n` +
+			`Choose wisely - your ${
+				currentSelectedValue === "heroes" ? "heroic actions" : "villainous schemes"
+			} will echo through eternity.`,
+		{
+			after: {
+				text: "Enter the Multiverse",
+				action: () => {
+					hideModal();
+					saveToStorage("mainBriefing", { ...mainBriefing, briefingCompleted: true });
+				},
+			},
 		}
+	);
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+	try {
+		[loginScreen, mapScreen, battleScreen, aside, title, navbar].forEach((el) => {
+			el.style.display = "none";
+		});
+
+		const currentScreen = loadFromStorage("currentScreen") || "login";
+		const gameStarted = loadFromStorage("gameStarted");
+
+		await imageEnemies();
+
+		if (currentScreen && gameStarted) {
+			await loadGameState(currentScreen);
+		} else {
+			loginScreen.style.display = "flex";
+			title.style.display = "flex";
+		}
+
+		setupPlayerState();
+		await setupCharacterSelection();
+		setupEventListeners();
+
+		if (currentScreen === "map") {
+			showInitialBriefing();
+		}
+	} catch (error) {
+		console.error("Initialization error:", error);
+		loginScreen.style.display = "flex";
+		title.style.display = "flex";
 	}
 });
