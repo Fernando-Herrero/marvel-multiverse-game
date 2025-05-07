@@ -15,18 +15,19 @@ export const renderBattleCards = async (enemyName) => {
 
 		saveToStorage("battleState", {
 			player: {
+				character: playerData,
 				currentHp: 100,
 				maxHp: 100,
 				defenseModifier: 0,
 				statusEffects: [],
 			},
 			enemy: {
+				character: enemyData,
 				currentHp: 100,
 				maxHp: 100,
 				defenseModifier: 0,
 				statusEffects: [],
 			},
-			playerHP: 100,
 			turn: "player",
 			specialAbilityUsed: false,
 		});
@@ -106,12 +107,6 @@ const restoreBattleState = (battleState) => {
 	if (enemyHealth) enemyHealth.style.width = `${battleState.enemyHP}%`;
 };
 
-const playerHealth = document.querySelector(".bar-ps-player");
-const enemyHealth = document.querySelector(".bar-ps-enemy");
-
-const playerCard = document.getElementById("player-battle-card");
-const enemyCard = document.getElementById("enemy-battle-card");
-
 const setupBattleActions = () => {
 	const attackbtn = document.getElementById("attack");
 	attackbtn.addEventListener("click", () => executeAction("attack"));
@@ -132,29 +127,82 @@ const executeAction = (action) => {
 	if (battleState.turn !== "player") return;
 
 	let result;
+	let turn = 0;
 
 	switch (action) {
 		case "attack":
 			result = calculateAttack();
 			break;
 		case "defence":
-			result = calculateDefence();
+			result = { message: "You brace yourself to defend against the next attack" };
+			battleState.player.defenseModifier = 10;
 			break;
-        case "sepecial-skill":
-            result = calculateSpecialSkill();
-            break;
-        case "dodge":
-            result = calculateDodge();
-            break;
+		case "sepecial-skill":
+			result = calculateSpecialSkill();
+			break;
+		case "dodge":
+			result = calculateDodge();
+			break;
 	}
 
-    //Funciones de enemigo y actualizar batalla
+	updateBattleUi(result);
+
+	if (action !== "defence") {
+		processEnemyTurn();
+	}
+
+	turn++;
 };
 
 const calculateAttack = () => {
-    const battleState = loadFromStorage("battleState");
-    const player = loadFromStorage("playerCharacter");
-    const enemy = battleState.enemy;
+	const battleState = loadFromStorage("battleState");
+	const player = loadFromStorage("playerCharacter");
+	const enemy = battleState.enemy;
 
-    const attackPower = player.powerstats
+	const attackPower = player.powerstats.strength + Math.random() * 20;
+	const defensePower = player.powerstats.durability + Math.random() * 15 + enemy.defenseModifier;
+
+	if (attackPower > defensePower) {
+		const damage = Math.max(5, Math.floor(attackPower - defensePower));
+		enemy.currentHp = Math.max(0, enemy.currentHp - damage);
+
+		saveToStorage("battleState", battleState);
+
+		return {
+			success: true,
+			damage,
+			message: `Successful attack! ${player.name} deals ${damage} damage points`,
+		};
+	} else {
+		return {
+			success: false,
+			message: `${enemy.character.name} blocked the attack`,
+		};
+	}
+};
+
+const calculateDodge = () => {
+	const battleState = loadFromStorage("battleState");
+	const player = loadFromStorage("playerCharacter");
+	const enemy = battleState.enemy;
+};
+
+const calculateSpecialSkill = () => {};
+
+const updateBattleUi = () => {
+	const battleText = document.getElementById("battle-text");
+
+	battleText.textContent = result.message;
+	battleText.style.display = "block";
+
+	const battleState = loadFromStorage("battleState");
+	document.querySelector(".bar-ps-player").style.width = `${battleState.player.currentHp}%`;
+	document.querySelector(".bar-ps-enemy").style.width = `${battleState.enemy.currentHp}%`;
+
+	if (result.success) {
+		document.getElementById("enemy-battle-card").classList.add("sake-effect");
+		setTimeout(() => {
+			document.getElementById("enemy-battle-card").classList.remove("shake-effect");
+		}, 500);
+	}
 };

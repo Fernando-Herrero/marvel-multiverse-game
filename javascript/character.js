@@ -81,7 +81,7 @@ export const fetchCharactersByName = async (name) => {
 			combat: parseInt(character.powerstats.combat) || 50,
 		};
 
-		if (!charactersSelect.specialAbility) {
+		if (!character.specialAbility) {
 			const specialAbilities = {
 				"Black Widow": {
 					name: "Tactical Ambush",

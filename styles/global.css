@@ -663,6 +663,83 @@ h1 {
 	display: none;
 }
 
+.attack-effect {
+	animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	20% {
+		transform: translateX(-10px);
+	}
+	40% {
+		transform: translateX(10px);
+	}
+	60% {
+		transform: translateX(-8px);
+	}
+	80% {
+		transform: translateX(8px);
+	}
+}
+
+.defense-effect {
+	animation: defenseGlow 1s ease;
+}
+
+@keyframes defenseGlow {
+	0% {
+		box-shadow: 0 0 0 0 rgba(0, 100, 255, 0.7);
+	}
+	50% {
+		box-shadow: 0 0 20px 10px rgba(0, 100, 255, 0.3);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(0, 100, 255, 0);
+	}
+}
+
+.dodge-effect {
+	animation: dodgeSlide 0.5s ease-out;
+}
+
+@keyframes dodgeSlide {
+	0% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-30px);
+	}
+	50% {
+		transform: translateX(30px);
+	}
+	100% {
+		transform: translateX(0);
+	}
+}
+
+.special-effect {
+	animation: specialPulse 0.8s ease-out;
+}
+
+@keyframes specialPulse {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	50% {
+		transform: scale(1.2);
+		opacity: 0.7;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
 /* ===== Aside ===== */
 .aside {
 	display: none;
