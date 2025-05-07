@@ -1,4 +1,5 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
+import { battleScreen } from "./map.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const renderBattleCards = async (enemyName) => {
@@ -13,10 +14,21 @@ export const renderBattleCards = async (enemyName) => {
 		enemyData = await fetchCharactersByName(enemyName);
 
 		saveToStorage("battleState", {
-			enemy: enemyData,
+			player: {
+				currentHp: 100,
+				maxHp: 100,
+				defenseModifier: 0,
+				statusEffects: [],
+			},
+			enemy: {
+				currentHp: 100,
+				maxHp: 100,
+				defenseModifier: 0,
+				statusEffects: [],
+			},
 			playerHP: 100,
-			enemyHP: 100,
-			currentTurn: "player",
+			turn: "player",
+			specialAbilityUsed: false,
 		});
 	}
 
@@ -90,9 +102,59 @@ const renderEnemyCard = (enemyData) => {
 };
 
 const restoreBattleState = (battleState) => {
-	const playerHealth = document.querySelector(".bar-ps-player");
-	const enemyHealth = document.querySelector(".bar-ps-enemy");
-
 	if (playerHealth) playerHealth.style.width = `${battleState.playerHP}%`;
 	if (enemyHealth) enemyHealth.style.width = `${battleState.enemyHP}%`;
+};
+
+const playerHealth = document.querySelector(".bar-ps-player");
+const enemyHealth = document.querySelector(".bar-ps-enemy");
+
+const playerCard = document.getElementById("player-battle-card");
+const enemyCard = document.getElementById("enemy-battle-card");
+
+const setupBattleActions = () => {
+	const attackbtn = document.getElementById("attack");
+	attackbtn.addEventListener("click", () => executeAction("attack"));
+
+	const defencebtn = document.getElementById("defence");
+	defencebtn.addEventListener("click", () => executeAction("defence"));
+
+	const specialSkillkbtn = document.getElementById("special-skill");
+	specialSkillkbtn.addEventListener("click", () => executeAction("special-skill"));
+
+	const dodgekbtn = document.getElementById("dodge");
+	dodgekbtn.addEventListener("click", () => executeAction("dodge"));
+};
+
+const executeAction = (action) => {
+	const battleState = loadFromStorage("battleState");
+
+	if (battleState.turn !== "player") return;
+
+	let result;
+
+	switch (action) {
+		case "attack":
+			result = calculateAttack();
+			break;
+		case "defence":
+			result = calculateDefence();
+			break;
+        case "sepecial-skill":
+            result = calculateSpecialSkill();
+            break;
+        case "dodge":
+            result = calculateDodge();
+            break;
+	}
+
+    //Funciones de enemigo y actualizar batalla
+};
+
+const calculateAttack = () => {
+    const battleState = loadFromStorage("battleState");
+    const player = loadFromStorage("playerCharacter");
+    const enemy = battleState.enemy;
+
+    const attackPower = player.powerstats
 };

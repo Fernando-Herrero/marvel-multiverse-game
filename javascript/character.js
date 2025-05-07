@@ -57,7 +57,7 @@ export const fetchCharactersByName = async (name) => {
 			throw new Error("Character not found in API");
 		}
 
-		const character = name === "Thor" && data.results.length > 1 ? data.results[1] : data.results[0];
+		let character = name === "Thor" && data.results.length > 1 ? data.results[1] : data.results[0];
 
 		const imgValid = await testImage(character.image?.url);
 		if (!imgValid) {
@@ -71,6 +71,95 @@ export const fetchCharactersByName = async (name) => {
 				console.error(`All image sources failed for ${name}`);
 				character.image.url = "/media/images/backgrounds/img-back.jpg";
 			}
+		}
+
+		character.powerstats = {
+			strength: parseInt(character.powerstats.strength) || 50,
+			speed: parseInt(character.powerstats.speed) || 50,
+			durability: parseInt(character.powerstats.durability) || 50,
+			intelligence: parseInt(character.powerstats.intelligence) || 50,
+			combat: parseInt(character.powerstats.combat) || 50,
+		};
+
+		if (!charactersSelect.specialAbility) {
+			const specialAbilities = {
+				"Black Widow": {
+					name: "Tactical Ambush",
+					description: "Deals double damage if she dodged the previous turn.",
+					used: false,
+				},
+				"Spider-Man": {
+					name: "Paralyzing Web",
+					description: "The enemy cannot attack for one turn.",
+					used: false,
+				},
+				"Iron Man": {
+					name: "Pulse Blast",
+					description: "Massive attack that ignores enemy defense.",
+					used: false,
+				},
+				"Captain America": {
+					name: "Perfect Block",
+					description: "Cancels all damage for one turn. Increases defense on the next.",
+					used: false,
+				},
+				Thor: {
+					name: "Divine Thunder",
+					description: "Unavoidable. Deals double damage.",
+					used: false,
+				},
+				Hulk: {
+					name: "Uncontrollable Rage",
+					description: "Gains +5 strength for two turns, but loses defense.",
+					used: false,
+				},
+				Thanos: {
+					name: "Infinity Fist",
+					description: "Massive damage. Requires 1 turn of charge before use.",
+					used: false,
+				},
+				Loki: {
+					name: "Multiform Illusion",
+					description: "Creates a fake copy. 50% chance to dodge all attacks that turn.",
+					used: false,
+				},
+				Ultron: {
+					name: "Lethal Upgrade",
+					description: "Copies one ability used by the player.",
+					used: false,
+				},
+				"Red Skull": {
+					name: "Terror Domination",
+					description: "Lowers player's morale: reduces their attack for 2 turns.",
+					used: false,
+				},
+				Hela: {
+					name: "Summon the Dead",
+					description: "Heals and revives with 30% health if defeated once.",
+					used: false,
+				},
+				Killmonger: {
+					name: "Killer Instinct",
+					description: "Gets a second attack in the same turn if the first one hits.",
+					used: false,
+				},
+			};
+
+			character.specialAbility = specialAbilities[character.name] || {
+				name: "Ataque Básico Mejorado",
+				description: "Ataque normal con +20% de daño",
+				used: false,
+			};
+		}
+
+		if (!character.stats) {
+			character.stats = [
+				`Strength: ${character.powerstats.strength}`,
+				`Speed: ${character.powerstats.speed}`,
+				`Defence: ${character.powerstats.durability}`,
+				`Intelligence: ${character.powerstats.intelligence}`,
+				`Strategy: ${character.powerstats.combat}`,
+			];
 		}
 
 		return character;

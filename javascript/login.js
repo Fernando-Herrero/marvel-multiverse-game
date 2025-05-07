@@ -68,6 +68,12 @@ export const renderCardInfohero = (characterData) => {
 	return card;
 };
 
+const extractStatValue = (card, statIndex) => {
+	const statText = card.querySelector(`.character-stats p:nth-child(${statIndex})`).textContent;
+
+	return parseInt(statText.split(":")[1].trim()) || 50;
+};
+
 export const setupGameListeners = () => {
 	startGameBtn.addEventListener("click", (e) => {
 		const currentName = inputUserName.value.trim();
@@ -102,6 +108,14 @@ export const setupGameListeners = () => {
 				name: selectedCard.querySelector("h3").textContent,
 				imageUrl: selectedCard.querySelector("img").src,
 				stats: Array.from(selectedCard.querySelectorAll(".character-stats p")).map((p) => p.textContent),
+				powerstats: {
+					Intelligence: extractStatValue(selectedCard, 1),
+					Strength: extractStatValue(selectedCard, 2),
+					Speed: extractStatValue(selectedCard, 3),
+					Durability: extractStatValue(selectedCard, 4),
+					Power: extractStatValue(selectedCard, 5),
+					Combat: extractStatValue(selectedCard, 6),
+				},
 			};
 
 			saveToStorage("playerCharacter", characterData);
