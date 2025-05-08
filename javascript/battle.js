@@ -24,16 +24,16 @@ export const renderBattleCards = async (enemyName) => {
 				currentHp: 100,
 				maxHp: 100,
 				statusEffects: [],
+				specialUsed: false,
 			},
 			enemy: {
 				character: enemyData,
 				currentHp: 100,
 				maxHp: 100,
 				statusEffects: [],
+				specialUsed: false,
 			},
-			turn: "player",
-			playerSpecialused: false,
-			enemySpecialUsed: false,
+			turn: 0,
 			currentLevel: loadFromStorage("currentLevel") || 1,
 		};
 
@@ -123,53 +123,102 @@ const setupBattleActions = () => {
 	dodgekbtn.addEventListener("click", () => executeAction("dodge"));
 };
 
-const executeAction = (action) => {
+const executeAction = async (playerAction) => {
 	const battleState = loadFromStorage("battleState");
+	const { player, enemy } = battleState;
 
-	const isWebbed = battleState.player.statusEffects.some((e) => e.type === "webbed");
-	if (isWebbed) {
+	const isPlayerWebbed = player.statusEffects.some((e) => e.type === "webbed");
+	if (isPlayerWebbed) {
 		updateBattleUi({
 			success: false,
 			message: "You are webbed and cannot act this turn!",
 			effect: null,
 		});
+
+		const enemyAction = chooseEnemyAction(battleState);
+		const enemyResult = calculateAction(enemyAction, playerAction, enemyAction, true);
+		updateBattleUi(enemyResult);
+
+		checkBattleEnd();
+		saveToStorage("battleState", battleState);
+		return;
 	}
 
-	const isEnemyShield = battleState.enemy.statusEffects.some((e) => e.type === "shield");
-	if (isEnemyShield && action === "attack") {
+	const isEnemyWebbed = enemy.statusEffects.some((e) => e.type === "webbed");
+	if (isEnemyWebbed) {
 		updateBattleUi({
 			success: false,
-			message: "Enemy is shielded! Your attack is completely blocked!",
+			message: `${enemy.character.name} is webbed and cannot act this turn!`,
 			effect: null,
 		});
-		battleState.statusEffects.turnsLeft--;
+
+		const playerResult = calculateAction(player, enemy, playerAction, false);
+		updateBattleUi(playerResult);
+
+		checkBattleEnd();
+		saveToStorage("battleState", battleState);
+		return;
 	}
 
-	if (battleState.turn !== "player") return;
+	const enemyAction = chooseEnemyAction(battleState);
 
-	let result;
+	const playerResult = calculateAction(player, enemy, playerAction, false);
+	const enemyResult = calculateAction(enemy, player, enemyAction, true);
 
+	handleSpecialInteractions(playerAction, enemyAction, playerResult, enemyResult, battleState);
+
+	updateBattleUi(playerResult);
+	updateBattleUi(enemyResult);
+
+	battleState.turn++;
+
+	updateStatusEffects(battleState);
+
+	checkBattleEnd();
+	saveToStorage("battleState", battleState);
+};
+
+const chooseEnemyAction = (battleState) => {
+	const { enemy, player } = battleState;
+	const actions = ["attack", "defence", "dodge"];
+
+	if ((!enemy.specialUsed && Math.random() < 0.3) || battleState.turn > 2) {
+		return "special";
+	}
+
+	if (player.currentHp < 30 && Math.random() < 0.7) {
+		return "attack";
+	}
+
+	if (enemy.currentHp < 40 && Math.random() < 0.6) {
+		return "defence";
+	}
+
+	const randomIndex = Math.floor(Math.random() * actions.length);
+	return actions[randomIndex];
+};
+
+const calculateAction = (attacker, defender, action, isEnemy) => {
 	switch (action) {
 		case "attack":
-			result = calculateAttack();
-			break;
+			return calculateAttack(attacker, defender, isEnemy);
 		case "defence":
-			result = calculateDefence();
-			break;
-		case "sepecial-skill":
-			result = calculateSpecialSkill();
-			break;
+			return calculateDefence(attacker, isEnemy);
+		case "special":
+			return calculateSpecialSkill(attacker, defender, isEnemy);
 		case "dodge":
-			result = calculateDodge();
-			break;
+			return calculateDodge(attacker, isEnemy);
+		default:
+			return {
+				success: false,
+				message: "Invalid action!",
+				effect: null,
+			};
 	}
 };
 
-const calculateAttack = () => {
-	const battleState = loadFromStorage("battleState");
-	const { player, enemy } = battleState;
-
-	let attackPower = player.powerstats.strength + Math.random() * 20;
+const calculateAttack = (attacker, defender) => {
+	let attackPower = attacker.character.powerstats.strength + Math.random() * 20;
 
 	const rageEffect = player.statusEffects.find((e) => e.type === "rage");
 	if (rageEffect) {
@@ -242,6 +291,15 @@ const calculateAttack = () => {
 	return result;
 };
 
+const calculateDodgeSuccess = (character) => {
+	const dodgeChance = character.character.powerstats.speed / 2 + character.character.powerstats.combat / 2;
+	if (character.character.name === "Black Widow") {
+		dodgeChance += 60;
+	}
+
+	return Math.random() * 100 <= dodgeChance;
+};
+
 const calculateDefence = () => {
 	const battleState = loadFromStorage("battleStatus");
 
@@ -258,38 +316,6 @@ const calculateDefence = () => {
 		message: `${battleState.player.character.name} assumes a defensive stance!`,
 		effect: "defence",
 	};
-};
-
-const calculateDodge = () => {
-	const battleState = loadFromStorage("battleState");
-	const { player, enemy } = battleState;
-
-	const dodgeChance = player.character.powerstats.speed / 2 + player.character.powerstats.combat / 2;
-	if (player.character.name === "Black Widow") {
-		dodgeChance += 60;
-	}
-	const dodgeRoll = Math.random() * 100;
-
-	if (dodgeRoll <= dodgeChance) {
-		player.statusEffects.push({
-			type: "dodging",
-			turnsLeft: 1,
-		});
-
-		saveToStorage("battleState", battleState);
-
-		return {
-			success: true,
-			message: `${player.character.name} prepares to dodge the next attack!`,
-			effect: "dodge",
-		};
-	} else {
-		return {
-			success: false,
-			message: `${player.character.name} tries to dodge but loses balance`,
-			effect: null,
-		};
-	}
 };
 
 const calculateSpecialSkill = () => {
@@ -394,8 +420,6 @@ const calculateSpecialSkill = () => {
 		damage,
 	};
 };
-
-
 
 // const processStatusEffects = () => {
 // 	const battleState = loadFromStorage("battleState", battleState);
