@@ -25,8 +25,6 @@ export const renderBattleCards = async (enemyName) => {
 				maxHp: 100,
 				defenseModifier: 0,
 				statusEffects: [],
-				charging: false,
-				revived: false,
 			},
 			enemy: {
 				character: enemyData,
@@ -34,8 +32,6 @@ export const renderBattleCards = async (enemyName) => {
 				maxHp: 100,
 				defenseModifier: 0,
 				statusEffects: [],
-				charging: false,
-				revived: false,
 			},
 			turn: "player",
 			playerSpecialused: false,
@@ -132,7 +128,7 @@ const setupBattleActions = () => {
 const executeAction = (action) => {
 	const battleState = loadFromStorage("battleState");
 
-	if (battleState.turn !== "player" || battleState.player.statusEffects.some((e) => e.type === "paralyzed")) return;
+	if (battleState.turn !== "player" || battleState.player.statusEffects.some((e) => e.type === "webbed")) return;
 
 	let result;
 
@@ -276,122 +272,87 @@ const calculateSpecialSkill = () => {
 	if (battleState.specialAbilityUsed) {
 		return {
 			success: false,
-			message: "You have already used your special ability in this battle!",
+			message: "You have already used your special ability in this battle! Can't use it anymore!",
 			effect: null,
 		};
 	}
 
-	let result;
+	let damage = 0;
+	let message = "";
+	let effect = "special";
 
 	switch (player.character.name) {
 		case "Black Widow":
-			if (player.statusEffects.some((e) => e.type === "dodging")) {
-				const damage = 40 + player.character.powerstats.combat;
-				enemy.currentHp = Math.max(0, enemy.currentHp - damage);
-				result = {
-					success: true,
-					message: `Black Widow executes a Tactical Ambush! Deals ${damage} damage!`,
-					effect: "special",
-				};
-			} else {
-				result = {
-					success: false,
-					message: "Black Widow needs to dodge first to set up her Tactical Ambush!",
-					effect: null,
-				};
-			}
+			damage = 40 + player.character.powerstats.combat;
+			enemy.currentHp = Math.max(0, enemy.currentHp - damage);
+			message = `Black Widow executes a Tactical Ambush! Deals ${damage} damage!`;
 			break;
 
 		case "Spider-Man":
 			enemy.statusEffects.push({ type: "webbed", turnsLeft: 1 });
 			message = "Spider-Man launches a Paralyzing Web! The enemy cannot attack next turn.";
+			effect = "status";
 			break;
 
 		case "Iron Man":
 			damage = 30 + player.powerstats.intelligence;
-			enemy.currentHp -= damage;
+			enemy.currentHp = Math.max(0, enemy.currentHp - damage);
 			message = `Iron Man fires a Pulse Blast! Deals ${damage} damage ignoring defense.`;
 			break;
 
 		case "Captain America":
-			battleState.player.shielded = true;
-			battleState.player.defenseModifier = 15;
-			message =
-				"Captain America executes a Perfect Block! Blocks all damage this turn and increases defense next.";
+			player.statusEffects.push({ type: "shield", turnsLeft: 2 });
+			message = "Captain America executes a Perfect Block! Blocks all damage for two turns.";
 			break;
 
 		case "Thor":
 			damage = 40 + player.powerstats.power;
-			enemy.currentHp -= damage;
+			enemy.currentHp = Math.max(0, enemy.currentHp - damage);
 			message = `Thor calls down Divine Thunder! Unavoidable attack deals ${damage} damage.`;
 			break;
 
 		case "Hulk":
-			battleState.player.statusEffects.push({
-				type: "rage",
-				strengthBonus: 5,
-				defensePenalty: 10,
-				turnsLeft: 2,
-			});
-			message = "Hulk enters Uncontrollable Rage! Gains +5 strength for 2 turns but loses defense.";
+			player.statusEffects.push({ type: "rage", turnsLeft: 2 });
+			message = "Hulk enters Uncontrollable Rage! Increased damage for the next two turns.";
 			break;
 
 		case "Thanos":
-			if (!battleState.player.charging) {
-				battleState.player.charging = true;
-				message = "Thanos charges up the Infinity Fist! Will strike next turn with devastating force.";
-				effect = "charging";
-			} else {
-				damage = 60 + player.powerstats.strength;
-				enemy.currentHp -= damage;
-				battleState.player.charging = false;
-				message = `Thanos unleashes the Infinity Fist! Massive blow deals ${damage} damage.`;
-			}
+			damage = 40 + player.powerstats.power;
+			enemy.currentHp = Math.max(0, enemy.currentHp - damage);
+			message = "Thanos charges up the Infinity Fist! Strikes with devastating force.";
 			break;
 
 		case "Loki":
-			battleState.player.statusEffects.push({ type: "illusion", dodgeChance: 0.5, turnsLeft: 1 });
-			message = "Loki uses Multiform Illusion! 50% chance to dodge all attacks this turn.";
+			player.statusEffects.push({ type: "illusion", turnsLeft: 1 });
+			message = "Loki uses Multiform Illusion! 50% chance to dodge all attacks next turn.";
 			break;
 
 		case "Ultron":
-			if (battleState.lastPlayerAbility) {
-				player.copiedAbility = battleState.lastPlayerAbility;
-				message = `Ultron uses Lethal Upgrade! Copied ability: ${player.copiedAbility.name}`;
-			} else {
-				message = "Ultron failed to copy a move — no recent player ability found.";
-				effect = "fail";
-			}
+			player.statusEffects.push({ type: "regen", turnsLeft: 1 });
+			message = `Ultron uses Regen Upgrade! Will regenerate 30% HP next turn.`;
 			break;
 
 		case "Red Skull":
-			battleState.enemy.statusEffects.push({
-				type: "demoralized",
-				attackPenalty: 10,
-				turnsLeft: 2,
-			});
-			message = "Red Skull invokes Terror Domination! Player's attack is reduced for 2 turns.";
+			enemy.statusEffects.push({ type: "demoralized", turnsLeft: 2 });
+			message = "Red Skull invokes Terror Domination! Enemy's attack is reduced for 2 turns.";
 			break;
 
 		case "Hela":
-			if (!battleState.player.revived && battleState.player.currentHp <= 0) {
-				battleState.player.currentHp = Math.floor(player.maxHp * 0.3);
-				battleState.player.revived = true;
-				message = "Hela summons the dead and revives with 30% HP!";
-			} else {
-				message = "Hela's ability is only activated upon defeat.";
-				effect = "fail";
-			}
+			damage = 30;
+			enemy.currentHp = Math.max(0, enemy.currentHp - damage);
+			const heal = 20;
+			player.currentHp = Math.min(player.maxHp, player.currentHp + heal);
+			message = `Hela uses Life Drain! Deals ${damage} damage and heals ${heal} HP.`;
 			break;
 
 		case "Killmonger":
-			battleState.player.statusEffects.push({ type: "doubleStrike", turnsLeft: 1 });
-			message = "Killmonger unleashes Killer Instinct! May attack twice this turn if the first hits.";
+			player.statusEffects.push({ type: "doubleStrike", turnsLeft: 1 });
+			message = "Killmonger unleashes Killer Instinct! May strike twice next turn if the first hits.";
 			break;
 
 		default:
 			damage = 20 + player.powerstats.strength;
-			enemy.currentHp -= damage;
+			enemy.currentHp = Math.max(0, enemy.currentHp - damage);
 			message = `${player.name} uses a basic enhanced attack! Deals ${damage} damage.`;
 			break;
 	}
@@ -400,10 +361,10 @@ const calculateSpecialSkill = () => {
 	saveToStorage("battleState", battleState);
 
 	return {
-		succes: true,
-		damage,
+		success: true,
 		message,
 		effect,
+		damage,
 	};
 };
 
