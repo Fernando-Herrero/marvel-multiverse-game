@@ -73,3 +73,17 @@ export const showBriefing = (title, message, buttons = {}) => {
 		briefingNextBtn.style.display = "none";
 	}
 };
+
+export const showBattleText = (role, message) => {
+	const selector = `.battle-text-${role}`;
+	const element = document.querySelector(selector);
+
+	if (!element) return;
+
+	element.textContent = message;
+	element.classList.add("show");
+
+	setTimeout(() => {
+		element.classList.remove("show");
+	}, 2000);
+};

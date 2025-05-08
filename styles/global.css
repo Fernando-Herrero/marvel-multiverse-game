@@ -559,6 +559,7 @@ h1 {
 	width: 90vw;
 	flex-direction: column;
 	align-items: center;
+	position: relative;
 }
 
 .player-battle-card {
@@ -707,6 +708,50 @@ h1 {
 
 .bar-ps-enemy {
 	transition: width 0.3s ease;
+}
+
+.battle-text-player,
+.battle-text-enemy {
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: var(--neutral-color);
+	color: var(--contrast-color);
+	padding: 8px 12px;
+	border-radius: 12px;
+	box-shadow: var(--box-shadow);
+	font-size: 14px;
+	max-width: 200px;
+	text-align: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+}
+
+.battle-text-player {
+	border: 1px solid var(--hero-color);
+}
+
+.battle-text-enemy {
+	border: 1px solid var(--villain-color);
+}
+
+.battle-text-player::after,
+.battle-text-enemy::after {
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translateX(-50%);
+	border-width: 6px;
+	border-style: solid;
+	border-color: var(--neutral-color) transparent transparent transparent;
+}
+
+.battle-text-player.show,
+.battle-text-enemy.show {
+	opacity: 1;
 }
 
 .buttons-battle button {

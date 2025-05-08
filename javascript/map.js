@@ -184,6 +184,7 @@ export const showLeveleInfo = () => {
 	};
 
 	const showBattleBriefing = async (enemy) => {
+		console.log("[3] Briefing - Enemigo recibido:", enemy.name);
 		return new Promise((resolve) => {
 			showBriefing(
 				`Level: ${enemy.level}. ${enemy.name}`,
@@ -207,6 +208,7 @@ export const showLeveleInfo = () => {
 		battleScreen.style.display = "flex";
 
 		saveToStorage("currentScreen", "battle");
+		console.log("[4] StartBattle - Enemigo:", enemy.name); 
 		await renderBattleCards(enemy.name);
 		saveToStorage("currentLevel", enemy.level);
 	};

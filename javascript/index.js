@@ -63,9 +63,11 @@ const resetGameState = () => {
 		"gameStarted",
 		"playerPosition",
 		"currentScreen",
-		"batttleState",
+		"battleState",
 		"currentLevel",
 		"playerCharacter",
+		"currentEnemy",
+		"mainBriefing",
 	];
 
 	clearKeys.forEach((key) => clearStorageKey(key));

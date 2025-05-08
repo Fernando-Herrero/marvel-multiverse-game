@@ -1,6 +1,7 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { battleScreen, player } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
+import { showBattleText } from "./utils.js";
 
 const playerHealthBar = document.querySelector(".bar-ps-player");
 const enemyHealthBar = document.querySelector(".bar-ps-enemy");
@@ -9,14 +10,23 @@ const playerCard = document.getElementById("player-battle-card");
 const enemyCard = document.getElementById("enemy-battle-card");
 
 export const renderBattleCards = async (enemyName) => {
+	console.log("[1] Nombre del enemigo recibido:", enemyName);
+	console.log("1. Iniciando renderBattleCards...");
+
 	const existingBattle = loadFromStorage("battleState");
+	console.log("2. Estado de batalla existente:", existingBattle);
+
 	const playerData = loadFromStorage("playerCharacter");
+	console.log("3. Datos del jugador:", playerData);
+
 	let enemyData;
 
 	if (existingBattle && existingBattle.enemy) {
 		enemyData = existingBattle.enemy.character;
+		console.log("4. Usando enemigo existente:", enemyData);
 	} else {
 		enemyData = await fetchCharactersByName(enemyName);
+		console.log("5. Datos del enemigo obtenidos:", enemyData);
 
 		const initialBattleState = {
 			player: {
@@ -38,12 +48,23 @@ export const renderBattleCards = async (enemyName) => {
 		};
 
 		saveToStorage("battleState", initialBattleState);
+		console.log("6. Nuevo estado de batalla guardado:", initialBattleState);
 	}
 
 	saveToStorage("currentScreen", "battle");
+	console.log("7. Pantalla actual establecida como 'battle'");
+
+	console.log("8. Renderizando carta del jugador...");
 	renderPlayerCard(playerData);
+
+	console.log("9. Renderizando carta del enemigo...");
 	renderEnemyCard(enemyData);
-	// setupBattleActions();
+
+	console.log("10. Configurando botones de batalla...");
+	setupBattleActions();
+
+	console.log("--- BATALLA LISTA PARA COMENZAR ---");
+	console.log("Estado completo:", loadFromStorage("battleState"));
 
 	// if (existingBattle) {
 	// 	restoreBattleState(existingBattle);
@@ -107,6 +128,64 @@ const renderEnemyCard = (enemyData) => {
 
 		enemyCardBattleContainer.appendChild(enemyCard);
 	}
+};
+
+const setupBattleActions = () => {
+	const attackBtn = document.getElementById("attack");
+	const defenceBtn = document.getElementById("defence");
+	const specialBtn = document.getElementById("special-skill");
+	const dodgeBtn = document.getElementById("dodge");
+
+	if (!attackBtn || !defenceBtn || !specialBtn || !dodgeBtn) {
+		console.error("¡Botones no encontrados en el DOM!");
+		return;
+	}
+
+	attackBtn.addEventListener("click", () => {
+		console.log("Botón ATTACK pulsado");
+		executeAction("attack");
+	});
+
+	defenceBtn.addEventListener("click", () => {
+		console.log("Botón DEFENCE pulsado");
+		executeAction("defence");
+	});
+
+	specialBtn.addEventListener("click", () => {
+		console.log("Botón SPECIAL pulsado");
+		executeAction("special");
+	});
+
+	dodgeBtn.addEventListener("click", () => {
+		console.log("Botón DODGE pulsado");
+		executeAction("dodge");
+	});
+
+	console.log("Botones configurados correctamente");
+};
+
+const executeAction = (playerAction) => {
+	console.log(`Acccion del jugador: ${playerAction}`);
+
+	const battleState = loadFromStorage("battleState");
+	console.log("Estado de batalla actual", battleState);
+
+	if (!battleState) {
+		console.error("No hay estado de batalla guardado");
+		return;
+	}
+
+	const enemyAction = chooseEnemyAction(battleState);
+	console.log(`Accion del enemigo: ${enemyAction}`);
+
+	showBattleText("player", `Player uses ${playerAction}`);
+	showBattleText("enemy", `Enemy uses ${playerAction}`);
+};
+
+const chooseEnemyAction = (battleState) => {
+	const actions = ["attack", "defence", "dodge", "special"];
+	const randomIndex = Math.floor(Math.random() * actions.length);
+	return actions[randomIndex];
 };
 
 // const setupBattleActions = () => {
