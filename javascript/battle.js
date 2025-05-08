@@ -1,6 +1,6 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { battleScreen, player } from "./map.js";
-import { loadFromStorage, saveToStorage } from "./storage.js";
+import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 
 const playerHealthBar = document.querySelector(".bar-ps-player");
 const enemyHealthBar = document.querySelector(".bar-ps-enemy");
@@ -219,7 +219,7 @@ const calculateAction = (attacker, defender, action, isEnemy) => {
 
 const calculateAttack = (attacker, defender, isEnemy) => {
 	const battleState = loadFromStorage("battleState");
-	const target = isEnemy ? player : enemy;
+	const target = isEnemy ? battleState.player : battleState.enemy;
 
 	let attackPower = attacker.character.powerstats.strength + Math.random() * 20;
 
@@ -281,12 +281,18 @@ const calculateDodge = (character) => {
 		dodgeChance += 30;
 	}
 
+	if (character.character.name === "Loki") {
+		if (character.statusEffects.some((e) => e.type === "ilusion")) {
+			dodgeChance *= 1.5;
+		}
+	}
+
 	const success = Math.random() * 100 <= dodgeChance;
 
 	return {
 		success,
 		message: success
-			? `${character.caharacter.name} succesfully dodged!`
+			? `${character.character.name} succesfully dodged!`
 			: `${character.character.name} failed to dodge`,
 		effect: "dodge",
 	};
@@ -296,7 +302,7 @@ const calculateSpecialSkill = (attacker, defender, isEnemy) => {
 	const battleState = loadFromStorage("battleState");
 	const target = isEnemy ? battleState.player : battleState.enemy;
 
-	if (attacker.specialAbilityUsed) {
+	if (attacker.specialUsed) {
 		return {
 			success: false,
 			message: `${attacker.character.name} has already used their special ability in this battle!`,
@@ -324,7 +330,7 @@ const calculateSpecialSkill = (attacker, defender, isEnemy) => {
 			break;
 
 		case "Iron Man":
-			damage = 30 + attacker.powerstats.intelligence;
+			damage = 30 + attacker.character.powerstats.intelligence;
 			target.currentHp = Math.max(0, target.currentHp - damage);
 			message = `Iron Man fires a Pulse Blast! Deals ${damage} damage ignoring defense.`;
 			break;
@@ -336,7 +342,7 @@ const calculateSpecialSkill = (attacker, defender, isEnemy) => {
 			break;
 
 		case "Thor":
-			damage = 40 + attacker.powerstats.power;
+			damage = 40 + attacker.character.powerstats.power;
 			target.currentHp = Math.max(0, target.currentHp - damage);
 			message = `Thor calls down Divine Thunder! Unavoidable attack deals ${damage} damage.`;
 			break;
@@ -348,7 +354,7 @@ const calculateSpecialSkill = (attacker, defender, isEnemy) => {
 			break;
 
 		case "Thanos":
-			damage = 40 + attacker.powerstats.power;
+			damage = 40 + attacker.character.powerstats.power;
 			target.currentHp = Math.max(0, target.currentHp - damage);
 			message = "Thanos charges up the Infinity Fist! Strikes with devastating force.";
 			break;
@@ -360,9 +366,9 @@ const calculateSpecialSkill = (attacker, defender, isEnemy) => {
 			break;
 
 		case "Ultron":
-			statusEffect = { type: "regen", turnsLeft: 1 };
-			attacker.statusEffects.push(statusEffect);
-			message = `Ultron uses Regen Upgrade! Will regenerate 30% HP next turn.`;
+			const regen = 30;
+			attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + regen);
+			message = `Ultron uses Regen Upgrade! Regenerate 30% HP.`;
 			break;
 
 		case "Red Skull":
@@ -375,7 +381,7 @@ const calculateSpecialSkill = (attacker, defender, isEnemy) => {
 			damage = 30;
 			target.currentHp = Math.max(0, target.currentHp - damage);
 			const heal = 20;
-			attacker.currentHp = Math.min(player.maxHp, attacker.currentHp + heal);
+			attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + heal);
 			message = `Hela uses Life Drain! Deals ${damage} damage and heals ${heal} HP.`;
 			break;
 
@@ -404,127 +410,162 @@ const calculateSpecialSkill = (attacker, defender, isEnemy) => {
 	};
 };
 
-const updateStatusEffects = (battleState) => {
-	const processCharacterEffects = (character) => {
-		character.statusEffects.forEach((effect) => effect.turnsLeft--);
-		character.statusEffects = character.statusEffect.filter((effect) => effect.turnsLeft > 0);
-	};
+const handleSpecialInteractions = (playerAction, enemyAction, playerResult, enemyResult, battleState) => {
+	if (playerAction === "defence" && enemyAction === "special") {
+		const enemyChar = battleState.enemy.character.name;
+		if (enemyChar === "Iron Man" || enemyChar === "Thor") {
+			(playerResult.success = false),
+				(playerResult.message = `${enemyChar}'s special attack pierces through defense!`);
+		}
+	}
 
-	processCharacterEffects(battleState.player);
-	processCharacterEffects(battleState.enemy);
+	if (enemyAction === "defence" && playerAction === "special") {
+		const playerChar = battleState.player.character.name;
+		if (playerChar === "Iron Man" || playerChar === "Thor") {
+			enemyResult.success = false;
+			enemyResult.message = `${playerChar}'s special attack pierces through defense!`;
+		}
+	}
+
+	if (playerAction === "dodge" && enemyAction === "special") {
+		const enemyChar = battleState.enemy.character.name;
+		if (enemyChar === "Thor") {
+			playerResult.success = false;
+			playerResult.message = "Thor's divine thunder cannot be dodged!";
+		}
+	}
+
+	if (enemyAction === "dodge" && playerAction === "special") {
+		const playerChar = battleState.player.character.name;
+		if (playerChar === "Thor") {
+			enemyResult.success = false;
+			enemyResult.message = "Thor's divine thunder cannot be dodged!";
+		}
+	}
 };
 
-// const processStatusEffects = () => {
-// 	const battleState = loadFromStorage("battleState", battleState);
-// 	const { player, enemy } = battleState;
+const updateStatusEffects = (battleState) => {
+	[battleState.player, battleState.enemy].forEach((character) => {
+		character.statusEffects.forEach((effect) => effect.turnsLeft--);
 
-// 	player.statusEffects = player.statusEffects.filter((effect) => {
-// 		effect.turnsLeft--;
-// 		return effect.turnsLeft > 0;
-// 	});
+		character.statusEffects = character.statusEffects.filter((effect) => effect.turnsLeft > 0);
+	});
+};
 
-// 	enemy.statusEffects = enemy.statusEffects.filter((effect) => {
-// 		effect.turnsLeft--;
-// 		return effect.turnsLeft > 0;
-// 	});
+const updateBattleUi = ({ success, message, effect, damage }) => {
+	const battleState = loadFromStorage("battleState");
+	battleText.innerHTML += `<p>${message}</p>`;
+	playerHealthBar.style.width = `${battleState.player.currentHp}%`;
+	enemyHealthBar.style.width = `${battleState.enemy.currentHp}%`;
 
-// 	// const regenEffect = battleState.player.statusEffects.find((e) => e.type === "regen");
-// 	// if (regenEffect) {
-// 	// 	const healAmount = Math.floor(battleState.player.maxHp * 0.3);
-// 	// 	battleState.player.currentHp = Math.min(battleState.player.maxHp, battleState.player.currentHp + healAmount);
-// 	// 	updateBattleUi({
-// 	// 		message: `${battleState.player.character.name} regenerates ${healAmount} HP!`,
-// 	// 		effect: "heal",
-// 	// 	});
-// 	// }
-// 	// const regenEffectEnemy = battleState.enemy.statusEffects.find((e) => e.type === "regen");
-// 	// if (regenEffectEnemy) {
-// 	// 	const healAmount = Math.floor(battleState.enemy.maxHp * 0.3);
-// 	// 	battleState.enemy.currentHp = Math.min(battleState.enemy.maxHp, battleState.enemy.currentHp + healAmount);
-// 	// 	updateBattleUi({
-// 	// 		message: `${battleState.enemy.character.name} regenerates ${healAmount} HP!`,
-// 	// 		effect: "heal",
-// 	// 	});
-// 	// }
+	playerCard.classList.remove("attack-effect", "defence-effect", "dodge-effect", "special-effect");
+	enemyCard.classList.remove("attack-effect", "defence-effect", "dodge-effect", "special-effect");
 
-// 	for (const character of [player, enemy]) {
-// 		const regen = character.statusEffects.find((e) => e.type === "regen");
-// 		if (regen) {
-// 			const healAmount = Math.floor(character.maxHp * 0.3);
-// 			character.currentHp = Math.min(character.maxHp, character.currentHp + healAmount);
-// 			updateBattleUi({
-// 				message: `${character.character.name} regenerates ${healAmount} HP!`,
-// 				effect: "heal",
-// 			});
-// 		}
-// 	}
+	if (effect) {
+		const targetCard =
+			effect === "defence"
+				? message.includes(battleState.player.character.name)
+					? playerCard
+					: enemyCard
+				: message.includes(battleState.player.character.name)
+				? playerCard
+				: enemyCard;
+		targetCard.classList.add(`${effect}-effect`);
 
-// 	for (const character of [player, enemy]) {
-// 		const webbed = character.statusEffects.find((e) => e.type === "webbed");
-// 		if (webbed) {
-// 			updateBattleUi({
-// 				message: `${character.character.name} is webbed and can't move this turn!`,
-// 				effect: "stunned",
-// 			});
-// 			saveToStorage("battleState", battleState);
-// 			return;
-// 		}
-// 	}
+		setTimeout(() => {
+			targetCard.classList.remove(`${effect}-effect`);
+		}, 1000);
+	}
+};
 
-// 	for (const character of [player, enemy]) {
-// 		const illusion = character.statusEffects.find((e) => e.type === "illusion");
-// 		if (illusion && Math.random() < 0.5) {
-// 			updateBattleUi({
-// 				message: `${character.character.name} dodged the attack with an illusion!`,
-// 				effect: "dodged",
-// 			});
-// 		}
-// 	}
+const restoreBattleState = (battleState) => {
+	playerHealthBar.style.width = `${battleState.player.currentHp}%`;
+	enemyHealthBar.style.width = `${battleState.enemy.currentHp}%`;
 
-// 	for (const char of [player, enemy]) {
-// 		let attackMultiplier = 1;
+	const specialBtn = document.getElementById("special-skill");
+	if (battleState.player.specialUsed) {
+		specialBtn.disabled = true;
+		specialBtn.classList.add("disabled");
+	} else {
+		specialBtn.disabled = false;
+		specialBtn.classList.remove("disabled");
+	}
 
-// 		const rage = char.statusEffects.find((e) => e.type === "rage");
-// 		if (rage) {
-// 			attackMultiplier *= 1.5;
-// 		}
+	document.querySelectorAll(".status-effect").forEach((el) => el.remove());
 
-// 		const strike = char.statusEffects.find((e) => e.type === "doubleStrike");
-// 		if (strike) {
-// 			attackMultiplier *= 2;
-// 		}
+	battleState.player.statusEffects.forEach((effect) => {
+		const effectElement = document.createElement("div");
+		effectElement.className = `status-effect ${effect.type}`;
+		effectElement.textContent = effect.type.toUpperCase();
+		effectElement.title = getStatusEffectDescription(effect.type);
+		playerCard.querySelector(".player-battle-card-content").appendChild(effectElement);
+	});
 
-// 		const demoralized = char.statusEffects.find((e) => e.type === "demoralized");
-// 		if (demoralized) {
-// 			attackMultiplier *= 0.7;
-// 		}
+	battleState.enemy.statusEffects.forEach((effect) => {
+		const effectElement = document.createElement("div");
+		effectElement.className = `status-effect ${effect.type}`;
+		effectElement.textContent = effect.type.toUpperCase();
+		effectElement.title = getStatusEffectDescription(effect.type);
+		enemyCard.querySelector(".card-character").appendChild(effectElement);
+	});
 
-// 		if (char === player) {
-// 			battleState.player.attackMultiplier = attackMultiplier;
-// 		} else {
-// 			battleState.enemy.attackMultiplier = attackMultiplier;
-// 		}
-// 	}
+	if (battleState.enemy.specialUsed) {
+		enemyCard.classList.add("special-used");
+	} else {
+		enemyCard.classList.remove("special-used");
+	}
+};
 
-// 	for (const char of [player, enemy]) {
-// 		const shield = char.statusEffects.find((e) => e.type === "shield");
+const getStatusEffectDescription = (type) => {
+	const descriptions = {
+		webbed: "Cannot act for X turns",
+		rage: "Damage increased by 50%",
+		shield: "Blocks all damage",
+		demoralized: "Attack reduced by 30%",
+		doubleStrike: "Next attack may hit twice",
+		illusion: "Dodge chance increased",
+	};
+	return descriptions[type] || "Status effect";
+};
 
-// 		if (shield && char === enemy) {
-// 			updateBattleUi({
-// 				message: `${enemy.character.name} blocked the attack completely with a shield!`,
-// 				effect: "blocked",
-// 			});
-// 			saveToStorage("battleState", battleState);
-// 			return;
-// 		}
+const checkBattleEnd = () => {
+	const battleState = loadFromStorage("battleState");
 
-// 		if (shield && char === player) {
-// 			updateBattleUi({
-// 				message: `${player.character.name} blocked the attack completely with a shield!`,
-// 				effect: "blocked",
-// 			});
-// 			saveToStorage("battleState", battleState);
-// 			return;
-// 		}
-// 	}
-// };
+	if (!battleState) return false;
+
+	if (battleState.player.currentHp <= 0) {
+		endBattle(false);
+		return true;
+	}
+	if (battleState.enemy.currentHp <= 0) {
+		endBattle(true);
+		return true;
+	}
+	return false;
+};
+
+const endBattle = (playerWon) => {
+	if (playerWon) {
+		battleText.innerHTML += `<p class="victory">You defeated the enemy!</p>`;
+
+		const currentLevel = loadFromStorage("currentLevel") || 1;
+		saveToStorage("currentLevel", currentLevel + 1);
+	} else {
+		battleText.innerHTML += `<p class="defeat">You were defeated!</p>`;
+	}
+
+	document.querySelectorAll(".battle-action").forEach((btn) => {
+		btn.disabled = true;
+	});
+
+	const continueBtn = document.createElement("button");
+	continueBtn.id = "continue-btn";
+	continueBtn.textContent = "Continue";
+	continueBtn.addEventListener("click", () => {
+		battleScreen.style.display = "none";
+	});
+
+	document.querySelector(".battle-actions").appendChild(continueBtn);
+
+	clearStorageKey("battleState");
+};

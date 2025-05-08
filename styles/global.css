@@ -298,6 +298,75 @@ h1 {
 	animation: spin 1s linear infinite;
 }
 
+.status-effect {
+	position: absolute;
+	padding: 2px 5px;
+	border-radius: 3px;
+	font-size: 12px;
+	font-weight: bold;
+	color: white;
+	z-index: 10;
+}
+
+.status-effect.webbed {
+	background-color: #8e44ad;
+	top: 10px;
+	left: 10px;
+}
+
+.status-effect.rage {
+	background-color: #e74c3c;
+	top: 10px;
+	right: 10px;
+}
+
+.status-effect.shield {
+	background-color: #3498db;
+	bottom: 10px;
+	left: 10px;
+}
+
+.status-effect.demoralized {
+	background-color: #7f8c8d;
+	bottom: 10px;
+	right: 10px;
+}
+
+.status-effect.doubleStrike {
+	background-color: #f39c12;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.status-effect.illusion {
+	background-color: #2ecc71;
+	top: 30px;
+	left: 10px;
+}
+
+.disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.special-used {
+	position: relative;
+}
+
+.special-used::after {
+	content: "SPECIAL USED";
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background-color: rgba(0, 0, 0, 0.7);
+	color: white;
+	padding: 2px 5px;
+	border-radius: 3px;
+	font-size: 10px;
+}
+
 @keyframes spin {
 	0% {
 		transform: translate(-50%, -50%) rotate(0deg);
@@ -501,6 +570,8 @@ h1 {
 	border-radius: 12px;
 	background-color: var(--primary-color-dark);
 	overflow: hidden;
+	transition: all 0.3s ease;
+	transform-origin: center;
 }
 
 .player-battle-card-content {
@@ -537,6 +608,8 @@ h1 {
 	height: 100%;
 	background-color: var(--primary-color-dark);
 	overflow: hidden;
+	transition: all 0.3s ease;
+	transform-origin: center;
 }
 
 .character-card[data-context="battle"] {
