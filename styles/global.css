@@ -659,6 +659,17 @@ h1 {
 	left: 2px;
 }
 
+.buttons-battle button:hover {
+	background-color: var(--accent-color);
+	transform: scale(1.05);
+	box-shadow: 0 0 10px var(--accent-color);
+}
+
+.buttons-battle button:active {
+	transform: scale(0.95);
+	box-shadow: 0 0 5px var(--accent-color) inset;
+}
+
 .bar-ps {
 	display: flex;
 	align-items: center;

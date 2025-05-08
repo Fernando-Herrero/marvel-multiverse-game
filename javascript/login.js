@@ -68,10 +68,12 @@ export const renderCardInfohero = (characterData) => {
 	return card;
 };
 
-const extractStatValue = (card, statIndex) => {
-	const statText = card.querySelector(`.character-stats p:nth-child(${statIndex})`).textContent;
-
-	return parseInt(statText.split(":")[1].trim()) || 50;
+const getStatValue = (selectedCard, statName) => {
+	const statP = Array.from(selectedCard.querySelectorAll(".character-stats p")).find((p) =>
+		p.textContent.startsWith(`${statName}:`)
+	);
+	if (!statP) return 50;
+	return parseInt(statP.textContent.split(":")[1].trim()) || 50;
 };
 
 export const setupGameListeners = () => {
@@ -109,12 +111,12 @@ export const setupGameListeners = () => {
 				imageUrl: selectedCard.querySelector("img").src,
 				stats: Array.from(selectedCard.querySelectorAll(".character-stats p")).map((p) => p.textContent),
 				powerstats: {
-					Intelligence: extractStatValue(selectedCard, 1),
-					Strength: extractStatValue(selectedCard, 2),
-					Speed: extractStatValue(selectedCard, 3),
-					Durability: extractStatValue(selectedCard, 4),
-					Power: extractStatValue(selectedCard, 5),
-					Combat: extractStatValue(selectedCard, 6),
+					Intelligence: getStatValue(selectedCard, "Intelligence"),
+					Strength: getStatValue(selectedCard, "Strength"),
+					Speed: getStatValue(selectedCard, "Speed"),
+					Durability: getStatValue(selectedCard, "Durability"),
+					Power: getStatValue(selectedCard, "Power"),
+					Combat: getStatValue(selectedCard, "Combat"),
 				},
 			};
 
