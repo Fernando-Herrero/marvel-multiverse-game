@@ -697,9 +697,10 @@ h1 {
 .bar-ps-enemy {
 	position: absolute;
 	width: 100%;
-	background-color: var(--accent-color);
+	background-color: green;
 	height: 90%;
 	z-index: 0;
+	transition: width 0.3s ease, background-color 0.3s ease;
 }
 
 .bar-ps-player {
@@ -727,6 +728,7 @@ h1 {
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.3s ease;
+	z-index: 10;
 }
 
 .battle-text-player {

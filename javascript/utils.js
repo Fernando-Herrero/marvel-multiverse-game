@@ -87,3 +87,9 @@ export const showBattleText = (role, message) => {
 		element.classList.remove("show");
 	}, 2000);
 };
+
+export const disableButtons = (disabled) => {
+	document.querySelectorAll(".buttons-battle button").forEach((btn) => {
+		btn.disabled = disabled;
+	});
+};

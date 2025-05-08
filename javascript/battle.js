@@ -1,7 +1,7 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { battleScreen, player } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
-import { showBattleText } from "./utils.js";
+import { disableButtons, showBattleText } from "./utils.js";
 
 const playerHealthBar = document.querySelector(".bar-ps-player");
 const enemyHealthBar = document.querySelector(".bar-ps-enemy");
@@ -24,6 +24,7 @@ export const renderBattleCards = async (enemyName) => {
 	if (existingBattle && existingBattle.enemy) {
 		enemyData = existingBattle.enemy.character;
 		console.log("4. Usando enemigo existente:", enemyData);
+		updateHealthBars(existingBattle);
 	} else {
 		enemyData = await fetchCharactersByName(enemyName);
 		console.log("5. Datos del enemigo obtenidos:", enemyData);
@@ -165,27 +166,91 @@ const setupBattleActions = () => {
 };
 
 const executeAction = (playerAction) => {
-	console.log(`Acccion del jugador: ${playerAction}`);
+	console.log("🔘 Botón pulsado:", playerAction);
 
 	const battleState = loadFromStorage("battleState");
-	console.log("Estado de batalla actual", battleState);
+	console.log("🔄 Estado ANTES:", JSON.parse(JSON.stringify(battleState)));
 
-	if (!battleState) {
-		console.error("No hay estado de batalla guardado");
-		return;
+	battleState.turn++;
+
+	disableButtons(true);
+
+	processAction("player", playerAction, battleState);
+
+	setTimeout(() => {
+		console.log("🤖 Turno del enemigo (HP actual:", battleState.enemy.currentHp, ")");
+		const enemyAction = chooseEnemyAction(battleState);
+		processAction("enemy", enemyAction, battleState);
+		console.log(processAction);
+		disableButtons(false);
+	}, 1000);
+};
+
+const processAction = (actor, action, battleState) => {
+	const target = actor === "player" ? battleState.enemy : battleState.player;
+	let damage = 0;
+
+	switch (action) {
+		case "attack":
+			damage = actor === "player" ? 20 : 15;
+			break;
+		case "special":
+			damage = actor === "player" ? 35 : 30;
+			break;
 	}
 
-	const enemyAction = chooseEnemyAction(battleState);
-	console.log(`Accion del enemigo: ${enemyAction}`);
+	target.currentHp = Math.max(0, target.currentHp - damage);
+	updateHealthBars(battleState);
 
-	showBattleText("player", `Player uses ${playerAction}`);
-	showBattleText("enemy", `Enemy uses ${playerAction}`);
+	showBattleText(
+		actor === "player" ? "player" : "enemy",
+		`${actor === "player" ? "Usas" : "Enemigo usa"} ${action}! -${damage}HP`
+	);
+
+	saveToStorage("battleState", battleState);
+	checkBattleEnd(battleState);
 };
 
 const chooseEnemyAction = (battleState) => {
 	const actions = ["attack", "defence", "dodge", "special"];
 	const randomIndex = Math.floor(Math.random() * actions.length);
 	return actions[randomIndex];
+};
+
+const updateHealthBars = (battleState) => {
+	playerHealthBar.style.width = `${battleState.player.currentHp}%`;
+	enemyHealthBar.style.width = `${battleState.enemy.currentHp}%`;
+
+	const setHealthBarColor = (healthBar, currentHp) => {
+		if (currentHp > 70) {
+			healthBar.style.backgroundColor = "green";
+		} else if (currentHp > 50) {
+			healthBar.style.backgroundColor = "#9ACD32";
+		} else if (currentHp > 30) {
+			healthBar.style.backgroundColor = "yellow";
+		} else if (currentHp > 15) {
+			healthBar.style.backgroundColor = "orange";
+		} else {
+			healthBar.style.backgroundColor = "red";
+		}
+	};
+
+	setHealthBarColor(playerHealthBar, battleState.player.currentHp);
+	setHealthBarColor(enemyHealthBar, battleState.enemy.currentHp);
+};
+
+const checkBattleEnd = (battleState) => {
+	if (battleState.enemy.currentHp <= 0) {
+		showBattleText("player", "¡Has ganado la batalla!");
+		setTimeout(() => endBattle(true), 1500);
+	} else if (battleState.player.currentHp <= 0) {
+		showBattleText("enemy", "¡Has sido derrotado!");
+		setTimeout(() => endBattle(false), 1500);
+	}
+};
+
+const endBattle = (playerWon) => {
+	console.log(playerWon ? "Ganaste" : "Perdiste");
 };
 
 // const setupBattleActions = () => {
