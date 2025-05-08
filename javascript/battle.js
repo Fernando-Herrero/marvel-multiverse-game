@@ -23,14 +23,12 @@ export const renderBattleCards = async (enemyName) => {
 				character: playerData,
 				currentHp: 100,
 				maxHp: 100,
-				defenseModifier: 0,
 				statusEffects: [],
 			},
 			enemy: {
 				character: enemyData,
 				currentHp: 100,
 				maxHp: 100,
-				defenseModifier: 0,
 				statusEffects: [],
 			},
 			turn: "player",
@@ -128,7 +126,26 @@ const setupBattleActions = () => {
 const executeAction = (action) => {
 	const battleState = loadFromStorage("battleState");
 
-	if (battleState.turn !== "player" || battleState.player.statusEffects.some((e) => e.type === "webbed")) return;
+	const isWebbed = battleState.player.statusEffects.some((e) => e.type === "webbed");
+	if (isWebbed) {
+		updateBattleUi({
+			success: false,
+			message: "You are webbed and cannot act this turn!",
+			effect: null,
+		});
+	}
+
+	const isEnemyShield = battleState.enemy.statusEffects.some((e) => e.type === "shield");
+	if (isEnemyShield && action === "attack") {
+		updateBattleUi({
+			success: false,
+			message: "Enemy is shielded! Your attack is completely blocked!",
+			effect: null,
+		});
+		battleState.statusEffects.turnsLeft--;
+	}
+
+	if (battleState.turn !== "player") return;
 
 	let result;
 
@@ -164,25 +181,12 @@ const calculateAttack = () => {
 	const battleState = loadFromStorage("battleState");
 	const { player, enemy } = battleState;
 
-	if (player.charging) {
-		player.character = false;
-		const damage = 60 + player.character.powerstats.strength;
-		enemy.currentHp = Math.max(0, enemy.currentHp - damage);
-
-		saveToStorage("battleState", battleState);
-
-		return {
-			success: true,
-			damage,
-			message: `${player.character.name} unleashes a charged attack! Deals ${damage} damage!`,
-			effect: "special",
-		};
-	}
-
 	const attackPower =
 		player.powerstats.strength +
 		Math.random() * 20 +
-		(player.statusEffects.find((e) => e.type === "rage")?.strengthBonus || 0);
+        if (player.statusEffects.find((e) => e.type === "rage")) {
+
+        };
 	const defencePower = player.powerstats.durability + Math.random() * 15 + enemy.defenseModifier;
 
 	if (attackPower > defencePower) {
