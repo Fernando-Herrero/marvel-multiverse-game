@@ -871,6 +871,30 @@ h1 {
 	}
 }
 
+.miss-effect {
+	animation: missFade 0.5s ease-out;
+	opacity: 1;
+}
+
+@keyframes missFade {
+	0% {
+		transform: translateX(0);
+		opacity: 1;
+	}
+	30% {
+		transform: translateX(-10px);
+		opacity: 0.6;
+	}
+	60% {
+		transform: translateX(10px);
+		opacity: 0.4;
+	}
+	100% {
+		transform: translateX(0);
+		opacity: 0;
+	}
+}
+
 /* ===== Aside ===== */
 .aside {
 	display: none;

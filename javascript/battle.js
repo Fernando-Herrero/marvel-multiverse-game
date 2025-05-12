@@ -164,29 +164,70 @@ const setupBattleActions = () => {
 };
 
 const executeAction = (playerAction) => {
-	console.log("🔘 Botón pulsado:", playerAction);
-
 	const battleState = loadFromStorage("battleState");
-	console.log("🔄 Estado ANTES:", JSON.parse(JSON.stringify(battleState)));
 
 	battleState.turn++;
 
 	disableButtons(true);
 
-	processAction("player", playerAction, battleState);
+	const playerResult = processAction("player", playerAction, battleState);
 
-	setTimeout(() => {
-		console.log("🤖 Turno del enemigo (HP actual:", battleState.enemy.currentHp, ")");
-		const enemyAction = chooseEnemyAction(battleState);
-		processAction("enemy", enemyAction, battleState);
-		console.log(processAction());
-		disableButtons(false);
-	}, 1000);
+	if (battleState.enemy.currentHp > 0) {
+		setTimeout(() => {
+			const enemyAction = chooseEnemyAction(battleState);
+			const enemyResult = processAction("enemy", enemyAction, battleState);
+
+			if (battleState.player.currentHp > 0) {
+				disableButtons(false);
+			}
+		}, 1000);
+	}
+
+	checkBattleEnd(battleState);
+};
+
+const addBattleEffect = (target, action, success = true) => {
+	const card = target === "player" ? playerCard : enemyCard;
+
+	card.classList.remove("attack-effect", "defence-effect", "dodge-effect", "special-effect", "miss-effect");
+
+	let effectClass = "";
+
+	if (success) {
+		switch (action) {
+			case "attack":
+				effectClass = "attack-effect";
+				break;
+			case "defence":
+				effectClass = "defence-effect";
+				break;
+			case "dodge":
+				effectClass = "dodge-effect";
+				break;
+			case "special":
+				effectClass = "special-effect";
+				break;
+		}
+	} else {
+		card.classList.add("miss-effect");
+	}
+
+	if (effectClass) {
+		card.classList.add(effectClass);
+
+		setTimeout(() => {
+			card.classList.remove(effectClass);
+		}, 500);
+	}
 };
 
 const processAction = (actor, action, battleState) => {
 	const target = actor === "player" ? battleState.enemy : battleState.player;
+	const targetData = actor === "player" ? battleState.enemy : battleState.player;
+	const targetKey = actor === "player" ? "enemy" : "player";
+
 	let damage = 0;
+	let success = true;
 
 	switch (action) {
 		case "attack":
@@ -195,15 +236,24 @@ const processAction = (actor, action, battleState) => {
 		case "special":
 			damage = actor === "player" ? 35 : 30;
 			break;
+		case "defence":
+		case "dodge":
+			success = false;
+			break;
 	}
 
-	target.currentHp = Math.max(0, target.currentHp - damage);
+	if (damage > 0) {
+		target.currentHp = Math.max(0, target.currentHp - damage);
+	}
+
 	updateHealthBars(battleState);
 
 	showBattleText(
 		actor === "player" ? "player" : "enemy",
 		`${actor === "player" ? "Usas" : "Enemigo usa"} ${action}! -${damage}HP`
 	);
+
+	addBattleEffect(targetKey, action, success);
 
 	saveToStorage("battleState", battleState);
 	checkBattleEnd(battleState);
@@ -218,7 +268,7 @@ const chooseEnemyAction = (battleState) => {
 export let playerHealthBar, enemyHealthBar;
 
 export const updateHealthBars = (battleState) => {
-	if (!playerHealthBar || !enemyHealthBar) initialBattleUi(); 
+	if (!playerHealthBar || !enemyHealthBar) initialBattleUi();
 
 	playerHealthBar.style.width = `${battleState.player.currentHp}%`;
 	enemyHealthBar.style.width = `${battleState.enemy.currentHp}%`;
