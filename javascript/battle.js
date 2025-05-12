@@ -295,8 +295,14 @@ const calculateAttack = (actor, battleState) => {
 	const attacker = actor === "player" ? battleState.player : battleState.enemy;
 	const defender = actor === "player" ? battleState.enemy : battleState.player;
 
-	let attackPower = attacker.character.powerstats.strength + Math.random() * 20;
-	const defencePower = attacker.character.powerstats.durability + Math.random() * 15;
+	const attackerStats = attacker.character.powerstats;
+	const defenderStats = defender.character.powerstats;
+
+	const strength = parseInt(attackerStats.strength ?? attackerStats.Strength) || 0;
+	const durability = parseInt(defenderStats.durability ?? defenderStats.Durability) || 0;
+
+	let attackPower = strength + Math.random() * 20;
+	let defencePower = durability + Math.random() * 15;
 
 	console.log(
 		`[CALCULO ATAQUE] ${actor} (Fuerza: ${attackPower.toFixed(1)}) vs ${
