@@ -63,12 +63,13 @@ export const renderBattleCards = async (enemyName) => {
 	console.log("10. Configurando botones de batalla...");
 	setupBattleActions();
 
+	const specialBtn = document.getElementById("special-skill");
+	if (specialBtn) {
+		specialBtn.disabled = false;
+	}
+
 	console.log("--- BATALLA LISTA PARA COMENZAR ---");
 	console.log("Estado completo:", loadFromStorage("battleState"));
-
-	// if (existingBattle) {
-	// 	restoreBattleState(existingBattle);
-	// }
 };
 
 const renderPlayerCard = (playerData) => {
@@ -166,6 +167,17 @@ const setupBattleActions = () => {
 
 const executeAction = (playerAction) => {
 	const battleState = loadFromStorage("battleState");
+
+	if (playerAction === "special") {
+		if (battleState.player.specialUsed) {
+			disableButtons(false);
+			return;
+		}
+
+		battleState.player.specialUsed = true;
+		document.getElementById("special-skill").disabled = true;
+	}
+
 	battleState.turn++;
 	battleState.player.defending = false;
 	battleState.enemy.defending = false;
@@ -186,6 +198,11 @@ const executeAction = (playerAction) => {
 };
 
 const resolveActions = (playerAction, enemyAction, battleState) => {
+	if (enemyAction === "special" && !battleState.enemy.specialUsed) {
+		battleState.enemy.specialUsed = true;
+		console.log(`[Enemy] ¡${battleState.enemy.character.name} ha gastado su ataque especial!`);
+	}
+
 	switch (playerAction) {
 		case "attack":
 			switch (enemyAction) {
@@ -210,10 +227,16 @@ const resolveActions = (playerAction, enemyAction, battleState) => {
 					handleAttackVsDefence(battleState, "enemy", "player");
 					break;
 				case "defence":
-					showBattleText("both", "¡Ambos se preparan para defender!");
+					addBattleEffect("player", "defence");
+					addBattleEffect("enemy", "defence");
+					showBattleText("player", "You brace for defense!");
+					showBattleText("enemy", "The enemy prepares to block!");
 					break;
 				case "dodge":
-					showBattleText("both", "¡Defensas pasivas no tienen efecto!");
+					addBattleEffect("player", "defence");
+					addBattleEffect("enemy", "dodge");
+					showBattleText("player", "Your passive defense has no effect!");
+					showBattleText("enemy", "You dodge the passive defense!");
 					break;
 				case "special":
 					handleSpecialVsDefence(battleState, "enemy", "player");
@@ -230,7 +253,10 @@ const resolveActions = (playerAction, enemyAction, battleState) => {
 					showBattleText("both", "¡Defensas pasivas no tienen efecto!");
 					break;
 				case "dodge":
-					showBattleText("both", "¡Ambos intentan esquivar!");
+					addBattleEffect("player", "dodge");
+					addBattleEffect("enemy", "dodge");
+					showBattleText("player", "You try to dodge the next attack!");
+					showBattleText("enemy", "The enemy attempts to dodge!");
 					break;
 				case "special":
 					handleSpecialVsDodge(battleState, "enemy", "player");
@@ -376,42 +402,44 @@ const calculateDamage = (attacker, defender) => {
 	const attackerStats = attacker.character.powerstats;
 	const defenderStats = defender.character.powerstats;
 
-	const attackPower =
-		parseInt(attackerStats.Strength) * 0.6 +
-		parseInt(attackerStats.Speed) * 0.25 +
-		parseInt(attackerStats.Intelligence) * 0.15;
+	const getStat = (stats, name) => {
+		const lowerName = name.toLowerCase();
+		for (const key in stats) {
+			if (key.toLowerCase() === lowerName) {
+				return parseInt(stats[key]) || 0;
+			}
+		}
+		return 0;
+	};
 
-	const defencePower = parseInt(defenderStats.Durability) * 0.7 + parseInt(attackerStats.Combat) * 0.3;
+	const strength = getStat(attackerStats, "strength");
+	const speed = getStat(attackerStats, "speed");
+	const intelligence = getStat(attackerStats, "intelligence");
+	const durability = getStat(defenderStats, "durability");
+	const combat = getStat(defenderStats, "combat");
 
-	const randomFator = 0.8 + Math.random() * 0.4;
+	const attackPower = strength * 0.6 + speed * 0.25 + intelligence * 0.15;
+	const defensePower = durability * 0.7 + combat * 0.3;
 
-	let damage = (attackPower - defencePower / 2) * randomFator;
+	const randomFactor = 0.8 + Math.random() * 0.4;
+	let damage = (attackPower - defensePower / 2) * randomFactor;
 
 	damage = Math.max(1, Math.round(damage));
 
-	// Log detallado
 	console.log("=== CÁLCULO DE DAÑO ===");
-	console.log("Atacante:", attacker.character.name);
-	console.log("- Fuerza:", attackerStats.strength);
-	console.log("- Velocidad:", attackerStats.speed);
-	console.log("- Inteligencia:", attackerStats.intelligence);
-	console.log("TOTAL ATAQUE:", attackPower);
-
-	console.log("\nDefensor:", defender.character.name);
-	console.log("- Durabilidad:", defenderStats.durability);
-	console.log("- Combate:", defenderStats.combat);
-	console.log("TOTAL DEFENSA:", defensePower);
-
-	console.log("\nFórmula: (Ataque - (Defensa/2)) * Aleatorio");
-	console.log(`(${attackPower} - (${defensePower}/2)) * ${randomFactor.toFixed(2)} = ${damage}`);
+	console.log(`Atacante: ${attacker.character.name}`);
+	console.log(`- Fuerza: ${strength}, Velocidad: ${speed}, Inteligencia: ${intelligence}`);
+	console.log(`Defensor: ${defender.character.name}`);
+	console.log(`- Durabilidad: ${durability}, Combate: ${combat}`);
+	console.log(`Daño calculado: ${damage}`);
 	console.log("=======================");
 
 	return damage;
 };
 
-const calculateSpecialDamage = () => {
-	let baseDamage = 20;
-	return baseDamage * 2;
+const calculateSpecialDamage = (attacker, defender) => {
+	const normalDamage = calculateDamage(attacker, defender);
+	return normalDamage * 2;
 };
 
 const addBattleEffect = (target, action, success = true) => {
@@ -450,9 +478,16 @@ const addBattleEffect = (target, action, success = true) => {
 };
 
 const chooseEnemyAction = (battleState) => {
-	const actions = ["attack", "defence", "dodge", "special"];
-	const randomIndex = Math.floor(Math.random() * actions.length);
-	return actions[randomIndex];
+	const baseActions = ["attack", "defence", "dodge"];
+
+	if (!battleState.enemy.specialUsed) {
+		const actionsWithSpecial = [...baseActions, "special", "special"];
+		const randomIndex = Math.floor(Math.random() * actionsWithSpecial.length);
+		return actionsWithSpecial[randomIndex];
+	}
+
+	const randomIndex = Math.floor(Math.random() * baseActions.length);
+	return baseActions[randomIndex];
 };
 
 export let playerHealthBar, enemyHealthBar;
@@ -502,6 +537,11 @@ const checkBattleEnd = (battleState) => {
 	} else if (battleState.player.currentHp <= 0) {
 		showBattleText("enemy", "¡Has sido derrotado!");
 		setTimeout(() => endBattle(false), 1500);
+	}
+
+	if (battleState.player.currentHp <= 0 && battleState.enemy.currentHp <= 0) {
+		showBattleText("both", "¡Empate! Ambos han caído.");
+		setTimeout(() => endBattle(null), 1500);
 	}
 };
 
