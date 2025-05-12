@@ -1,10 +1,8 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { battleScreen, player } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
-import { disableButtons, showBattleText } from "./utils.js";
+import { disableButtons, initialBattleUi, showBattleText } from "./utils.js";
 
-const playerHealthBar = document.querySelector(".bar-ps-player");
-const enemyHealthBar = document.querySelector(".bar-ps-enemy");
 const battleText = document.getElementById("battle-text");
 const playerCard = document.getElementById("player-battle-card");
 const enemyCard = document.getElementById("enemy-battle-card");
@@ -181,7 +179,7 @@ const executeAction = (playerAction) => {
 		console.log("🤖 Turno del enemigo (HP actual:", battleState.enemy.currentHp, ")");
 		const enemyAction = chooseEnemyAction(battleState);
 		processAction("enemy", enemyAction, battleState);
-		console.log(processAction);
+		console.log(processAction());
 		disableButtons(false);
 	}, 1000);
 };
@@ -217,7 +215,11 @@ const chooseEnemyAction = (battleState) => {
 	return actions[randomIndex];
 };
 
-const updateHealthBars = (battleState) => {
+export let playerHealthBar, enemyHealthBar;
+
+export const updateHealthBars = (battleState) => {
+	if (!playerHealthBar || !enemyHealthBar) initialBattleUi(); 
+
 	playerHealthBar.style.width = `${battleState.player.currentHp}%`;
 	enemyHealthBar.style.width = `${battleState.enemy.currentHp}%`;
 

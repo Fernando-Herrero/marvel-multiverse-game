@@ -1,4 +1,4 @@
-import { renderBattleCards } from "./battle.js";
+import { renderBattleCards, updateHealthBars } from "./battle.js";
 import { handleCharacterSelection } from "./character.js";
 import {
 	aside,
@@ -22,7 +22,7 @@ import {
 	showLeveleInfo,
 } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
-import { hideModal, modalAcceptBtn, modalCloseBtn, showBriefing, showModal } from "./utils.js";
+import { hideModal, modalAcceptBtn, modalCloseBtn, resetHealthBars, showBriefing, showModal } from "./utils.js";
 
 export const loginScreen = document.getElementById("login-screen");
 export const mapScreen = document.getElementById("map-screen");
@@ -72,6 +72,8 @@ const resetGameState = () => {
 
 	clearKeys.forEach((key) => clearStorageKey(key));
 	resetPlayerPosition();
+
+	resetHealthBars();
 };
 
 const setupEventListeners = () => {
@@ -133,18 +135,20 @@ const setupEventListeners = () => {
 		modalAcceptBtn.onclick = () => {
 			localStorage.clear();
 			resetPlayerPosition();
+			resetHealthBars();
 
-			mapScreen.style.display = "none";
 			loginScreen.style.display = "flex";
+			mapScreen.classList.remove("active");
+			mapScreen.style.display = "none";
 			navbar.style.display = "none";
-			title.style.display = "block";
+			title.style.display = "flex";
+			aside.classList.remove("show");
+			aside.style.display = "none";
 			battleScreen.style.display = "none";
 
-			inputUserName.value = "";
-			charactersSelect.value = "" || "heroes";
-			document.querySelectorAll(".character-card.selected-card").forEach((card) => {
-				card.classList.remove("selected-card");
-			});
+			inputUserName.value = " ";
+			const selectedCard = document.querySelector(".character-card.selected-card");
+			selectedCard?.classList.remove("selected-card");
 
 			hideModal();
 		};
