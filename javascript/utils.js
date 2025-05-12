@@ -1,4 +1,3 @@
-import { enemyHealthBar, playerHealthBar } from "./battle.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 
 export const modalCard = document.getElementById("modal-card");
@@ -93,18 +92,4 @@ export const disableButtons = (disabled) => {
 	document.querySelectorAll(".buttons-battle button").forEach((btn) => {
 		btn.disabled = disabled;
 	});
-};
-
-export const initialBattleUi = () => {
-	playerHealthBar = document.querySelector(".bar-ps-player");
-	enemyHealthBar = document.querySelector(".bar-ps-enemy");
-};
-
-export const resetHealthBars = () => {
-	if (playerHealthBar && enemyHealthBar) {
-		playerHealthBar.style.width = "100%";
-		enemyHealthBar.style.width = "100%";
-		playerHealthBar.style.backgroundColor = "green";
-		enemyHealthBar.style.backgroundColor = "green";
-	}
 };

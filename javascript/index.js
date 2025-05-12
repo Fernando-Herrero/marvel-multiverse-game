@@ -1,4 +1,4 @@
-import { renderBattleCards, updateHealthBars } from "./battle.js";
+import { renderBattleCards, resetHealthBars } from "./battle.js";
 import { handleCharacterSelection } from "./character.js";
 import {
 	aside,
@@ -22,7 +22,7 @@ import {
 	showLeveleInfo,
 } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
-import { hideModal, modalAcceptBtn, modalCloseBtn, resetHealthBars, showBriefing, showModal } from "./utils.js";
+import { hideModal, modalAcceptBtn, modalCloseBtn, showBriefing, showModal } from "./utils.js";
 
 export const loginScreen = document.getElementById("login-screen");
 export const mapScreen = document.getElementById("map-screen");
