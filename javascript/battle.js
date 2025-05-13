@@ -1,17 +1,33 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { battleScreen } from "./map.js";
-import { loadFromStorage, saveToStorage } from "./storage.js";
+import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 import { disableButtons, showBattleText } from "./utils.js";
 
 const playerCard = document.getElementById("player-battle-card");
 const enemyCard = document.getElementById("enemy-battle-card");
 
 export const renderBattleCards = async (enemyName) => {
+	console.clear();
+	console.log("[RENDER BATTLE CARDS] Iniciando con enemigo:", enemyName);
+	if (loadFromStorage("forceBattleReset") || !enemyName) {
+		clearStorageKey("battleState");
+		clearStorageKey("forceBattleReset");
+		console.log("Forzando reset de batalla");
+	}
+
 	console.log("[1] Nombre del enemigo recibido:", enemyName);
 	console.log("1. Iniciando renderBattleCards...");
 
-	const existingBattle = loadFromStorage("battleState");
+	let existingBattle = loadFromStorage("battleState");
 	console.log("2. Estado de batalla existente:", existingBattle);
+
+	const shouldResetBattle =
+		!existingBattle || existingBattle.enemy?.character?.name !== enemyName || loadFromStorage("forceBattleReset");
+
+	if (shouldResetBattle) {
+		clearStorageKey("battleState");
+		existingBattle = null;
+	}
 
 	const playerData = loadFromStorage("playerCharacter");
 	console.log("3. Datos del jugador:", playerData);
@@ -21,6 +37,12 @@ export const renderBattleCards = async (enemyName) => {
 	if (existingBattle && existingBattle.enemy) {
 		enemyData = existingBattle.enemy.character;
 		console.log("4. Usando enemigo existente:", enemyData);
+		console.log(
+			"Vida inicial - Jugador:",
+			existingBattle.player.currentHp,
+			"Enemigo:",
+			existingBattle.enemy.currentHp
+		);
 		updateHealthBars(existingBattle);
 	} else {
 		enemyData = await fetchCharactersByName(enemyName);
@@ -45,6 +67,7 @@ export const renderBattleCards = async (enemyName) => {
 			},
 			turn: 0,
 			currentLevel: loadFromStorage("currentLevel") || 1,
+			winner: null,
 		};
 
 		saveToStorage("battleState", initialBattleState);
@@ -424,7 +447,7 @@ const calculateDamage = (attacker, defender) => {
 	const randomFactor = 0.8 + Math.random() * 0.4;
 	let damage = (attackPower - defensePower / 2) * randomFactor;
 
-	damage = Math.max(1, Math.round(damage));
+	damage = Math.max(1, Math.min(50, Math.round(damage)));
 
 	console.log("=== CÁLCULO DE DAÑO ===");
 	console.log(`Atacante: ${attacker.character.name}`);
@@ -509,8 +532,11 @@ export const resetHealthBars = () => {
 export const updateHealthBars = (battleState) => {
 	if (!playerHealthBar || !enemyHealthBar) initialBattleUi();
 
-	playerHealthBar.style.width = `${battleState.player.currentHp}%`;
-	enemyHealthBar.style.width = `${battleState.enemy.currentHp}%`;
+	const playerHp = Math.max(0, Math.min(100, battleState.player.currentHp));
+	const enemyHp = Math.max(0, Math.min(100, battleState.enemy.currentHp));
+
+	playerHealthBar.style.width = `${playerHp}%`;
+	enemyHealthBar.style.width = `${enemyHp}%`;
 
 	const setHealthBarColor = (healthBar, currentHp) => {
 		if (currentHp > 70) {
@@ -531,22 +557,51 @@ export const updateHealthBars = (battleState) => {
 };
 
 const checkBattleEnd = (battleState) => {
-	if (battleState.enemy.currentHp <= 0) {
-		showBattleText("player", "¡Has ganado la batalla!");
-		setTimeout(() => endBattle(true), 1500);
-	} else if (battleState.player.currentHp <= 0) {
-		showBattleText("enemy", "¡Has sido derrotado!");
-		setTimeout(() => endBattle(false), 1500);
+	if (battleState.winner !== null && battleState.winner !== undefined) {
+		return true;
 	}
 
-	if (battleState.player.currentHp <= 0 && battleState.enemy.currentHp <= 0) {
-		showBattleText("both", "¡Empate! Ambos han caído.");
-		setTimeout(() => endBattle(null), 1500);
+	let battleEnded = false;
+
+	if (battleState.enemy.currentHp <= 0 && battleState.player.currentHp > 0) {
+		battleState.winner = "player";
+		showBattleText("player", "¡Has ganado la batalla!");
+		battleEnded = true;
+	} else if (battleState.player.currentHp <= 0 && battleState.enemy.currentHp > 0) {
+		battleState.winner = "enemy";
+		showBattleText("enemy", "¡Has sido derrotado!");
+		battleEnded = true;
+	} else if (battleState.player.currentHp <= 0 && battleState.enemy.currentHp <= 0) {
+		battleState.winner = "draw";
+		showBattleText("player", "¡Empate! Ambos han caído.");
+		showBattleText("enemy", "¡Empate! Ambos han caído.");
+		battleEnded = true;
 	}
+
+	if (battleEnded) {
+		saveToStorage("battleState", battleState);
+		setTimeout(() => endBattle(battleState.winner), 1500);
+		return true;
+	}
+
+	return false;
 };
 
 const endBattle = (playerWon) => {
 	console.log(playerWon ? "Ganaste" : "Perdiste");
+
+	playerCard.classList.remove("attack-effect", "defence-effect", "dodge-effect", "special-effect", "miss-effect");
+	enemyCard.classList.remove("attack-effect", "defence-effect", "dodge-effect", "special-effect", "miss-effect");
+
+	clearStorageKey("battleState");
+
+	disableButtons(true);
+
+	setTimeout(() => {
+		saveToStorage("currentScreen", "map");
+		battleScreen.style.display = "none";
+		mapScreen.style.display = "flex";
+	}, 1500);
 };
 
 // const calculateSpecialSkill = (attacker, defender, isEnemy) => {

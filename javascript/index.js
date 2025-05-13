@@ -68,12 +68,23 @@ const resetGameState = () => {
 		"playerCharacter",
 		"currentEnemy",
 		"mainBriefing",
+		"characterType",
 	];
 
 	clearKeys.forEach((key) => clearStorageKey(key));
 	resetPlayerPosition();
-
 	resetHealthBars();
+
+	//sugerido por ia por problema en la batalla
+	// Limpieza más agresiva de timeouts
+	let id = window.setTimeout(() => {}, 0);
+	while (id--) {
+		window.clearTimeout(id);
+	}
+
+	saveToStorage("forceBattleReset", true);
+	saveToStorage("battleState", null);
+	localStorage.removeItem("battleState");
 };
 
 const setupEventListeners = () => {
@@ -91,9 +102,11 @@ const setupEventListeners = () => {
 		});
 		modalAcceptBtn.onclick = () => {
 			resetGameState();
-
 			saveToStorage("currentScreen", "login");
 
+			clearStorageKey("battleState");
+			saveToStorage("forceBattleReset", true);
+			
 			loginScreen.style.display = "flex";
 			mapScreen.classList.remove("active");
 			mapScreen.style.display = "none";
@@ -106,6 +119,10 @@ const setupEventListeners = () => {
 			inputUserName.value = " ";
 			const selectedCard = document.querySelector(".character-card.selected-card");
 			selectedCard?.classList.remove("selected-card");
+
+			document.querySelectorAll(".battle-button").forEach((btn) => {
+				btn.disabled = false;
+			});
 
 			showModal("You've succesfully logout.", {
 				confirmText: "Accept",
@@ -134,6 +151,8 @@ const setupEventListeners = () => {
 
 		modalAcceptBtn.onclick = () => {
 			localStorage.clear();
+			resetGameState();
+			saveToStorage("forceBattleReset", true);
 			resetPlayerPosition();
 			resetHealthBars();
 
@@ -149,6 +168,12 @@ const setupEventListeners = () => {
 			inputUserName.value = " ";
 			const selectedCard = document.querySelector(".character-card.selected-card");
 			selectedCard?.classList.remove("selected-card");
+
+			document.querySelectorAll(".battle-button").forEach((btn) => {
+				btn.disabled = false;
+			});
+
+			saveToStorage("forceBattleReset", true);
 
 			hideModal();
 		};
@@ -211,7 +236,14 @@ const loadbattleState = async () => {
 
 	const battleState = loadFromStorage("battleState");
 	if (battleState?.enemy) {
-		await renderBattleCards(battleState.enemy.name);
+		if (battleState.turn > 0 && battleState.winner === null) {
+			clearStorageKey("battleState");
+			saveToStorage("currentScreen", "map");
+			mapScreen.style.display = "flex";
+			battleScreen.style.display = "none";
+			return;
+		}
+		await renderBattleCards(battleState.enemy.character.name);
 	} else {
 		saveToStorage("currentScreen", "map");
 		mapScreen.style.display = "flex";

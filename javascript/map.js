@@ -2,7 +2,7 @@ import { renderBattleCards } from "./battle.js";
 import { fetchCharactersByName } from "./character.js";
 import { mapScreen } from "./index.js";
 import { charactersSelect } from "./login.js";
-import { loadFromStorage, saveToStorage } from "./storage.js";
+import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 import { hideModal, showBriefing } from "./utils.js";
 
 export const levelEnemies = {
@@ -207,8 +207,11 @@ export const showLeveleInfo = () => {
 		mapScreen.style.display = "none";
 		battleScreen.style.display = "flex";
 
+		clearStorageKey("battleState");
+		saveToStorage("forceBattleReset", false);
+
 		saveToStorage("currentScreen", "battle");
-		console.log("[4] StartBattle - Enemigo:", enemy.name); 
+		console.log("[4] StartBattle - Enemigo:", enemy.name);
 		await renderBattleCards(enemy.name);
 		saveToStorage("currentLevel", enemy.level);
 	};
