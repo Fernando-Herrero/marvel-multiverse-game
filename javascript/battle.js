@@ -7,7 +7,7 @@ const playerCard = document.getElementById("player-battle-card");
 const enemyCard = document.getElementById("enemy-battle-card");
 
 export const renderBattleCards = async (enemyName) => {
-	console.clear();
+	// console.clear();
 	console.log("[RENDER BATTLE CARDS] Iniciando con enemigo:", enemyName);
 	if (loadFromStorage("forceBattleReset") || !enemyName) {
 		clearStorageKey("battleState");
@@ -155,6 +155,14 @@ const renderEnemyCard = (enemyData) => {
 };
 
 const setupBattleActions = () => {
+	const buttonBattleContainer = document.getElementById("buttons-battle");
+
+	buttonBattleContainer.innerHTML = `
+	<button id="attack" class="attack">Attack</button>
+	<button id="defence" class="defence">Defence</button>
+	<button id="special-skill" class="special-skill">S.Skill</button>
+	<button id="dodge" class="dodge">Dodge</button>`
+
 	const attackBtn = document.getElementById("attack");
 	const defenceBtn = document.getElementById("defence");
 	const specialBtn = document.getElementById("special-skill");
@@ -202,6 +210,7 @@ const executeAction = (playerAction) => {
 	}
 
 	battleState.turn++;
+	console.log("aumento turno");
 	battleState.player.defending = false;
 	battleState.enemy.defending = false;
 

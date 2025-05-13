@@ -106,7 +106,7 @@ const setupEventListeners = () => {
 
 			clearStorageKey("battleState");
 			saveToStorage("forceBattleReset", true);
-			
+
 			loginScreen.style.display = "flex";
 			mapScreen.classList.remove("active");
 			mapScreen.style.display = "none";
@@ -131,6 +131,7 @@ const setupEventListeners = () => {
 
 			modalAcceptBtn.onclick = () => {
 				hideModal();
+				// window.location.reload
 			};
 		};
 
