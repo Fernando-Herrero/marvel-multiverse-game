@@ -154,14 +154,29 @@ const renderEnemyCard = (enemyData) => {
 	}
 };
 
-const setupBattleActions = () => {
+const buttonsName = ["attack", "defence", "special-skill", "dodge"];
+
+const createButtonAction = () => {
 	const buttonBattleContainer = document.getElementById("buttons-battle");
 
-	buttonBattleContainer.innerHTML = `
-	<button id="attack" class="attack">Attack</button>
-	<button id="defence" class="defence">Defence</button>
-	<button id="special-skill" class="special-skill">S.Skill</button>
-	<button id="dodge" class="dodge">Dodge</button>`
+	buttonsName.forEach((name) => {
+		const button = document.createElement("button");
+		button.id = name;
+		button.textContent = name;
+
+		buttonBattleContainer.appendChild(button);
+	});
+};
+
+const setupBattleActions = () => {
+	createButtonAction();
+	// const buttonBattleContainer = document.getElementById("buttons-battle");
+
+	// buttonBattleContainer.innerHTML = `
+	// <button id="attack" class="attack">Attack</button>
+	// <button id="defence" class="defence">Defence</button>
+	// <button id="special-skill" class="special-skill">S.Skill</button>
+	// <button id="dodge" class="dodge">Dodge</button>`;
 
 	const attackBtn = document.getElementById("attack");
 	const defenceBtn = document.getElementById("defence");
