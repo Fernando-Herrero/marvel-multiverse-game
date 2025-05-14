@@ -368,52 +368,135 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 };
 
 const handleAttackVsDodge = (battleState, attacker, dodger) => {
-	const dodgeSuccess = Math.random() < 0.6;
+	const attackerStats = battleState[attacker].character.powerstats;
+	const dodgerStats = battleState[dodger].character.powerstats;
 
-	if (dodgeSuccess) {
-		addBattleEffect(attacker, "attack", false);
+	const getStat = (stats, name) => {
+		const lowerName = name.toLowerCase();
+		for (const key in stats) {
+			if (key.toLowerCase() === lowerName) {
+				return parseInt(stats[key]) || 0;
+			}
+		}
+		return 0;
+	};
+
+	const dodgeSpeed = getStat(dodgerStats, "speed");
+	const dodgeCombat = getStat(dodgerStats, "combat");
+
+	const attackerSpeed = getStat(attackerStats, "speed");
+	const attackerIntelligence = getStat(attackerStats, "intelligence");
+
+	const dodgeChance = Math.max(
+		5,
+		Math.min(95, dodgeSpeed * 0.6 + dodgeCombat * 0.4 - (attackerSpeed * 0.4 + attackerIntelligence * 0.6))
+	);
+
+	const randomRoll = Math.random() * 100;
+
+	if (randomRoll < dodgeChance) {
 		addBattleEffect(dodger, "dodge");
+		addBattleEffect(attacker, "miss-effect");
+
+		showBattleText(dodger, "Dodged the attack!");
 		showBattleText(attacker, "Your attack missed!");
-		showBattleText(dodger, "You dodged the attack!");
 	} else {
 		const damage = calculateDamage(battleState[attacker], battleState[dodger]);
+
 		battleState[dodger].currentHp = Math.max(0, battleState[dodger].currentHp - damage);
+
 		addBattleEffect(attacker, "attack");
-		showBattleText(attacker, `Your attack hits! (-${damage} HP)`);
-		showBattleText(dodger, `You got hit! (-${damage} HP)`);
+		addBattleEffect(dodger, "miss-effect");
+
+		showBattleText(attacker, `You hit for ${damage} damage!`);
+		showBattleText(dodger, `You tried to dodge but missed and got hit for ${damage} damage!`);
 	}
 };
 
 const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
-	const specialDamage = calculateSpecialDamage(battleState[specialUser], battleState[attacker]);
-	battleState[attacker].currentHp = Math.max(0, battleState[attacker].currentHp - specialDamage);
-
-	let attackDamage = 0;
-	if (battleState[attacker].currentHp > 0) {
-		attackDamage = calculateDamage(battleState[attacker], battleState[specialUser]);
-		battleState[specialUser].currentHp = Math.max(0, battleState[specialUser].currentHp - attackDamage);
+	if (processStatusEffect(battleState[specialUser], "webbed")) {
+		return;
+	}
+	if (processStatusEffect(battleState[attacker], "webbed")) {
+		return;
 	}
 
-	addBattleEffect(specialUser, "special");
-	addBattleEffect(attacker, "attack");
+	const specialResult = calculateSpecialSkill(battleState[specialUser], battleState[attacker]);
 
-	showBattleText(specialUser, `You used a special move! (-${specialDamage} HP to enemy)`);
+	if (specialResult.damage > 0 && !processStatusEffect(battleState[attacker], "shield")) {
+		battleState[attacker].currentHp = Math.max(0, battleState[attacker].currentHp - specialResult.damage);
+	}
+
+	if (specialResult.heal > 0) {
+		battleState[specialUser].currentHp = Math.min(
+			battleState[specialUser].maxHp,
+			battleState[specialUser].currentHp + specialResult.heal
+		);
+	}
+
+	if (specialResult.message) {
+		showBattleText(specialUser, specialResult.message);
+	} else {
+		showBattleText(specialUser, `You used a special move!`);
+	}
+
+	if (processStatusEffect(battleState[attacker], "illusion")) {
+		const dodgeChance = Math.random();
+		if (dodgeChance > 0.9) {
+			showBattleText(attacker, `${attacker.character.name} dodges the attack using illusion!`);
+			return;
+		}
+	} else {
+		showBattleText(attacker, `${attacker.character.name} failed to dodge the attack!`);
+	}
+
+	let attackDamage = calculateDamage(battleState[attacker], battleState[specialUser]);
+
+	if (processStatusEffect(battleState[attacker], "demoralized")) {
+		showBattleText(attacker, `${attacker.character.name} is demoralized and their attack is weakened!`);
+		attackDamage -= 10;
+	}
+
+	if (processStatusEffect(battleState[attacker], "doubleStrike")) {
+		showBattleText(attacker, `${attacker.character.name} is ready for a double strike!`);
+		attackDamage += 20;
+	}
+
+	if (processStatusEffect(battleState[attacker], "rage")) {
+		attackDamage += 10;
+	}
+
+	if (!processStatusEffect(battleState[specialUser], "shield")) {
+		battleState[specialUser].currentHp = Math.max(0, battleState[specialUser].currentHp - attackDamage);
+	} else {
+		attackDamage = 0;
+	}
 
 	if (attackDamage > 0) {
 		showBattleText(attacker, `You strike back! (-${attackDamage} HP to enemy)`);
 	} else {
-		showBattleText(attacker, `You were defeated before attacking!`);
+		showBattleText(attacker, `Your counterattack missed!`);
 	}
-
-	battleState[specialUser].specialUsed = true;
 };
 
 const handleSpecialVsDefence = (battleState, specialUser, defender) => {
-	const damage = calculateSpecialDamage(battleState[specialUser], battleState[defender]);
+	const failChance = Math.random() < 0.05;
+
+	if (failChance) {
+		addBattleEffect(specialUser, "miss-effect");
+		addBattleEffect(defender, "defence");
+		showBattleText(specialUser, `${specialUser} tried to use a special move... but incredible missed!`);
+		showBattleText(defender, `${defender} avoided the special attack! Incredible luck!`);
+
+		battleState[specialUser].specialUsed = true;
+		return;
+	}
+
+	const damage = calculateSpecialSkill(battleState[specialUser], battleState[defender]);
 	battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - damage);
 
 	addBattleEffect(specialUser, "special");
-	addBattleEffect(defender, "defence");
+	addBattleEffect(defender, "miss-effect");
 
 	showBattleText(specialUser, `${specialUser} used a special attack! Double damage!`);
 	showBattleText(defender, `${defender} took ${damage} special damage.`);
@@ -422,11 +505,23 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 };
 
 const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
-	const damage = calculateSpecialDamage(battleState[specialUser], battleState[dodger]);
+	const failChance = Math.random() < 0.05;
+
+	if (failChance) {
+		addBattleEffect(specialUser, "miss-effect");
+		addBattleEffect(dodger, "dodge");
+		showBattleText(specialUser, `${specialUser} tried to use a special move... but incredibly missed!`);
+		showBattleText(dodger, `${dodger} dodged the special attack! Incredible reflexes!`);
+
+		battleState[specialUser].specialUsed = true;
+		return;
+	}
+
+	const damage = calculateSpecialSkill(battleState[specialUser], battleState[dodger]);
 	battleState[dodger].currentHp = Math.max(0, battleState[dodger].currentHp - damage);
 
 	addBattleEffect(specialUser, "special");
-	addBattleEffect(dodger, "dodge", false);
+	addBattleEffect(dodger, "miss-effect");
 
 	showBattleText(specialUser, `${specialUser} used a special attack! Cannot be dodged!`);
 	showBattleText(dodger, `${dodger} took ${damage} special damage.`);
@@ -435,8 +530,8 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 };
 
 const handleSpecialVsSpecial = (battleState) => {
-	const playerDamage = calculateSpecialDamage(battleState.player, battleState.enemy);
-	const enemyDamage = calculateSpecialDamage(battleState.enemy, battleState.player);
+	const playerDamage = calculateSpecialSkill(battleState.player, battleState.enemy);
+	const enemyDamage = calculateSpecialSkill(battleState.enemy, battleState.player);
 
 	battleState.enemy.currentHp = Math.max(0, battleState.enemy.currentHp - playerDamage);
 	battleState.player.currentHp = Math.max(0, battleState.player.currentHp - enemyDamage);
@@ -490,9 +585,135 @@ const calculateDamage = (attacker, defender) => {
 	return damage;
 };
 
-const calculateSpecialDamage = (attacker, defender) => {
-	const normalDamage = calculateDamage(attacker, defender);
-	return normalDamage * 2;
+const calculateSpecialSkill = (attacker, defender) => {
+	if (attacker.specialUsed) {
+		return {
+			success: false,
+			message: `${attacker.character.name} has already used their special ability!`,
+			damage: 0,
+			effects: [],
+		};
+	}
+
+	let result = {
+		damage: 0,
+		statusEffect: null,
+		heal: 0,
+		message: "",
+	};
+
+	switch (attacker.character.name) {
+		case "Black Widow":
+			result.damage = 40 + attacker.character.powerstats.combat;
+			result.message = `Black Widow executes a Tactical Ambush! Deals ${damage} damage!`;
+			break;
+
+		case "Spider-Man":
+			statusEffect = { type: "webbed", turnsLeft: 1 };
+			defender.statusEffects.push(statusEffect);
+			result.message = "Spider-Man launches a Paralyzing Web! The enemy cannot attack next turn.";
+			break;
+
+		case "Iron Man":
+			result.damage = 30 + attacker.character.powerstats.intelligence;
+			result.message = `Iron Man fires a Pulse Blast! Deals ${damage} damage ignoring defense.`;
+			break;
+
+		case "Captain America":
+			statusEffect = { type: "shield", turnsLeft: 2 };
+			attacker.statusEffects.push(statusEffect);
+			result.message = "Captain America executes a Perfect Block! Blocks all damage for two turns.";
+			break;
+
+		case "Thor":
+			damage = 40 + attacker.character.powerstats.power;
+			result.message = `Thor calls down Divine Thunder! Unavoidable attack deals ${damage} damage.`;
+			break;
+
+		case "Hulk":
+			statusEffect = { type: "rage", turnsLeft: 2 };
+			attacker.statusEffects.push(statusEffect);
+			result.message = "Hulk enters Uncontrollable Rage! Increased damage for the next two turns.";
+			break;
+
+		case "Thanos":
+			damage = 40 + attacker.character.powerstats.power;
+			result.message = "Thanos charges up the Infinity Fist! Strikes with devastating force.";
+			break;
+
+		case "Loki":
+			statusEffect = { type: "illusion", turnsLeft: 1 };
+			attacker.statusEffects.push(statusEffect);
+			result.message = "Loki uses Multiform Illusion! 90% chance to dodge all attacks next turn.";
+			break;
+
+		case "Ultron":
+			result.heal = 30;
+			result.message = `Ultron uses Regen Upgrade! Regenerate 30% HP.`;
+			break;
+
+		case "Red Skull":
+			statusEffect = { type: "demoralized", turnsLeft: 2 };
+			defender.statusEffects.push(statusEffect);
+			result.message = "Red Skull invokes Terror Domination! Enemy's attack is reduced for 2 turns.";
+			break;
+
+		case "Hela":
+			result.damage = 30;
+			result.heal = 20;
+			result.message = `Hela uses Life Drain! Deals ${damage} damage and heals ${heal} HP.`;
+			break;
+
+		case "Killmonger":
+			statusEffect = { type: "doubleStrike", turnsLeft: 1 };
+			attacker.statusEffects.push(statusEffect);
+			result.message = "Killmonger unleashes Killer Instinct! May strike twice next turn if the first hits.";
+			break;
+	}
+
+	attacker.specialUsed = true;
+	saveToStorage("battleState", battleState);
+
+	return {
+		success: true,
+		...result,
+	};
+};
+
+const processStatusEffect = (character, effectType) => {
+	const effect = character.statusEffects.find((effect) => effect.type === effectType);
+	if (!effect) return false;
+
+	switch (effectType) {
+		case "webbed":
+			showBattleText(character, `${character.character.name} is webbed and can't act this turn!`);
+			break;
+		case "shield":
+			showBattleText(character, `${character.character.name} blocked the damage with their shield!`);
+			break;
+		case "rage":
+			showBattleText(character, `${character.character.name} is enraged and deals more damage this turn!`);
+			break;
+		case "illusion":
+			showBattleText(
+				character,
+				`${character.character.name} is making an illusion and their actions may be unpredictable!`
+			);
+			break;
+		case "demoralized":
+			showBattleText(character, `${character.character.name} is demoralized and weakened!`);
+			break;
+		case "doubleStrike":
+			showBattleText(character, `${character.character.name} is ready for a double strike!`);
+			break;
+	}
+
+	effect.turnsLeft--;
+	if (effect.turnsLeft <= 0) {
+		character.statusEffects = character.statusEffects.filter((effect) => effect.type !== effectType);
+	}
+
+	return true;
 };
 
 const addBattleEffect = (target, action, success = true) => {
@@ -633,115 +854,3 @@ const endBattle = (playerWon) => {
 		mapScreen.style.display = "flex";
 	}, 1500);
 };
-
-// const calculateSpecialSkill = (attacker, defender, isEnemy) => {
-// 	const battleState = loadFromStorage("battleState");
-// 	const target = isEnemy ? battleState.player : battleState.enemy;
-
-// 	if (attacker.specialUsed) {
-// 		return {
-// 			success: false,
-// 			message: `${attacker.character.name} has already used their special ability in this battle!`,
-// 			effect: null,
-// 		};
-// 	}
-
-// 	let damage = 0;
-// 	let message = "";
-// 	let effect = "special";
-// 	let statusEffect = null;
-
-// 	switch (attacker.character.name) {
-// 		case "Black Widow":
-// 			damage = 40 + attacker.character.powerstats.combat;
-// 			target.currentHp = Math.max(0, target.currentHp - damage);
-// 			message = `Black Widow executes a Tactical Ambush! Deals ${damage} damage!`;
-// 			break;
-
-// 		case "Spider-Man":
-// 			statusEffect = { type: "webbed", turnsLeft: 1 };
-// 			defender.statusEffects.push(statusEffect);
-// 			message = "Spider-Man launches a Paralyzing Web! The enemy cannot attack next turn.";
-// 			effect = "status";
-// 			break;
-
-// 		case "Iron Man":
-// 			damage = 30 + attacker.character.powerstats.intelligence;
-// 			target.currentHp = Math.max(0, target.currentHp - damage);
-// 			message = `Iron Man fires a Pulse Blast! Deals ${damage} damage ignoring defense.`;
-// 			break;
-
-// 		case "Captain America":
-// 			statusEffect = { type: "shield", turnsLeft: 2 };
-// 			attacker.statusEffects.push(statusEffect);
-// 			message = "Captain America executes a Perfect Block! Blocks all damage for two turns.";
-// 			break;
-
-// 		case "Thor":
-// 			damage = 40 + attacker.character.powerstats.power;
-// 			target.currentHp = Math.max(0, target.currentHp - damage);
-// 			message = `Thor calls down Divine Thunder! Unavoidable attack deals ${damage} damage.`;
-// 			break;
-
-// 		case "Hulk":
-// 			statusEffect = { type: "rage", turnsLeft: 2 };
-// 			attacker.statusEffects.push(statusEffect);
-// 			message = "Hulk enters Uncontrollable Rage! Increased damage for the next two turns.";
-// 			break;
-
-// 		case "Thanos":
-// 			damage = 40 + attacker.character.powerstats.power;
-// 			target.currentHp = Math.max(0, target.currentHp - damage);
-// 			message = "Thanos charges up the Infinity Fist! Strikes with devastating force.";
-// 			break;
-
-// 		case "Loki":
-// 			statusEffect = { type: "illusion", turnsLeft: 1 };
-// 			attacker.statusEffects.push(statusEffect);
-// 			message = "Loki uses Multiform Illusion! 50% chance to dodge all attacks next turn.";
-// 			break;
-
-// 		case "Ultron":
-// 			const regen = 30;
-// 			attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + regen);
-// 			message = `Ultron uses Regen Upgrade! Regenerate 30% HP.`;
-// 			break;
-
-// 		case "Red Skull":
-// 			statusEffect = { type: "demoralized", turnsLeft: 2 };
-// 			defender.statusEffects.push(statusEffect);
-// 			message = "Red Skull invokes Terror Domination! Enemy's attack is reduced for 2 turns.";
-// 			break;
-
-// 		case "Hela":
-// 			damage = 30;
-// 			target.currentHp = Math.max(0, target.currentHp - damage);
-// 			const heal = 20;
-// 			attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + heal);
-// 			message = `Hela uses Life Drain! Deals ${damage} damage and heals ${heal} HP.`;
-// 			break;
-
-// 		case "Killmonger":
-// 			statusEffect = { type: "doubleStrike", turnsLeft: 1 };
-// 			attacker.statusEffects.push(statusEffect);
-// 			message = "Killmonger unleashes Killer Instinct! May strike twice next turn if the first hits.";
-// 			break;
-
-// 		default:
-// 			damage = 20 + attacker.character.powerstats.strength;
-// 			target.currentHp = Math.max(0, target.currentHp - damage);
-// 			message = `${attacker.character.name} uses a basic enhanced attack! Deals ${damage} damage.`;
-// 			break;
-// 	}
-
-// 	attacker.specialUsed = true;
-// 	saveToStorage("battleState", battleState);
-
-// 	return {
-// 		success: true,
-// 		message,
-// 		effect,
-// 		damage: damage || 0,
-// 		statusEffect,
-// 	};
-// };
