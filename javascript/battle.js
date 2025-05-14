@@ -376,76 +376,56 @@ const handleBothAttack = (battleState) => {
 };
 
 const handleAttackVsDefence = (battleState, attacker, defender) => {
-	if (processStatusEffect(attacker, "webbed")) return;
-	if (processStatusEffect(defender, "webbed")) return;
-
-	const playerRawDamage = calculateDamage(battleState.player, battleState.enemy);
-	const enemyRawDamage = calculateDamage(battleState.enemy, battleState.player);
-
-	let playerFinalDamage = playerRawDamage;
-	let enemyFinalDamage = enemyRawDamage;
-
-	if (processStatusEffect(battleState.player, "shield")) {
-		enemyFinalDamage = 0;
-		addBattleEffect("enemy", "miss-effect");
-	}
-	if (processStatusEffect(battleState.enemy, "shield")) {
-		playerFinalDamage = 0;
-		addBattleEffect("player", "miss-effect");
+	if (processStatusEffect(attacker, "webbed")) {
+		setTimeout(() => {
+			addBattleEffect(attacker, "miss-effect");
+			showBattleText(
+				attacker,
+				`The turn has ended. Since you couldn't attack, the opponent used a defensive stance.`
+			);
+		}, 4500);
+		return;
 	}
 
-	if (processStatusEffect(battleState.player, "rage")) {
-		playerFinalDamage += 10;
-	}
-	if (processStatusEffect(battleState.enemy, "rage")) {
-		enemyFinalDamage += 10;
-	}
+	let damage = calculateDamage(attacker, defender);
 
-	if (processStatusEffect(battleState.player, "illusion")) {
+	if (processStatusEffect(attacker, "rage")) damage += 10;
+	if (processStatusEffect(attacker, "demoralized")) damage -= 10;
+	if (processStatusEffect(attacker, "doubleStrike")) damage += 20;
+
+	if (processStatusEffect(defender, "illusion")) {
 		const dodgeChance = Math.random();
 		if (dodgeChance > 0.9) {
-			enemyFinalDamage = 0;
-			addBattleEffect("enemy", "miss-effect");
-		}
-	}
-	if (processStatusEffect(battleState.enemy, "illusion")) {
-		const dodgeChance = Math.random();
-		if (dodgeChance > 0.9) {
-			playerFinalDamage = 0;
-			addBattleEffect("player", "miss-effect");
+			damage = 0;
+			setTimeout(() => {
+				addBattleEffect(attacker, "miss-effect");
+			}, 2000);
 		}
 	}
 
-	if (processStatusEffect(battleState.player, "demoralized")) {
-		enemyFinalDamage -= 10;
-	}
-	if (processStatusEffect(battleState.enemy, "demoralized")) {
-		playerFinalDamage -= 10;
-	}
-
-	if (processStatusEffect(battleState.player, "doubleStrike")) {
-		playerFinalDamage += 20;
-	}
-	if (processStatusEffect(battleState.enemy, "doubleStrike")) {
-		enemyFinalDamage += 20;
+	if (processStatusEffect(defender, "webbed")) {
+		defender.currentHp = Math.max(0, defender.currentHp - damage);
+		setTimeout(() => {
+			addBattleEffect(defender, "miss-effect");
+		}, 2000);
+		return;
 	}
 
-	const damage = calculateDamage(battleState[attacker], battleState[defender]);
+	if (processStatusEffect(defender, "shield")) {
+		setTimeout(() => {
+			addBattleEffect(attacker, "miss-effect");
+		}, 2000);
+		return;
+	}
 
 	const defenceEffectiveness = 0.3 + Math.random() * 0.4;
 	const reducedDamage = Math.max(1, Math.floor(damage * defenceEffectiveness));
+	defender.currentHp = Math.max(0, defender.currentHp - reducedDamage);
 
 	let defenceQuality;
-	if (defenceEffectiveness > 0.6) {
-		defenceQuality = "poor";
-	} else if (defenceEffectiveness > 0.45) {
-		defenceQuality = "good";
-	} else {
-		defenceQuality = "excellent";
-	}
-
-	battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - reducedDamage);
-	battleState[defender].defending = true;
+	if (defenceEffectiveness > 0.6) defenceQuality = "poor";
+	else if (defenceEffectiveness > 0.45) defenceQuality = "good";
+	else defenceQuality = "excellent";
 
 	const attackerMessages = {
 		excellent: "Your attack was almost completely blocked!",
@@ -842,7 +822,7 @@ const addBattleEffect = (target, action, success = true) => {
 
 		setTimeout(() => {
 			card.classList.remove(effectClass);
-		}, 500);
+		}, 1000);
 	}
 };
 

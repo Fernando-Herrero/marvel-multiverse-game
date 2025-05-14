@@ -68,11 +68,24 @@
             break;
     }
 
-    attacker.specialUsed = true;
-    saveToStorage("battleState", battleState);
-
-    return {
-        success: true,
-        ...result,
-    };
-};
+    case "webbed":
+            showBattleText(character, `${character.character.name} is webbed and can't act this turn!`);
+            break;
+        case "shield":
+            showBattleText(character, `${character.character.name} blocked the damage with their shield!`);
+            break;
+        case "rage":
+            showBattleText(character, `${character.character.name} is enraged and deals more damage this turn!`);
+            break;
+        case "illusion":
+            showBattleText(
+                character,
+                `${character.character.name} is making an illusion and their actions may be unpredictable!`
+            );
+            break;
+        case "demoralized":
+            showBattleText(character, `${character.character.name} is demoralized and weakened!`);
+            break;
+        case "doubleStrike":
+            showBattleText(character, `${character.character.name} is ready for a double strike!`);
+            break;
