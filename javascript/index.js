@@ -75,16 +75,10 @@ const resetGameState = () => {
 	resetPlayerPosition();
 	resetHealthBars();
 
-	//sugerido por ia por problema en la batalla
-	// Limpieza más agresiva de timeouts
 	let id = window.setTimeout(() => {}, 0);
 	while (id--) {
 		window.clearTimeout(id);
 	}
-
-	saveToStorage("forceBattleReset", true);
-	saveToStorage("battleState", null);
-	localStorage.removeItem("battleState");
 };
 
 const setupEventListeners = () => {
@@ -103,9 +97,6 @@ const setupEventListeners = () => {
 		modalAcceptBtn.onclick = () => {
 			resetGameState();
 			saveToStorage("currentScreen", "login");
-
-			clearStorageKey("battleState");
-			saveToStorage("forceBattleReset", true);
 
 			loginScreen.style.display = "flex";
 			mapScreen.classList.remove("active");

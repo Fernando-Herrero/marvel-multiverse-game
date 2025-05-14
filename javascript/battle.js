@@ -7,27 +7,13 @@ const playerCard = document.getElementById("player-battle-card");
 const enemyCard = document.getElementById("enemy-battle-card");
 
 export const renderBattleCards = async (enemyName) => {
-	// console.clear();
-	console.log("[RENDER BATTLE CARDS] Iniciando con enemigo:", enemyName);
-	if (loadFromStorage("forceBattleReset") || !enemyName) {
-		clearStorageKey("battleState");
-		clearStorageKey("forceBattleReset");
-		console.log("Forzando reset de batalla");
-	}
+	console.clear();
 
 	console.log("[1] Nombre del enemigo recibido:", enemyName);
 	console.log("1. Iniciando renderBattleCards...");
 
 	let existingBattle = loadFromStorage("battleState");
 	console.log("2. Estado de batalla existente:", existingBattle);
-
-	const shouldResetBattle =
-		!existingBattle || existingBattle.enemy?.character?.name !== enemyName || loadFromStorage("forceBattleReset");
-
-	if (shouldResetBattle) {
-		clearStorageKey("battleState");
-		existingBattle = null;
-	}
 
 	const playerData = loadFromStorage("playerCharacter");
 	console.log("3. Datos del jugador:", playerData);
@@ -37,12 +23,6 @@ export const renderBattleCards = async (enemyName) => {
 	if (existingBattle && existingBattle.enemy) {
 		enemyData = existingBattle.enemy.character;
 		console.log("4. Usando enemigo existente:", enemyData);
-		console.log(
-			"Vida inicial - Jugador:",
-			existingBattle.player.currentHp,
-			"Enemigo:",
-			existingBattle.enemy.currentHp
-		);
 		updateHealthBars(existingBattle);
 	} else {
 		enemyData = await fetchCharactersByName(enemyName);
@@ -162,7 +142,7 @@ const createButtonAction = () => {
 	buttonsName.forEach((name) => {
 		const button = document.createElement("button");
 		button.id = name;
-		button.textContent = name;
+		button.textContent = name.slice(0, 3).charAt(0).toUpperCase() + name.slice(1, 3).toLowerCase();
 
 		buttonBattleContainer.appendChild(button);
 	});
@@ -170,13 +150,6 @@ const createButtonAction = () => {
 
 const setupBattleActions = () => {
 	createButtonAction();
-	// const buttonBattleContainer = document.getElementById("buttons-battle");
-
-	// buttonBattleContainer.innerHTML = `
-	// <button id="attack" class="attack">Attack</button>
-	// <button id="defence" class="defence">Defence</button>
-	// <button id="special-skill" class="special-skill">S.Skill</button>
-	// <button id="dodge" class="dodge">Dodge</button>`;
 
 	const attackBtn = document.getElementById("attack");
 	const defenceBtn = document.getElementById("defence");
@@ -225,7 +198,6 @@ const executeAction = (playerAction) => {
 	}
 
 	battleState.turn++;
-	console.log("aumento turno");
 	battleState.player.defending = false;
 	battleState.enemy.defending = false;
 
@@ -276,14 +248,14 @@ const resolveActions = (playerAction, enemyAction, battleState) => {
 				case "defence":
 					addBattleEffect("player", "defence");
 					addBattleEffect("enemy", "defence");
-					showBattleText("player", "You brace for defense!");
-					showBattleText("enemy", "The enemy prepares to block!");
+					showBattleText("player", "You block... but so does the enemy!");
+					showBattleText("enemy", "The enemy blocks... but you do too!");
 					break;
 				case "dodge":
 					addBattleEffect("player", "defence");
 					addBattleEffect("enemy", "dodge");
-					showBattleText("player", "Your passive defense has no effect!");
-					showBattleText("enemy", "You dodge the passive defense!");
+					showBattleText("player", "You defend... but the enemy dodges!");
+					showBattleText("enemy", "You dodge... but the player just defends!");
 					break;
 				case "special":
 					handleSpecialVsDefence(battleState, "enemy", "player");
@@ -297,13 +269,14 @@ const resolveActions = (playerAction, enemyAction, battleState) => {
 					handleAttackVsDodge(battleState, "enemy", "player");
 					break;
 				case "defence":
-					showBattleText("both", "¡Defensas pasivas no tienen efecto!");
+					showBattleText("player", "You dodge, but the enemy only defends — nothing happens.");
+					showBattleText("enemy", "You defend, but the player just dodges — nothing happens.");
 					break;
 				case "dodge":
 					addBattleEffect("player", "dodge");
 					addBattleEffect("enemy", "dodge");
-					showBattleText("player", "You try to dodge the next attack!");
-					showBattleText("enemy", "The enemy attempts to dodge!");
+					showBattleText("player", "You both dodge cautiously, waiting for an attack that never comes.");
+					showBattleText("enemy", "You both dodge cautiously, waiting for an attack that never comes.");
 					break;
 				case "special":
 					handleSpecialVsDodge(battleState, "enemy", "player");
@@ -349,16 +322,49 @@ const handleBothAttack = (battleState) => {
 
 const handleAttackVsDefence = (battleState, attacker, defender) => {
 	const damage = calculateDamage(battleState[attacker], battleState[defender]);
-	const reducedDamage = Math.floor(damage * 0.5);
+
+	const defenceEffectiveness = 0.3 + Math.random() * 0.4;
+	const reducedDamage = Math.max(1, Math.floor(damage * defenceEffectiveness));
+
+	let defenceQuality;
+	if (defenceEffectiveness > 0.6) {
+		defenceQuality = "poor";
+	} else if (defenceEffectiveness > 0.45) {
+		defenceQuality = "good";
+	} else {
+		defenceQuality = "excellent";
+	}
 
 	battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - reducedDamage);
 	battleState[defender].defending = true;
 
+	const attackerMessages = {
+		excellent: "Your attack was almost completely blocked!",
+		good: "Your attack was partially blocked!",
+		poor: "Your attack penetrated their defense!",
+	};
+
+	const defenderMessages = {
+		excellent: `Perfect defense! Only ${reducedDamage} damage taken.`,
+		good: `Good defense! You took ${reducedDamage} damage.`,
+		poor: `Weak defense! You took ${reducedDamage} damage.`,
+	};
+
 	addBattleEffect(attacker, "attack");
 	addBattleEffect(defender, "defence");
 
-	showBattleText(attacker, "You attack, but the enemy defends!");
-	showBattleText(defender, `You defend and receive only ${reducedDamage} damage.`);
+	showBattleText(attacker, attackerMessages[defenceQuality]);
+	showBattleText(defender, defenderMessages[defenceQuality]);
+
+	setTimeout(() => {
+		if (defenceQuality === "poor") {
+			addBattleEffect(defender, "miss-effect");
+			showBattleText(defender, "Defense failed completely!", "critical");
+		} else if (defenceQuality === "excellent") {
+			addBattleEffect(attacker, "miss-effect");
+			showBattleText(attacker, "Attack completely neutralized!", "blocked");
+		}
+	}, 600);
 };
 
 const handleAttackVsDodge = (battleState, attacker, dodger) => {
