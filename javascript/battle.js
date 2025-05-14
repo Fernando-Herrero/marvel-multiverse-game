@@ -307,17 +307,68 @@ const resolveActions = (playerAction, enemyAction, battleState) => {
 };
 
 const handleBothAttack = (battleState) => {
-	const playerDamage = calculateDamage(battleState.player, battleState.enemy);
-	const enemyDamage = calculateDamage(battleState.enemy, battleState.player);
+	if (processStatusEffect(battleState.player, "webbed")) return;
+	if (processStatusEffect(battleState.enemy, "webbed")) return;
 
-	battleState.enemy.currentHp = Math.max(0, battleState.enemy.currentHp - playerDamage);
-	battleState.player.currentHp = Math.max(0, battleState.player.currentHp - enemyDamage);
+	const playerRawDamage = calculateDamage(battleState.player, battleState.enemy);
+	const enemyRawDamage = calculateDamage(battleState.enemy, battleState.player);
+
+	let playerFinalDamage = playerRawDamage;
+	let enemyFinalDamage = enemyRawDamage;
+
+	if (processStatusEffect(battleState.player, "shield")) {
+		enemyFinalDamage = 0;
+		addBattleEffect("enemy", "miss-effect");
+	}
+	if (processStatusEffect(battleState.enemy, "shield")) {
+		playerFinalDamage = 0;
+		addBattleEffect("player", "miss-effect");
+	}
+
+	if (processStatusEffect(battleState.player, "rage")) {
+		playerFinalDamage += 10;
+	}
+	if (processStatusEffect(battleState.enemy, "rage")) {
+		enemyFinalDamage += 10;
+	}
+
+	if (processStatusEffect(battleState.player, "illusion")) {
+		const dodgeChance = Math.random();
+		if (dodgeChance > 0.9) {
+			enemyFinalDamage = 0;
+			addBattleEffect("enemy", "miss-effect");
+		}
+	}
+	if (processStatusEffect(battleState.enemy, "illusion")) {
+		const dodgeChance = Math.random();
+		if (dodgeChance > 0.9) {
+			playerFinalDamage = 0;
+			addBattleEffect("player", "miss-effect");
+		}
+	}
+
+	if (processStatusEffect(battleState.player, "demoralized")) {
+		enemyFinalDamage -= 10;
+	}
+	if (processStatusEffect(battleState.enemy, "demoralized")) {
+		playerFinalDamage -= 10;
+	}
+
+	if (processStatusEffect(battleState.player, "doubleStrike")) {
+		playerFinalDamage += 20;
+	}
+	if (processStatusEffect(battleState.enemy, "doubleStrike")) {
+		enemyFinalDamage += 20;
+	}
+
+	battleState.enemy.currentHp = Math.max(0, battleState.enemy.currentHp - playerFinalDamage);
+	battleState.player.currentHp = Math.max(0, battleState.player.currentHp - enemyFinalDamage);
 
 	addBattleEffect("player", "attack");
 	addBattleEffect("enemy", "attack");
 
-	showBattleText("player", `You attack dealing ${playerDamage} HP to the enemy!`);
-	showBattleText("enemy", `Enemy attacks and deals ${enemyDamage} HP to you!`);
+	showBattleText("player", `You attack dealing ${playerFinalDamage} HP to the enemy!`);
+	showBattleText("enemy", `Enemy attacks and deals ${enemyFinalDamage} HP to you!`);
 };
 
 const handleAttackVsDefence = (battleState, attacker, defender) => {
@@ -421,19 +472,6 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 		return;
 	}
 
-	const specialResult = calculateSpecialSkill(battleState[specialUser], battleState[attacker]);
-
-	if (specialResult.damage > 0 && !processStatusEffect(battleState[attacker], "shield")) {
-		battleState[attacker].currentHp = Math.max(0, battleState[attacker].currentHp - specialResult.damage);
-	}
-
-	if (specialResult.heal > 0) {
-		battleState[specialUser].currentHp = Math.min(
-			battleState[specialUser].maxHp,
-			battleState[specialUser].currentHp + specialResult.heal
-		);
-	}
-
 	if (specialResult.message) {
 		showBattleText(specialUser, specialResult.message);
 	} else {
@@ -443,11 +481,10 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 	if (processStatusEffect(battleState[attacker], "illusion")) {
 		const dodgeChance = Math.random();
 		if (dodgeChance > 0.9) {
-			showBattleText(attacker, `${attacker.character.name} dodges the attack using illusion!`);
 			return;
+		} else {
+			showBattleText(attacker, `${attacker.character.name} failed to dodge the attack!`);
 		}
-	} else {
-		showBattleText(attacker, `${attacker.character.name} failed to dodge the attack!`);
 	}
 
 	let attackDamage = calculateDamage(battleState[attacker], battleState[specialUser]);
@@ -605,7 +642,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 	switch (attacker.character.name) {
 		case "Black Widow":
 			result.damage = 40 + attacker.character.powerstats.combat;
-			result.message = `Black Widow executes a Tactical Ambush! Deals ${damage} damage!`;
+			result.message = `Black Widow executes a Tactical Ambush! Deals ${result.damage} damage!`;
 			break;
 
 		case "Spider-Man":
@@ -616,7 +653,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 
 		case "Iron Man":
 			result.damage = 30 + attacker.character.powerstats.intelligence;
-			result.message = `Iron Man fires a Pulse Blast! Deals ${damage} damage ignoring defense.`;
+			result.message = `Iron Man fires a Pulse Blast! Deals ${result.damage} damage ignoring defense.`;
 			break;
 
 		case "Captain America":
@@ -627,7 +664,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 
 		case "Thor":
 			damage = 40 + attacker.character.powerstats.power;
-			result.message = `Thor calls down Divine Thunder! Unavoidable attack deals ${damage} damage.`;
+			result.message = `Thor calls down Divine Thunder! Unavoidable attack deals ${result.damage} damage.`;
 			break;
 
 		case "Hulk":
@@ -661,7 +698,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 		case "Hela":
 			result.damage = 30;
 			result.heal = 20;
-			result.message = `Hela uses Life Drain! Deals ${damage} damage and heals ${heal} HP.`;
+			result.message = `Hela uses Life Drain! Deals ${result.damage} damage and heals ${result.heal} HP.`;
 			break;
 
 		case "Killmonger":
