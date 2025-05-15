@@ -228,13 +228,6 @@ const loadbattleState = async () => {
 
 	const battleState = loadFromStorage("battleState");
 	if (battleState?.enemy) {
-		if (battleState.turn > 0 && battleState.winner === null) {
-			clearStorageKey("battleState");
-			saveToStorage("currentScreen", "map");
-			mapScreen.style.display = "flex";
-			battleScreen.style.display = "none";
-			return;
-		}
 		await renderBattleCards(battleState.enemy.character.name);
 	} else {
 		saveToStorage("currentScreen", "map");

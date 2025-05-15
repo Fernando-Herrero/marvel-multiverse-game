@@ -187,16 +187,6 @@ const setupBattleActions = () => {
 const executeAction = (playerAction) => {
 	const battleState = loadFromStorage("battleState");
 
-	if (playerAction === "special") {
-		if (battleState.player.specialUsed) {
-			disableButtons(false);
-			return;
-		}
-
-		battleState.player.specialUsed = true;
-		document.getElementById("special-skill").disabled = true;
-	}
-
 	battleState.turn++;
 	battleState.player.defending = false;
 	battleState.enemy.defending = false;
@@ -204,16 +194,12 @@ const executeAction = (playerAction) => {
 	console.log(`\n=== TURNO ${battleState.turn} ===`);
 	console.log(`Jugador elige acción: ${playerAction.toUpperCase()}`);
 
-	disableButtons(true);
-
 	const enemyAction = chooseEnemyAction(battleState);
 	console.log(`Enemigo elige acción: ${enemyAction.toUpperCase()}`);
 
 	resolveActions(playerAction, enemyAction, battleState);
 
-	if (!checkBattleEnd(battleState)) {
-		setTimeout(() => disableButtons(false), 1000);
-	}
+	checkBattleEnd(battleState);
 };
 
 const resolveActions = (playerAction, enemyAction, battleState) => {
@@ -308,34 +294,34 @@ const handleBothAttack = (battleState) => {
 	let playerFinalDamage = playerRawDamage;
 	let enemyFinalDamage = enemyRawDamage;
 
-	if (processStatusEffect(battleState.player, "webbed")) {
+	if (processStatusEffect("player", battleState.player, "webbed")) {
 		playerFinalDamage = 0;
 	}
-	if (processStatusEffect(battleState.enemy, "webbed")) {
+	if (processStatusEffect("enemy", battleState.enemy, "webbed")) {
 		enemyFinalDamage = 0;
 	}
 
-	if (processStatusEffect(battleState.player, "shield")) {
+	if (processStatusEffect("player", battleState.player, "shield")) {
 		enemyFinalDamage = 0;
 		setTimeout(() => {
 			addBattleEffect("enemy", "miss-effect");
 		}, 2000);
 	}
-	if (processStatusEffect(battleState.enemy, "shield")) {
+	if (processStatusEffect("enemy", battleState.enemy, "shield")) {
 		playerFinalDamage = 0;
 		setTimeout(() => {
 			addBattleEffect("player", "miss-effect");
 		}, 2000);
 	}
 
-	if (processStatusEffect(battleState.player, "rage")) {
+	if (processStatusEffect("player", battleState.player, "rage")) {
 		playerFinalDamage += 10;
 	}
-	if (processStatusEffect(battleState.enemy, "rage")) {
+	if (processStatusEffect("enemy", battleState.enemy, "rage")) {
 		enemyFinalDamage += 10;
 	}
 
-	if (processStatusEffect(battleState.player, "illusion")) {
+	if (processStatusEffect("player", battleState.player, "illusion")) {
 		if (Math.random() < 0.9) {
 			enemyFinalDamage = 0;
 			setTimeout(() => {
@@ -343,7 +329,7 @@ const handleBothAttack = (battleState) => {
 			}, 2000);
 		}
 	}
-	if (processStatusEffect(battleState.enemy, "illusion")) {
+	if (processStatusEffect("enemy", battleState.enemy, "illusion")) {
 		if (Math.random() > 0.9) {
 			playerFinalDamage = 0;
 			setTimeout(() => {
@@ -352,17 +338,17 @@ const handleBothAttack = (battleState) => {
 		}
 	}
 
-	if (processStatusEffect(battleState.player, "demoralized")) {
+	if (processStatusEffect("player", battleState.player, "demoralized")) {
 		enemyFinalDamage -= 10;
 	}
-	if (processStatusEffect(battleState.enemy, "demoralized")) {
+	if (processStatusEffect("enemy", battleState.enemy, "demoralized")) {
 		playerFinalDamage -= 10;
 	}
 
-	if (processStatusEffect(battleState.player, "doubleStrike")) {
+	if (processStatusEffect("player", battleState.player, "doubleStrike")) {
 		playerFinalDamage += 20;
 	}
-	if (processStatusEffect(battleState.enemy, "doubleStrike")) {
+	if (processStatusEffect("enemy", battleState.enemy, "doubleStrike")) {
 		enemyFinalDamage += 20;
 	}
 
@@ -373,11 +359,14 @@ const handleBothAttack = (battleState) => {
 	addBattleEffect("enemy", "attack");
 
 	showBattleText("player", `You attack dealing ${playerFinalDamage} HP to the enemy!`);
-	showBattleText("enemy", `Enemy attacks and deals ${enemyFinalDamage} HP to you!`);
+	showBattleText("enemy", `Attacks and deals ${enemyFinalDamage} HP to the player!`);
 };
 
 const handleAttackVsDefence = (battleState, attacker, defender) => {
-	if (processStatusEffect(battleState[attacker], "webbed")) {
+	console.log("=== ATTACK vs DEFENCE ===");
+	console.log(`Attacker: ${attacker}, Defender: ${defender}`);
+
+	if (processStatusEffect(attacker, battleState[attacker], "webbed")) {
 		setTimeout(() => {
 			addBattleEffect(attacker, "miss-effect");
 		}, 2000);
@@ -386,11 +375,11 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 
 	let damage = calculateDamage(battleState[attacker], battleState[defender]);
 
-	if (processStatusEffect(battleState[attacker], "rage")) damage += 10;
-	if (processStatusEffect(battleState[attacker], "demoralized")) damage -= 10;
-	if (processStatusEffect(battleState[attacker], "doubleStrike")) damage += 20;
+	if (processStatusEffect(attacker, battleState[attacker], "rage")) damage += 10;
+	if (processStatusEffect(attacker, battleState[attacker], "demoralized")) damage -= 10;
+	if (processStatusEffect(attacker, battleState[attacker], "doubleStrike")) damage += 20;
 
-	if (processStatusEffect(battleState[defender], "illusion")) {
+	if (processStatusEffect(defender, battleState[defender], "illusion")) {
 		const dodgeChance = Math.random();
 		if (dodgeChance > 0.9) {
 			damage = 0;
@@ -400,7 +389,7 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 		}
 	}
 
-	if (processStatusEffect(battleState[defender], "webbed")) {
+	if (processStatusEffect(defender, battleState[defender], "webbed")) {
 		battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - damage);
 		setTimeout(() => {
 			addBattleEffect(defender, "miss-effect");
@@ -408,7 +397,7 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 		return;
 	}
 
-	if (processStatusEffect(battleState[defender], "shield")) {
+	if (processStatusEffect(defender, battleState[defender], "shield")) {
 		setTimeout(() => {
 			addBattleEffect(attacker, "miss-effect");
 		}, 2000);
@@ -423,6 +412,11 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 	if (defenceEffectiveness > 0.6) defenceQuality = "poor";
 	else if (defenceEffectiveness > 0.45) defenceQuality = "good";
 	else defenceQuality = "excellent";
+
+	console.log(`Base damage: ${damage}`);
+	console.log(`Defence effectiveness: ${defenceEffectiveness} (${defenceQuality})`);
+	console.log(`Reduced damage: ${reducedDamage}`);
+	console.log("=========================");
 
 	const attackerMessages = {
 		excellent: "Your attack was almost completely blocked!",
@@ -454,6 +448,9 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 };
 
 const handleAttackVsDodge = (battleState, attacker, dodger) => {
+	console.log("=== ATTACK vs DODGE ===");
+	console.log(`Attacker: ${attacker}, Dodger: ${dodger}`);
+
 	const attackerStats = battleState[attacker].character.powerstats;
 	const dodgerStats = battleState[dodger].character.powerstats;
 
@@ -482,7 +479,7 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 	if (randomRoll < dodgeChance) {
 		let damage = calculateDamage(battleState[attacker], battleState[dodger]);
 
-		if (processStatusEffect(battleState[dodger], "webbed")) {
+		if (processStatusEffect(dodger, battleState[dodger], "webbed")) {
 			battleState[dodger].currentHp = Math.max(0, battleState[dodger].currentHp - damage);
 			setTimeout(() => {
 				addBattleEffect(dodger, "miss-effect");
@@ -490,7 +487,7 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 			return;
 		}
 
-		if (processStatusEffect(battleState[dodger], "shield")) {
+		if (processStatusEffect(dodger, battleState[dodger], "shield")) {
 			damage = 0;
 			setTimeout(() => {
 				addBattleEffect(attacker, "miss-effect");
@@ -498,7 +495,7 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 			return;
 		}
 
-		if (processStatusEffect(battleState[dodger], "illusion")) {
+		if (processStatusEffect(dodger, battleState[dodger], "illusion")) {
 			if (Math.random() < 0.9) {
 				damage = 0;
 				setTimeout(() => {
@@ -515,7 +512,7 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 		return;
 	}
 
-	if (processStatusEffect(battleState[attacker], "webbed")) {
+	if (processStatusEffect(attacker, battleState[attacker], "webbed")) {
 		setTimeout(() => {
 			addBattleEffect(attacker, "miss-effect");
 		}, 2000);
@@ -524,9 +521,9 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 
 	let damage = calculateDamage(battleState[attacker], battleState[dodger]);
 
-	if (processStatusEffect(battleState[attacker], "rage")) damage += 10;
-	if (processStatusEffect(battleState[attacker], "doubleStrike")) damage += 20;
-	if (processStatusEffect(battleState[attacker], "demoralized")) damage -= 10;
+	if (processStatusEffect(attacker, battleState[attacker], "rage")) damage += 10;
+	if (processStatusEffect(attacker, battleState[attacker], "doubleStrike")) damage += 20;
+	if (processStatusEffect(attacker, battleState[attacker], "demoralized")) damage -= 10;
 
 	battleState[dodger].currentHp = Math.max(0, battleState[dodger].currentHp - damage);
 
@@ -535,17 +532,22 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 
 	showBattleText(attacker, `You hit for ${damage} damage!`);
 	showBattleText(dodger, `You tried to dodge but missed and got hit for ${damage} damage!`);
+
+	console.log(`Dodge chance: ${dodgeChance}%`);
+	console.log(`Random roll: ${randomRoll}`);
+	console.log(`Dodge successful? ${randomRoll < dodgeChance}`);
+	console.log("=======================");
 };
 
 const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
-	if (processStatusEffect(battleState[specialUser], "webbed")) {
+	if (processStatusEffect(specialUser, battleState[specialUser], "webbed")) {
 		setTimeout(() => {
 			addBattleEffect(specialUser, "miss-effect");
 		}, 2000);
 		battleState[specialUser].specialUsed = true;
 		return;
 	}
-	if (processStatusEffect(battleState[attacker], "webbed")) {
+	if (processStatusEffect(specialUser, battleState[attacker], "webbed")) {
 		setTimeout(() => {
 			addBattleEffect(attacker, "miss-effect");
 		}, 2000);
@@ -567,7 +569,7 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 		);
 	}
 
-	if (processStatusEffect(battleState[attacker], "illusion")) {
+	if (processStatusEffect(attacker, battleState[attacker], "illusion")) {
 		if (Math.random() < 0.9) {
 			setTimeout(() => {
 				addBattleEffect(specialUser, "miss-effect");
@@ -580,7 +582,7 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 	}
 
 	if (specialResult.damage && specialResult.damage > 0) {
-		if (!processStatusEffect(battleState[attacker], "shield")) {
+		if (!processStatusEffect(attacker, battleState[attacker], "shield")) {
 			battleState[attacker].currentHp = Math.max(0, battleState[attacker].currentHp - specialResult.damage);
 			battleState[specialUser].specialUsed = true;
 		} else {
@@ -598,11 +600,11 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 
 	let attackDamage = calculateDamage(battleState[attacker], battleState[specialUser]);
 
-	if (processStatusEffect(battleState[attacker], "demoralized")) attackDamage -= 10;
-	if (processStatusEffect(battleState[attacker], "doubleStrike")) attackDamage += 20;
-	if (processStatusEffect(battleState[attacker], "rage")) attackDamage += 10;
+	if (processStatusEffect(attacker, battleState[attacker], "demoralized")) attackDamage -= 10;
+	if (processStatusEffect(attacker, battleState[attacker], "doubleStrike")) attackDamage += 20;
+	if (processStatusEffect(attacker, battleState[attacker], "rage")) attackDamage += 10;
 
-	if (!processStatusEffect(battleState[specialUser], "shield")) {
+	if (!processStatusEffect(specialUser, battleState[specialUser], "shield")) {
 		battleState[specialUser].currentHp = Math.max(0, battleState[specialUser].currentHp - attackDamage);
 	} else {
 		attackDamage = 0;
@@ -622,6 +624,9 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 };
 
 const handleSpecialVsDefence = (battleState, specialUser, defender) => {
+	console.log("=== SPECIAL vs DEFENCE ===");
+	console.log(`Special user: ${specialUser}, Defender: ${defender}`);
+
 	if (Math.random() < 0.05) {
 		setTimeout(() => {
 			addBattleEffect(specialUser, "miss-effect");
@@ -639,7 +644,7 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 		return;
 	}
 
-	if (processStatusEffect(battleState[specialUser], "webbed")) {
+	if (processStatusEffect(specialUser, battleState[specialUser], "webbed")) {
 		setTimeout(() => {
 			addBattleEffect(specialUser, "miss-effect");
 		}, 2000);
@@ -661,7 +666,7 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 		);
 	}
 
-	if (processStatusEffect(battleState[defender], "webbed")) {
+	if (processStatusEffect(defender, battleState[defender], "webbed")) {
 		battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - specialResult.damage);
 		setTimeout(() => {
 			addBattleEffect(defender, "miss-effect");
@@ -670,10 +675,10 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 		return;
 	}
 
-	if (processStatusEffect(battleState[specialUser], "demoralized"))
+	if (processStatusEffect(specialUser, battleState[specialUser], "demoralized"))
 		specialResult.damage = Math.max(0, specialResult.damage - 10);
 
-	if (processStatusEffect(battleState[defender], "shield")) {
+	if (processStatusEffect(defender, battleState[defender], "shield")) {
 		specialResult.damage = 0;
 		setTimeout(() => {
 			addBattleEffect(specialUser, "miss-effect");
@@ -681,7 +686,7 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 		battleState[specialUser].specialUsed = true;
 		return;
 	}
-	if (processStatusEffect(battleState[defender], "illusion")) {
+	if (processStatusEffect(defender, battleState[defender], "illusion")) {
 		if (Math.random() < 0.9) {
 			specialResult.damage = 0;
 			setTimeout(() => {
@@ -709,9 +714,16 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 	}
 
 	battleState[specialUser].specialUsed = true;
+
+	console.log(`Special result:`, specialResult);
+	console.log(`Damage after effects: ${specialResult.damage}`);
+	console.log("==========================");
 };
 
 const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
+	console.log("=== SPECIAL vs DODGE ===");
+	console.log(`Special user: ${specialUser}, Dodger: ${dodger}`);
+
 	if (Math.random() < 0.05) {
 		setTimeout(() => addBattleEffect(specialUser, "miss-effect"), 2000);
 		addBattleEffect(dodger, "dodge");
@@ -724,7 +736,7 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 		return;
 	}
 
-	if (processStatusEffect(battleState[specialUser], "webbed")) {
+	if (processStatusEffect(specialUser, battleState[specialUser], "webbed")) {
 		setTimeout(() => addBattleEffect(specialUser, "miss-effect"), 2000);
 		battleState[specialUser].specialUsed = true;
 		return;
@@ -745,24 +757,24 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 		);
 	}
 
-	if (processStatusEffect(battleState[dodger], "webbed")) {
+	if (processStatusEffect(dodger, battleState[dodger], "webbed")) {
 		battleState[dodger].currentHp = Math.max(0, battleState[dodger].currentHp - specialResult.damage);
 		setTimeout(() => addBattleEffect(dodger, "miss-effect"), 2000);
 		battleState[specialUser].specialUsed = true;
 		return;
 	}
 
-	if (processStatusEffect(battleState[specialUser], "demoralized"))
+	if (processStatusEffect(specialUser, battleState[specialUser], "demoralized"))
 		specialResult.damage = Math.max(0, specialResult.damage - 10);
 
-	if (processStatusEffect(battleState[dodger], "shield")) {
+	if (processStatusEffect(dodger, battleState[dodger], "shield")) {
 		specialResult.damage = 0;
 		setTimeout(() => addBattleEffect(specialUser, "miss-effect"), 2000);
 		battleState[specialUser].specialUsed = true;
 		return;
 	}
 
-	if (processStatusEffect(battleState[dodger], "illusion")) {
+	if (processStatusEffect(dodger, battleState[dodger], "illusion")) {
 		if (Math.random() < 0.9) {
 			specialResult.damage = 0;
 			setTimeout(() => addBattleEffect(specialUser, "miss-effect"), 2000);
@@ -783,9 +795,18 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 	}
 
 	battleState[specialUser].specialUsed = true;
+
+	console.log(`Special result:`, specialResult);
+	console.log(`Damage after effects: ${specialResult.damage}`);
+	console.log("========================");
 };
 
 const handleSpecialVsSpecial = (battleState) => {
+	console.log("=== SPECIAL vs SPECIAL ===");
+	console.log("Player special:", playerSpecial);
+	console.log("Enemy special:", enemySpecial);
+	console.log("==========================");
+
 	const player = battleState.player;
 	const enemy = battleState.enemy;
 
@@ -876,6 +897,9 @@ const calculateSpecialSkill = (attacker, defender) => {
 		message: "",
 	};
 
+	let statusEffect;
+	let damage;
+
 	switch (attacker.character.name) {
 		case "Black Widow":
 			result.damage = 40 + attacker.character.powerstats.combat;
@@ -945,8 +969,13 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 	}
 
+	console.log("=== SPECIAL SKILL USED ===");
+	console.log(`Attacker: ${attacker.character.name}`);
+	console.log(`Special skill result:`, result);
+	console.log("==========================");
+
 	attacker.specialUsed = true;
-	saveToStorage("battleState", battleState);
+	// saveToStorage("battleState", battleState);
 
 	return {
 		success: true,
@@ -954,31 +983,35 @@ const calculateSpecialSkill = (attacker, defender) => {
 	};
 };
 
-const processStatusEffect = (character, effectType) => {
+const processStatusEffect = (role, character, effectType) => {
+	console.log("=== STATUS EFFECT PROCESSED ===");
+	console.log(`Character: ${character.character.name}`);
+	console.log(`Effect type: ${effectType}`);
+
 	const effect = character.statusEffects.find((effect) => effect.type === effectType);
 	if (!effect) return false;
 
 	switch (effectType) {
 		case "webbed":
-			showBattleText(character, `${character.character.name} is webbed and can't act this turn!`);
+			showBattleText(role, `${character.character.name} is webbed and can't act this turn!`);
 			break;
 		case "shield":
-			showBattleText(character, `${character.character.name} blocked the damage with their shield!`);
+			showBattleText(role, `${character.character.name} blocked the damage with their shield!`);
 			break;
 		case "rage":
-			showBattleText(character, `${character.character.name} is enraged and deals more damage this turn!`);
+			showBattleText(role, `${character.character.name} is enraged and deals more damage this turn!`);
 			break;
 		case "illusion":
 			showBattleText(
-				character,
+				role,
 				`${character.character.name} is making an illusion and their actions may be unpredictable!`
 			);
 			break;
 		case "demoralized":
-			showBattleText(character, `${character.character.name} is demoralized and weakened!`);
+			showBattleText(role, `${character.character.name} is demoralized and weakened!`);
 			break;
 		case "doubleStrike":
-			showBattleText(character, `${character.character.name} is ready for a double strike!`);
+			showBattleText(role, `${character.character.name} is ready for a double strike!`);
 			break;
 	}
 
@@ -986,6 +1019,9 @@ const processStatusEffect = (character, effectType) => {
 	if (effect.turnsLeft <= 0) {
 		character.statusEffects = character.statusEffects.filter((effect) => effect.type !== effectType);
 	}
+
+	console.log(`Turns left: ${effect.turnsLeft}`);
+	console.log("==============================");
 
 	return true;
 };
