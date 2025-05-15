@@ -1,7 +1,9 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
-import { battleScreen } from "./map.js";
+import { mapScreen } from "./index.js";
+import { inputUserName } from "./login.js";
+import { battleScreen, enemiesInLevel, levelEnemies, showLeveleInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
-import { disableButtons, showBattleText } from "./utils.js";
+import { disableButtons, hideModal, showBattleText, showBriefing } from "./utils.js";
 
 const playerCard = document.getElementById("player-battle-card");
 const enemyCard = document.getElementById("enemy-battle-card");
@@ -63,6 +65,7 @@ export const renderBattleCards = async (enemyName) => {
 	console.log("9. Renderizando carta del enemigo...");
 	renderEnemyCard(enemyData);
 
+	resetHealthBars();
 	console.log("10. Configurando botones de batalla...");
 	setupBattleActions();
 
@@ -363,9 +366,6 @@ const handleBothAttack = (battleState) => {
 };
 
 const handleAttackVsDefence = (battleState, attacker, defender) => {
-	console.log("=== ATTACK vs DEFENCE ===");
-	console.log(`Attacker: ${attacker}, Defender: ${defender}`);
-
 	if (processStatusEffect(attacker, battleState[attacker], "webbed")) {
 		setTimeout(() => {
 			addBattleEffect(attacker, "miss-effect");
@@ -413,11 +413,6 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 	else if (defenceEffectiveness > 0.45) defenceQuality = "good";
 	else defenceQuality = "excellent";
 
-	console.log(`Base damage: ${damage}`);
-	console.log(`Defence effectiveness: ${defenceEffectiveness} (${defenceQuality})`);
-	console.log(`Reduced damage: ${reducedDamage}`);
-	console.log("=========================");
-
 	const attackerMessages = {
 		excellent: "Your attack was almost completely blocked!",
 		good: "Your attack was partially blocked!",
@@ -448,9 +443,6 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 };
 
 const handleAttackVsDodge = (battleState, attacker, dodger) => {
-	console.log("=== ATTACK vs DODGE ===");
-	console.log(`Attacker: ${attacker}, Dodger: ${dodger}`);
-
 	const attackerStats = battleState[attacker].character.powerstats;
 	const dodgerStats = battleState[dodger].character.powerstats;
 
@@ -532,11 +524,6 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 
 	showBattleText(attacker, `You hit for ${damage} damage!`);
 	showBattleText(dodger, `You tried to dodge but missed and got hit for ${damage} damage!`);
-
-	console.log(`Dodge chance: ${dodgeChance}%`);
-	console.log(`Random roll: ${randomRoll}`);
-	console.log(`Dodge successful? ${randomRoll < dodgeChance}`);
-	console.log("=======================");
 };
 
 const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
@@ -624,9 +611,6 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 };
 
 const handleSpecialVsDefence = (battleState, specialUser, defender) => {
-	console.log("=== SPECIAL vs DEFENCE ===");
-	console.log(`Special user: ${specialUser}, Defender: ${defender}`);
-
 	if (Math.random() < 0.05) {
 		setTimeout(() => {
 			addBattleEffect(specialUser, "miss-effect");
@@ -698,13 +682,9 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 		return;
 	}
 
-	battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - specialResult.damage);
-	addBattleEffect(specialUser, "special");
-	setTimeout(() => {
-		addBattleEffect(defender, "miss-effect");
-	}, 2000);
-
 	if (specialResult.damage > 0) {
+		battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - specialResult.damage);
+		addBattleEffect(specialUser, "special");
 		showBattleText(
 			defender,
 			`${battleState[defender].character.name} took ${specialResult.damage} special damage.`
@@ -714,16 +694,9 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 	}
 
 	battleState[specialUser].specialUsed = true;
-
-	console.log(`Special result:`, specialResult);
-	console.log(`Damage after effects: ${specialResult.damage}`);
-	console.log("==========================");
 };
 
 const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
-	console.log("=== SPECIAL vs DODGE ===");
-	console.log(`Special user: ${specialUser}, Dodger: ${dodger}`);
-
 	if (Math.random() < 0.05) {
 		setTimeout(() => addBattleEffect(specialUser, "miss-effect"), 2000);
 		addBattleEffect(dodger, "dodge");
@@ -795,18 +768,9 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 	}
 
 	battleState[specialUser].specialUsed = true;
-
-	console.log(`Special result:`, specialResult);
-	console.log(`Damage after effects: ${specialResult.damage}`);
-	console.log("========================");
 };
 
 const handleSpecialVsSpecial = (battleState) => {
-	console.log("=== SPECIAL vs SPECIAL ===");
-	console.log("Player special:", playerSpecial);
-	console.log("Enemy special:", enemySpecial);
-	console.log("==========================");
-
 	const player = battleState.player;
 	const enemy = battleState.enemy;
 
@@ -969,13 +933,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 	}
 
-	console.log("=== SPECIAL SKILL USED ===");
-	console.log(`Attacker: ${attacker.character.name}`);
-	console.log(`Special skill result:`, result);
-	console.log("==========================");
-
 	attacker.specialUsed = true;
-	// saveToStorage("battleState", battleState);
 
 	return {
 		success: true,
@@ -984,10 +942,6 @@ const calculateSpecialSkill = (attacker, defender) => {
 };
 
 const processStatusEffect = (role, character, effectType) => {
-	console.log("=== STATUS EFFECT PROCESSED ===");
-	console.log(`Character: ${character.character.name}`);
-	console.log(`Effect type: ${effectType}`);
-
 	const effect = character.statusEffects.find((effect) => effect.type === effectType);
 	if (!effect) return false;
 
@@ -1019,9 +973,6 @@ const processStatusEffect = (role, character, effectType) => {
 	if (effect.turnsLeft <= 0) {
 		character.statusEffects = character.statusEffects.filter((effect) => effect.type !== effectType);
 	}
-
-	console.log(`Turns left: ${effect.turnsLeft}`);
-	console.log("==============================");
 
 	return true;
 };
@@ -1082,12 +1033,12 @@ export const initialBattleUi = () => {
 };
 
 export const resetHealthBars = () => {
-	if (playerHealthBar && enemyHealthBar) {
-		playerHealthBar.style.width = "100%";
-		enemyHealthBar.style.width = "100%";
-		playerHealthBar.style.backgroundColor = "green";
-		enemyHealthBar.style.backgroundColor = "green";
-	}
+	if (!playerHealthBar || !enemyHealthBar) initialBattleUi();
+
+	playerHealthBar.style.width = "100%";
+	enemyHealthBar.style.width = "100%";
+	playerHealthBar.style.backgroundColor = "green";
+	enemyHealthBar.style.backgroundColor = "green";
 };
 
 export const updateHealthBars = (battleState) => {
@@ -1126,22 +1077,28 @@ const checkBattleEnd = (battleState) => {
 
 	if (battleState.enemy.currentHp <= 0 && battleState.player.currentHp > 0) {
 		battleState.winner = "player";
-		showBattleText("player", "¡Has ganado la batalla!");
+		setTimeout(() => {
+			showBattleText("player", "You won the battle!");
+		}, 2000);
 		battleEnded = true;
 	} else if (battleState.player.currentHp <= 0 && battleState.enemy.currentHp > 0) {
 		battleState.winner = "enemy";
-		showBattleText("enemy", "¡Has sido derrotado!");
+		setTimeout(() => {
+			showBattleText("enemy", "¡Enmey won the battle!");
+		}, 2000);
 		battleEnded = true;
 	} else if (battleState.player.currentHp <= 0 && battleState.enemy.currentHp <= 0) {
 		battleState.winner = "draw";
-		showBattleText("player", "¡Empate! Ambos han caído.");
-		showBattleText("enemy", "¡Empate! Ambos han caído.");
+		setTimeout(() => {
+			showBattleText("player", "Draw!");
+			showBattleText("enemy", "Draw!");
+		}, 2000);
 		battleEnded = true;
 	}
 
 	if (battleEnded) {
 		saveToStorage("battleState", battleState);
-		setTimeout(() => endBattle(battleState.winner), 1500);
+		setTimeout(() => endBattle(battleState.winner), 4000);
 		return true;
 	}
 
@@ -1149,18 +1106,55 @@ const checkBattleEnd = (battleState) => {
 };
 
 const endBattle = (playerWon) => {
-	console.log(playerWon ? "Ganaste" : "Perdiste");
+	if (!playerWon) return;
 
 	playerCard.classList.remove("attack-effect", "defence-effect", "dodge-effect", "special-effect", "miss-effect");
 	enemyCard.classList.remove("attack-effect", "defence-effect", "dodge-effect", "special-effect", "miss-effect");
 
 	clearStorageKey("battleState");
-
 	disableButtons(true);
 
+	const currentLevel = loadFromStorage("currentLevel") || 1;
+	const currentSelection = loadFromStorage("characterType") || "heroes";
+	const enemies = currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
+	const currentEnemy = enemies.find((enemy) => enemy.level === currentLevel);
+
 	setTimeout(() => {
-		saveToStorage("currentScreen", "map");
-		battleScreen.style.display = "none";
-		mapScreen.style.display = "flex";
-	}, 1500);
+		showBriefing(
+			`${inputUserName.value} ${currentSelection === "heroes" ? "triumphs" : "dominates"} against ${
+				currentEnemy.name
+			}`,
+			`The ${
+				currentSelection === "heroes" ? "forces of justice cheer" : "shadows of evil whisper"
+			} as you claim victory in level ${currentEnemy.level}.\n\n` +
+				`Your ${
+					currentSelection === "heroes" ? "heroic resolve" : "ruthless ambition"
+				} has rewritten the fate of this reality.\n` +
+				`The Nexus grows ${currentSelection === "heroes" ? "brighter" : "darker"} with each conquered world...`,
+			{
+				after: {
+					text: "Continue Your Journey",
+					action: () => {
+						const nextLevel = currentLevel + 1;
+						if (currentLevel < 6) {
+							const nextLevelElement = document.querySelector(`.level[data-level="${nextLevel}"]`);
+
+							if (nextLevelElement) {
+								nextLevelElement.classList.remove("locked");
+								nextLevelElement.classList.add("unlocked");
+								saveToStorage(`level${nextLevel}Unlocked`, true);
+								saveToStorage("currentLevel", nextLevel);
+							}
+						}
+
+						mapScreen.style.display = "flex";
+						battleScreen.style.display = "none";
+						hideModal();
+						showLeveleInfo();
+						enemiesInLevel();
+					},
+				},
+			}
+		);
+	}, 5000);
 };
