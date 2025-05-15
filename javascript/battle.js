@@ -355,14 +355,23 @@ const handleBothAttack = (battleState) => {
 		enemyFinalDamage += 20;
 	}
 
-	battleState.enemy.currentHp = Math.max(0, battleState.enemy.currentHp - playerFinalDamage);
-	battleState.player.currentHp = Math.max(0, battleState.player.currentHp - enemyFinalDamage);
+	if (playerFinalDamage > 0) {
+		battleState.enemy.currentHp = Math.max(0, battleState.enemy.currentHp - playerFinalDamage);
+		addBattleEffect("player", "attack");
+		showBattleText("player", `You attack dealing ${playerFinalDamage} HP to the enemy!`);
+	} else {
+		addBattleEffect("enemy", "miss-effect");
+		showBattleText("player", "Your attack missed or was blocked!");
+	}
 
-	addBattleEffect("player", "attack");
-	addBattleEffect("enemy", "attack");
-
-	showBattleText("player", `You attack dealing ${playerFinalDamage} HP to the enemy!`);
-	showBattleText("enemy", `Attacks and deals ${enemyFinalDamage} HP to the player!`);
+	if (enemyFinalDamage > 0) {
+		battleState.player.currentHp = Math.max(0, battleState.player.currentHp - enemyFinalDamage);
+		addBattleEffect("enemy", "attack");
+		showBattleText("enemy", `Attacks and deals ${enemyFinalDamage} HP to the player!`);
+	} else {
+		addBattleEffect("player", "miss-effect");
+		showBattleText("enemy", "The enemy's attack missed or was blocked!");
+	}
 };
 
 const handleAttackVsDefence = (battleState, attacker, defender) => {
@@ -517,13 +526,13 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 	if (processStatusEffect(attacker, battleState[attacker], "doubleStrike")) damage += 20;
 	if (processStatusEffect(attacker, battleState[attacker], "demoralized")) damage -= 10;
 
-	battleState[dodger].currentHp = Math.max(0, battleState[dodger].currentHp - damage);
-
-	addBattleEffect(attacker, "attack");
-	addBattleEffect(dodger, "miss-effect");
-
-	showBattleText(attacker, `You hit for ${damage} damage!`);
-	showBattleText(dodger, `You tried to dodge but missed and got hit for ${damage} damage!`);
+	if (damage > 0) {
+		battleState[dodger].currentHp = Math.max(0, battleState[dodger].currentHp - damage);
+		addBattleEffect(attacker, "attack");
+		addBattleEffect(dodger, "miss-effect");
+		showBattleText(attacker, `You hit for ${damage} damage!`);
+		showBattleText(dodger, `You tried to dodge but missed and got hit for ${damage} damage!`);
+	}
 };
 
 const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
@@ -690,7 +699,7 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 			`${battleState[defender].character.name} took ${specialResult.damage} special damage.`
 		);
 	} else {
-		showBattleText(defender, `${battleState[defender].character.name} resisted the attack.`);
+		showBattleText(defender, `${battleState[defender].character.name} ignores the attack.`);
 	}
 
 	battleState[specialUser].specialUsed = true;
@@ -830,6 +839,10 @@ const calculateDamage = (attacker, defender) => {
 
 	const randomFactor = 0.8 + Math.random() * 0.4;
 	let damage = (attackPower - defensePower / 2) * randomFactor;
+
+	if (attacker.character.name === "Captain America") {
+		damage += 30;
+	}
 
 	damage = Math.max(1, Math.min(50, Math.round(damage)));
 
@@ -1156,5 +1169,5 @@ const endBattle = (playerWon) => {
 				},
 			}
 		);
-	}, 5000);
+	}, 3000);
 };

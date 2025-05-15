@@ -81,6 +81,19 @@ export const fetchCharactersByName = async (name) => {
 			combat: parseInt(character.powerstats.combat) || 50,
 		};
 
+		if (name === "Black Widow") character.powerstats.strength = 70;
+		if (name === "Captain America") character.powerstats.strength = 95;
+
+		if (!character.stats) {
+			character.stats = [
+				`Strength: ${character.powerstats.strength}`,
+				`Speed: ${character.powerstats.speed}`,
+				`Defence: ${character.powerstats.durability}`,
+				`Intelligence: ${character.powerstats.intelligence}`,
+				`Strategy: ${character.powerstats.combat}`,
+			];
+		}
+
 		if (!character.specialAbility) {
 			const specialAbilities = {
 				"Black Widow": {
