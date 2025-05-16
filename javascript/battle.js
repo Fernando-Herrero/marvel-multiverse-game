@@ -1,6 +1,6 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { mapScreen } from "./index.js";
-import { inputUserName } from "./login.js";
+import { charactersSelect, inputUserName } from "./login.js";
 import { battleScreen, enemiesInLevel, levelEnemies, showLeveleInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 import { disableButtons, hideModal, showBattleText, showBriefing } from "./utils.js";
@@ -35,7 +35,6 @@ export const renderBattleCards = async (enemyName) => {
 				character: playerData,
 				currentHp: 100,
 				maxHp: 100,
-				defending: false,
 				statusEffects: [],
 				specialUsed: false,
 			},
@@ -43,7 +42,6 @@ export const renderBattleCards = async (enemyName) => {
 				character: enemyData,
 				currentHp: 100,
 				maxHp: 100,
-				defending: false,
 				statusEffects: [],
 				specialUsed: false,
 			},
@@ -191,8 +189,6 @@ const executeAction = (playerAction) => {
 	const battleState = loadFromStorage("battleState");
 
 	battleState.turn++;
-	battleState.player.defending = false;
-	battleState.enemy.defending = false;
 
 	console.log(`\n=== TURNO ${battleState.turn} ===`);
 	console.log(`Jugador elige acción: ${playerAction.toUpperCase()}`);
@@ -610,9 +606,9 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 	}
 
 	if (attackDamage > 0) {
-		showBattleText(attacker, `You strike back! (-${attackDamage} HP to enemy)`);
+		showBattleText(attacker, `${battleState[attacker].character.name} strikes for ${attackDamage} damage!`);
 	} else {
-		showBattleText(attacker, `Your counterattack missed!`);
+		showBattleText(attacker, `${battleState[attacker].character.name} attacks, but it has no effect...`);
 		setTimeout(() => {
 			addBattleEffect(attacker, "miss-effect");
 		}, 2000);
@@ -844,7 +840,7 @@ const calculateDamage = (attacker, defender) => {
 		damage += 30;
 	}
 
-	damage = Math.max(1, Math.min(50, Math.round(damage)));
+	damage = Math.max(1, Math.min(30, Math.round(damage)));
 
 	console.log("=== CÁLCULO DE DAÑO ===");
 	console.log(`Atacante: ${attacker.character.name}`);
@@ -1028,7 +1024,7 @@ const addBattleEffect = (target, action, success = true) => {
 const chooseEnemyAction = (battleState) => {
 	const baseActions = ["attack", "defence", "dodge"];
 
-	if (!battleState.enemy.specialUsed) {
+	if (battleState.turn > 1 && !battleState.enemy.specialUsed) {
 		const actionsWithSpecial = [...baseActions, "special", "special"];
 		const randomIndex = Math.floor(Math.random() * actionsWithSpecial.length);
 		return actionsWithSpecial[randomIndex];

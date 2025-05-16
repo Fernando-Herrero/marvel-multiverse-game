@@ -538,7 +538,7 @@ h1 {
 @import url("https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap");
 .vs-logo {
 	font-family: "Luckiest Guy", cursive;
-	font-size: 120px;
+	font-size: 60px;
 	color: transparent;
 	text-shadow: -3px -3px 0 var(--hero-color), 3px -3px 0 var(--hero-color), -3px 3px 0 var(--villain-color),
 		6px 6px 0 var(--villain-color), 0 0 18px var(--contrast-color);
@@ -553,7 +553,7 @@ h1 {
 
 .player-div,
 .enemy-div {
-	height: 400px;
+	height: 300px;
 	display: flex;
 	gap: 10px;
 	width: 90vw;
@@ -599,7 +599,11 @@ h1 {
 }
 
 .info-battle-card h3 {
-	font-size: xx-large;
+	font-size: large;
+}
+
+.stats-battle-card p {
+	font-size: 12px;
 }
 
 #enemy-battle-card {
@@ -645,11 +649,11 @@ h1 {
 }
 
 .card-info-character[data-context="battle"] h3 {
-	font-size: xx-large;
+	font-size: large;
 }
 
 .card-info-character[data-context="battle"] p {
-	font-size: 16px;
+	font-size: 12px;
 }
 
 .buttons-battle {
@@ -658,6 +662,7 @@ h1 {
 	height: 200px;
 	bottom: 2px;
 	left: 2px;
+	z-index: 2;
 }
 
 .buttons-battle button:hover {
