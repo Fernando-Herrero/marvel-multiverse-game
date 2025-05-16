@@ -75,6 +75,19 @@ const resetGameState = () => {
 	resetPlayerPosition();
 	resetHealthBars();
 
+	const levels = [1, 2, 3, 4, 5, 6];
+	for (let i = 0; i < levels.length; i++) {
+		clearStorageKey(`level${levels[i]}Unlocked`);
+	}
+
+	document.querySelector(".level").forEach((levelElement) => {
+		const level = parseInt(levelElement.dataset.level);
+		if (level > 1) {
+			levelElement.classList.add("locked");
+			levelElement.classList.remove("unlocked");
+		}
+	});
+
 	let id = window.setTimeout(() => {}, 0);
 	while (id--) {
 		window.clearTimeout(id);

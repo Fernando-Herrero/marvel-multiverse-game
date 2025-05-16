@@ -202,6 +202,8 @@ const executeAction = (playerAction) => {
 };
 
 const resolveActions = (playerAction, enemyAction, battleState) => {
+	console.log(`[DEBUG] Resolviendo acciones: Jugador=${playerAction}, Enemigo=${enemyAction}`);
+
 	switch (playerAction) {
 		case "attack":
 			switch (enemyAction) {
@@ -265,8 +267,10 @@ const resolveActions = (playerAction, enemyAction, battleState) => {
 			break;
 
 		case "special":
+			console.log("[DEBUG] Jugador usa SPECIAL SKILL");
 			switch (enemyAction) {
 				case "attack":
+					console.log("[DEBUG] Caso: SPECIAL vs ATTACK");
 					handleAttackAndSpecial(battleState, "player", "enemy");
 					break;
 				case "defence":
@@ -533,7 +537,11 @@ const handleAttackVsDodge = (battleState, attacker, dodger) => {
 };
 
 const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
+	console.log(`[DEBUG] handleAttackAndSpecial: specialUser=${specialUser}, attacker=${attacker}`);
+
 	if (processStatusEffect(specialUser, battleState[specialUser], "webbed")) {
+		console.log(`[DEBUG] ${specialUser} está webbed y no puede actuar`);
+
 		setTimeout(() => {
 			addBattleEffect(specialUser, "miss-effect");
 		}, 2000);
@@ -548,14 +556,19 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 	}
 
 	const specialResult = calculateSpecialSkill(battleState[specialUser], battleState[attacker]);
+	console.log("[DEBUG] Resultado del especial:", specialResult);
 
 	if (specialResult.message) {
+		console.log(`[DEBUG] Mensaje especial: ${specialResult.message}`);
+
 		showBattleText(specialUser, specialResult.message);
 	} else {
 		showBattleText(specialUser, `You used a special move!`);
 	}
 
 	if (specialResult.heal > 0) {
+		console.log(`[DEBUG] ${specialUser} se cura ${specialResult.heal} HP`);
+
 		battleState[specialUser].currentHp = Math.min(
 			battleState[specialUser].maxHp,
 			battleState[specialUser].currentHp + specialResult.heal
@@ -575,6 +588,8 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 	}
 
 	if (specialResult.damage && specialResult.damage > 0) {
+		console.log(`[DEBUG] ${specialUser} inflige ${specialResult.damage} de daño a ${attacker}`);
+
 		if (!processStatusEffect(attacker, battleState[attacker], "shield")) {
 			battleState[attacker].currentHp = Math.max(0, battleState[attacker].currentHp - specialResult.damage);
 			battleState[specialUser].specialUsed = true;
@@ -855,7 +870,11 @@ const calculateDamage = (attacker, defender) => {
 };
 
 const calculateSpecialSkill = (attacker, defender) => {
+	console.log(`[DEBUG] calculateSpecialSkill: ${attacker.character.name} vs ${defender.character.name}`);
+
 	if (attacker.specialUsed) {
+		console.log("[DEBUG] Special ya usado, no se puede usar de nuevo");
+
 		return {
 			success: false,
 			message: `${attacker.character.name} has already used their special ability!`,
@@ -876,8 +895,9 @@ const calculateSpecialSkill = (attacker, defender) => {
 
 	switch (attacker.character.name) {
 		case "Black Widow":
-			result.damage = 40 + attacker.character.powerstats.combat;
-			defender.currentHp = Math.max(0, defender.currentHp - result.damage);
+			result.damage = 40;
+			console.log(`[DEBUG] Black Widow - Daño calculado: ${result.damage}`);
+
 			result.message = `Black Widow executes a Tactical Ambush! Deals ${result.damage} damage!`;
 			break;
 
@@ -888,7 +908,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 
 		case "Iron Man":
-			result.damage = 30 + attacker.character.powerstats.intelligence;
+			result.damage = 40;
 			result.message = `Iron Man fires a Pulse Blast! Deals ${result.damage} damage ignoring defense.`;
 			break;
 
@@ -899,7 +919,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 
 		case "Thor":
-			damage = 40 + attacker.character.powerstats.power;
+			damage = 40;
 			result.message = `Thor calls down Divine Thunder! Unavoidable attack deals ${result.damage} damage.`;
 			break;
 
@@ -910,7 +930,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 
 		case "Thanos":
-			damage = 40 + attacker.character.powerstats.power;
+			damage = 40;
 			result.message = "Thanos charges up the Infinity Fist! Strikes with devastating force.";
 			break;
 
@@ -946,6 +966,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 	}
 
 	attacker.specialUsed = true;
+	console.log("[DEBUG] Resultado final del especial:", result);
 
 	return {
 		success: true,
@@ -1059,6 +1080,8 @@ export const updateHealthBars = (battleState) => {
 	const playerHp = Math.max(0, Math.min(100, battleState.player.currentHp));
 	const enemyHp = Math.max(0, Math.min(100, battleState.enemy.currentHp));
 
+	console.log(`[DEBUG] updateHealthBars: Jugador HP=${playerHp}%, Enemigo HP=${enemyHp}%`);
+
 	playerHealthBar.style.width = `${playerHp}%`;
 	enemyHealthBar.style.width = `${enemyHp}%`;
 
@@ -1081,7 +1104,13 @@ export const updateHealthBars = (battleState) => {
 };
 
 const checkBattleEnd = (battleState) => {
+	console.log(
+		`[DEBUG] checkBattleEnd: Jugador HP=${battleState.player.currentHp}, Enemigo HP=${battleState.enemy.currentHp}`
+	);
+
 	if (battleState.winner !== null && battleState.winner !== undefined) {
+		console.log("[DEBUG] La batalla ya terminó");
+
 		return true;
 	}
 
