@@ -1,5 +1,5 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
-import { mapScreen } from "./index.js";
+import { loadMapState, mapScreen } from "./index.js";
 import { charactersSelect, inputUserName } from "./login.js";
 import { battleScreen, enemiesInLevel, levelEnemies, showLeveleInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
@@ -584,6 +584,10 @@ const handleAttackAndSpecial = (battleState, specialUser, attacker) => {
 	const specialResult = calculateSpecialSkill(battleState[specialUser], battleState[attacker]);
 	console.log("[DEBUG] Resultado del especial:", specialResult);
 
+	if (specialResult.statusEffect) {
+		battleState[attacker].statusEffects.push(specialResult.statusEffect);
+	}
+
 	if (specialResult.message) {
 		console.log(`[DEBUG] Mensaje especial: ${specialResult.message}`);
 
@@ -684,6 +688,10 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 	}
 	const specialResult = calculateSpecialSkill(battleState[specialUser], battleState[defender]);
 
+	if (specialResult.statusEffect) {
+		battleState[defender].statusEffects.push(specialResult.statusEffect);
+	}
+
 	if (specialResult.message) {
 		showBattleText(specialUser, specialResult.message);
 	} else {
@@ -764,6 +772,10 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 
 	const specialResult = calculateSpecialSkill(battleState[specialUser], battleState[dodger]);
 
+	if (specialResult.statusEffect) {
+		battleState[dodger].statusEffects.push(specialResult.statusEffect);
+	}
+
 	if (specialResult.message) {
 		showBattleText(specialUser, specialResult.message);
 	} else {
@@ -823,6 +835,14 @@ const handleSpecialVsSpecial = (battleState) => {
 
 	const playerSpecial = calculateSpecialSkill(player, enemy);
 	const enemySpecial = calculateSpecialSkill(enemy, player);
+
+	if (playerSpecial.statusEffect) {
+		enemySpecial.statusEffects.push(playerSpecial.statusEffect);
+	}
+
+	if (enemySpecial.statusEffect) {
+		playerSpecial.statusEffects.push(enemySpecial.statusEffect);
+	}
 
 	if (playerSpecial.message) {
 		showBattleText("player", playerSpecial.message);
@@ -929,7 +949,6 @@ const calculateSpecialSkill = (attacker, defender) => {
 
 		case "Spider-Man":
 			statusEffect = { type: "webbed", turnsLeft: 1 };
-			defender.statusEffects.push(statusEffect);
 			result.message = "Spider-Man launches a Paralyzing Web! The enemy cannot attack next turn.";
 			break;
 
@@ -972,21 +991,18 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 
 		case "Red Skull":
-			statusEffect = { type: "demoralized", turnsLeft: 2 };
-			defender.statusEffects.push(statusEffect);
+			result.statusEffect = { type: "demoralized", turnsLeft: 2 };
 			result.message = "Red Skull invokes Terror Domination! Enemy's attack is reduced for 2 turns.";
 			break;
 
 		case "Hela":
 			result.damage = 30;
-
 			result.heal = 20;
 			result.message = `Hela uses Life Drain! Deals ${result.damage} damage and heals ${result.heal} HP.`;
 			break;
 
 		case "Killmonger":
-			statusEffect = { type: "doubleStrike", turnsLeft: 1 };
-			attacker.statusEffects.push(statusEffect);
+			result.statusEffect = { type: "doubleStrike", turnsLeft: 1 };
 			result.message = "Killmonger unleashes Killer Instinct! May strike twice next turn if the first hits.";
 			break;
 	}
@@ -1153,14 +1169,42 @@ const checkBattleEnd = (battleState) => {
 		setTimeout(() => {
 			showBattleText("enemy", "¡Enmey won the battle!");
 		}, 2000);
-		battleEnded = true;
+		battleEnded = false;
+		showBriefing("You lost!", "Your enemy defeated you.", {
+			before: {
+				text: "Back to map",
+				action: () => {
+					mapScreen.style.display = "flex";
+					battleScreen.style.display = "none";
+					loadMapState();
+					hideModal();
+				},
+			},
+			after: {
+				text: "Retry",
+				action: () => {
+					battleState.player.currentHp = battleState.player.character.powerstats.durability;
+					battleState.enemy.currentHp = battleState.enemy.character.powerstats.durability;
+
+					battleState.player.statusEffects = [];
+					battleState.enemy.statusEffects = [];
+
+					battleState.player.specialUsed = false;
+					battleState.enemy.specialUsed = false;
+
+					updateBattleUI(battleState);
+					showBattleText("player", "The battle restarts!");
+					hideModal();
+				},
+			},
+		});
 	} else if (battleState.player.currentHp <= 0 && battleState.enemy.currentHp <= 0) {
 		battleState.winner = "draw";
 		setTimeout(() => {
 			showBattleText("player", "Draw!");
 			showBattleText("enemy", "Draw!");
 		}, 2000);
-		battleEnded = true;
+		battleEnded = false;
 	}
 
 	if (battleEnded) {

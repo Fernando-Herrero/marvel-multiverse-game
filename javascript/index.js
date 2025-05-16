@@ -213,7 +213,7 @@ const loadGameState = async (currentScreen) => {
 	}
 };
 
-const loadMapState = async () => {
+export const loadMapState = async () => {
 	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
 
 	if (levelOneUnlocked) {

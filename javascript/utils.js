@@ -58,7 +58,7 @@ export const showBriefing = (title, message, buttons = {}) => {
 	document.body.style.overflow = "hidden";
 
 	if (buttons.before) {
-		briefingBeforeBtn.textContent = buttons.after.text || "Before";
+		briefingBeforeBtn.textContent = buttons.before.text || "Before";
 		briefingBeforeBtn.onclick = buttons.before.action;
 		briefingBeforeBtn.style.display = "flex";
 	} else {
