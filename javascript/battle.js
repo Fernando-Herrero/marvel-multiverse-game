@@ -413,9 +413,10 @@ const handleAttackVsDefence = (battleState, attacker, defender) => {
 	const reducedDamage = Math.max(1, Math.floor(damage * defenceEffectiveness));
 	battleState[defender].currentHp = Math.max(0, battleState[defender].currentHp - reducedDamage);
 
+	const damageRatio = reducedDamage / damage;
 	let defenceQuality;
-	if (defenceEffectiveness > 0.6) defenceQuality = "poor";
-	else if (defenceEffectiveness > 0.45) defenceQuality = "good";
+	if (damageRatio >= 0.7) defenceQuality = "poor";
+	else if (damageRatio >= 0.4) defenceQuality = "good";
 	else defenceQuality = "excellent";
 
 	const attackerMessages = {
@@ -769,7 +770,7 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 	if (specialResult.damage > 0) {
 		showBattleText(dodger, `${battleState[dodger].character.name} took ${specialResult.damage} special damage.`);
 	} else {
-		showBattleText(dodger, `${battleState[dodger].character.name} resisted the attack.`);
+		showBattleText(dodger, `${battleState[dodger].character.name} made a dodge!.`);
 	}
 
 	battleState[specialUser].specialUsed = true;
@@ -876,6 +877,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 	switch (attacker.character.name) {
 		case "Black Widow":
 			result.damage = 40 + attacker.character.powerstats.combat;
+			defender.currentHp = Math.max(0, defender.currentHp - result.damage);
 			result.message = `Black Widow executes a Tactical Ambush! Deals ${result.damage} damage!`;
 			break;
 
@@ -931,6 +933,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 
 		case "Hela":
 			result.damage = 30;
+
 			result.heal = 20;
 			result.message = `Hela uses Life Drain! Deals ${result.damage} damage and heals ${result.heal} HP.`;
 			break;
