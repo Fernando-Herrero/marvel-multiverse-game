@@ -690,6 +690,15 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 
 	if (specialResult.statusEffect) {
 		battleState[defender].statusEffects.push(specialResult.statusEffect);
+		console.log(`[DEBUG] Efecto aplicado a ${defender}:`, specialResult.statusEffect);
+	}
+
+	if (processStatusEffect(specialUser, battleState[specialUser], "webbed")) {
+		setTimeout(() => {
+			addBattleEffect(specialUser, "miss-effect");
+		}, 2000);
+		battleState[specialUser].specialUsed = true;
+		return;
 	}
 
 	if (specialResult.message) {
@@ -746,6 +755,7 @@ const handleSpecialVsDefence = (battleState, specialUser, defender) => {
 		);
 	} else {
 		showBattleText(defender, `${battleState[defender].character.name} ignores the attack.`);
+		battleState[defender].statusEffects.push(specialResult.statusEffect);
 	}
 
 	battleState[specialUser].specialUsed = true;
@@ -774,6 +784,7 @@ const handleSpecialVsDodge = (battleState, specialUser, dodger) => {
 
 	if (specialResult.statusEffect) {
 		battleState[dodger].statusEffects.push(specialResult.statusEffect);
+		console.log(`[DEBUG] Efecto aplicado a ${dodger}:`, specialResult.statusEffect);
 	}
 
 	if (specialResult.message) {
@@ -837,11 +848,11 @@ const handleSpecialVsSpecial = (battleState) => {
 	const enemySpecial = calculateSpecialSkill(enemy, player);
 
 	if (playerSpecial.statusEffect) {
-		enemySpecial.statusEffects.push(playerSpecial.statusEffect);
+		enemy.statusEffects.push(playerSpecial.statusEffect);
 	}
 
 	if (enemySpecial.statusEffect) {
-		playerSpecial.statusEffects.push(enemySpecial.statusEffect);
+		player.statusEffects.push(enemySpecial.statusEffect);
 	}
 
 	if (playerSpecial.message) {
@@ -948,7 +959,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 
 		case "Spider-Man":
-			statusEffect = { type: "webbed", turnsLeft: 1 };
+			result.statusEffect = { type: "webbed", turnsLeft: 1 };
 			result.message = "Spider-Man launches a Paralyzing Web! The enemy cannot attack next turn.";
 			break;
 
