@@ -201,6 +201,31 @@ const executeAction = (playerAction) => {
 	checkBattleEnd(battleState);
 };
 
+const logBattleState = (battleState, playerAction, enemyAction) => {
+	console.log(`\n=== POST-ACTION STATE (Turn ${battleState.turn}) ===`);
+	console.log(`Actions: Player=${playerAction} | Enemy=${enemyAction}`);
+
+	// Log del jugador
+	console.log("\n[PLAYER]");
+	console.log(`- HP: ${battleState.player.currentHp}/${battleState.player.maxHp}`);
+	console.log(`- Special Used: ${battleState.player.specialUsed}`);
+	console.log(
+		"- Status Effects:",
+		battleState.player.statusEffects.map((e) => `${e.type} (${e.turnsLeft}t)`).join(", ") || "None"
+	);
+
+	// Log del enemigo
+	console.log("\n[ENEMY]");
+	console.log(`- HP: ${battleState.enemy.currentHp}/${battleState.enemy.maxHp}`);
+	console.log(`- Special Used: ${battleState.enemy.specialUsed}`);
+	console.log(
+		"- Status Effects:",
+		battleState.enemy.statusEffects.map((e) => `${e.type} (${e.turnsLeft}t)`).join(", ") || "None"
+	);
+
+	console.log("====================================\n");
+};
+
 const resolveActions = (playerAction, enemyAction, battleState) => {
 	console.log(`[DEBUG] Resolviendo acciones: Jugador=${playerAction}, Enemigo=${enemyAction}`);
 
@@ -286,6 +311,7 @@ const resolveActions = (playerAction, enemyAction, battleState) => {
 			break;
 	}
 
+	logBattleState(battleState, playerAction, enemyAction);
 	updateHealthBars(battleState);
 	saveToStorage("battleState", battleState);
 };
@@ -333,7 +359,7 @@ const handleBothAttack = (battleState) => {
 		}
 	}
 	if (processStatusEffect("enemy", battleState.enemy, "illusion")) {
-		if (Math.random() > 0.9) {
+		if (Math.random() < 0.9) {
 			playerFinalDamage = 0;
 			setTimeout(() => {
 				addBattleEffect("player", "miss-effect");

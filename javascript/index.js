@@ -80,7 +80,7 @@ const resetGameState = () => {
 		clearStorageKey(`level${levels[i]}Unlocked`);
 	}
 
-	document.querySelector(".level").forEach((levelElement) => {
+	document.querySelectorAll(".level").forEach((levelElement) => {
 		const level = parseInt(levelElement.dataset.level);
 		if (level > 1) {
 			levelElement.classList.add("locked");
