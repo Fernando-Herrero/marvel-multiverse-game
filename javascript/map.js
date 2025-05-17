@@ -13,7 +13,7 @@ export const levelEnemies = {
 			level: 1,
 			description: "Dios de las Mentiras - Nueva York",
 			powers: "Ilusiones, Dagas Mágicas",
-			reward: "Gema del Espacio",
+			reward: "/media/images/icons/time-stone.webp",
 		},
 		{
 			name: "Red Skull",
@@ -21,7 +21,7 @@ export const levelEnemies = {
 			level: 2,
 			description: "Cráneo Rojo - Europa 1945",
 			powers: "Fuerza Mejorada, Pistolas de Energía",
-			reward: "Gema de la Mente",
+			reward: "/media/images/icons/space-stone.webp",
 		},
 		{
 			name: "Ultron",
@@ -29,7 +29,7 @@ export const levelEnemies = {
 			level: 3,
 			description: "IA Despiadada - Sokovia",
 			powers: "Ejército de Drones, Vuelo",
-			reward: "Gema del Alma",
+			reward: "/media/images/icons/mind-stone.webp",
 		},
 		{
 			name: "Hela",
@@ -37,7 +37,7 @@ export const levelEnemies = {
 			level: 4,
 			description: "Diosa de la Muerte - Asgard",
 			powers: "Espadas Infinitas, Inmortalidad",
-			reward: "Gema del Poder",
+			reward: "/media/images/icons/soul-stone.webp",
 		},
 		{
 			name: "Thanos",
@@ -45,7 +45,7 @@ export const levelEnemies = {
 			level: 5,
 			description: "El Titán Loco - Titán",
 			powers: "Fuerza Cósmica, Guantelete",
-			reward: "Gema de la Realidad",
+			reward: "/media/images/icons/power-stone.webp",
 		},
 		{
 			name: "Doctor Doom",
@@ -53,7 +53,7 @@ export const levelEnemies = {
 			level: 6,
 			description: "Señor de Latveria - Dimensión Oscura",
 			powers: "Magia y Tecnología, Armadura",
-			reward: "Gema del Tiempo",
+			reward: "/media/images/icons/reality-stone.webp",
 		},
 	],
 	villains: [
@@ -63,7 +63,7 @@ export const levelEnemies = {
 			level: 1,
 			description: "Espía Letal - Budapest",
 			powers: "Combate cuerpo a cuerpo, Sigilo",
-			reward: "Información secreta obtenida",
+			reward: "/media/images/icons/space-stone.webp",
 		},
 		{
 			name: "Spider-Man",
@@ -71,7 +71,7 @@ export const levelEnemies = {
 			level: 2,
 			description: "El Hombre Araña - Queens",
 			powers: "Sentido arácnido, Telarañas",
-			reward: "Tecnología de Stark hackeada",
+			reward: "/media/images/icons/power-stone.webp",
 		},
 		{
 			name: "Iron Man",
@@ -79,7 +79,7 @@ export const levelEnemies = {
 			level: 3,
 			description: "Genio, Millonario - Torre Stark",
 			powers: "Armadura MK-50, IA Friday",
-			reward: "Armadura dañada robada",
+			reward: "/media/images/icons/mind-stone.webp",
 		},
 		{
 			name: "Captain America",
@@ -87,7 +87,7 @@ export const levelEnemies = {
 			level: 4,
 			description: "El Primer Vengador - Washington",
 			powers: "Escudo de Vibranium, Liderazgo",
-			reward: "Escudo copiado para experimentos",
+			reward: "/media/images/icons/reality-stone.webp",
 		},
 		{
 			name: "Thor",
@@ -95,7 +95,7 @@ export const levelEnemies = {
 			level: 5,
 			description: "Dios del Trueno - Asgard",
 			powers: "Mjolnir, Control del Clima",
-			reward: "Energía del rayo condensada",
+			reward: "/media/images/icons/soul-stone.webp",
 		},
 		{
 			name: "Hulk",
@@ -103,7 +103,7 @@ export const levelEnemies = {
 			level: 6,
 			description: "Furia Imparable - Laboratorio Gamma",
 			powers: "Fuerza Bruta, Regeneración",
-			reward: "ADN Gamma mutado",
+			reward: "/media/images/icons/time-stone.webp",
 		},
 	],
 };

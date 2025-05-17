@@ -975,7 +975,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 
 		case "Thor":
-			damage = 40;
+			result.damage = 40;
 			result.message = `Thor calls down Divine Thunder! Unavoidable attack deals ${result.damage} damage.`;
 			break;
 
@@ -986,7 +986,7 @@ const calculateSpecialSkill = (attacker, defender) => {
 			break;
 
 		case "Thanos":
-			damage = 40;
+			result.damage = 40;
 			result.message = "Thanos charges up the Infinity Fist! Strikes with devastating force.";
 			break;
 
@@ -1216,6 +1216,34 @@ const checkBattleEnd = (battleState) => {
 			showBattleText("enemy", "Draw!");
 		}, 2000);
 		battleEnded = false;
+		showBriefing("You draw!", "You were both defeated at the same time!", {
+			before: {
+				text: "Back to map",
+				action: () => {
+					mapScreen.style.display = "flex";
+					battleScreen.style.display = "none";
+					loadMapState();
+					hideModal();
+				},
+			},
+			after: {
+				text: "Retry",
+				action: () => {
+					battleState.player.currentHp = battleState.player.character.powerstats.durability;
+					battleState.enemy.currentHp = battleState.enemy.character.powerstats.durability;
+
+					battleState.player.statusEffects = [];
+					battleState.enemy.statusEffects = [];
+
+					battleState.player.specialUsed = false;
+					battleState.enemy.specialUsed = false;
+
+					updateBattleUI(battleState);
+					showBattleText("player", "The battle restarts!");
+					hideModal();
+				},
+			},
+		});
 	}
 
 	if (battleEnded) {
@@ -1268,15 +1296,63 @@ const endBattle = (playerWon) => {
 								saveToStorage("currentLevel", nextLevel);
 							}
 						}
+						if (currentLevel === 6) {
+							saveToStorage(`level${nextLevel}Unlocked`, true);
+							saveToStorage("currentLevel", nextLevel);
+						}
 
 						mapScreen.style.display = "flex";
 						battleScreen.style.display = "none";
 						hideModal();
 						showLeveleInfo();
 						enemiesInLevel();
+						getRewards();
+
+						setTimeout(() => {
+							showBriefing(
+								`${inputUserName.value} ${
+									currentSelection === "heroes"
+										? "has brought peace to the multiverse"
+										: "has plunged the multiverse into darkness"
+								}!`,
+								`All six realms have fallen before your might.\n\n` +
+									`The ${
+										currentSelection === "heroes"
+											? "light of justice shines across realities"
+											: "shadows of tyranny now rule all dimensions"
+									}.\n` +
+									`Your ${
+										currentSelection === "heroes" ? "heroic journey" : "dark crusade"
+									} has reshaped the Nexus forever.\n\n` +
+									`${
+										currentSelection === "heroes"
+											? "Hope echoes through every world you saved."
+											: "Fear and chaos spread in your unstoppable wake."
+									}`
+							);
+						}, 2000);
 					},
 				},
 			}
 		);
-	}, 3000);
+	}, 2000);
+};
+
+const getRewards = () => {
+	const containerRewards = document.getElementById("rewards");
+	const currentLevel = loadFromStorage("currentLevel") || 1;
+	const currentSelection = loadFromStorage("characterType") || "heroes";
+	const enemies = currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
+	const currentEnemy = enemies.find((enemy) => enemy.level === currentLevel);
+
+	containerRewards.innerHTML = "";
+
+	if (currentEnemy && currentEnemy.reward) {
+		const img = document.createElement("img");
+		img.classList.add("reward-img");
+		img.src = currentEnemy.reward;
+		img.alt = "Infinity Stone";
+
+		containerRewards.appendChild(img);
+	}
 };

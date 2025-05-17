@@ -502,7 +502,7 @@ h1 {
 }
 
 .level.unlocked:hover {
-	transform: translateX(-2px);
+	transform: translateY(-2px);
 }
 
 .level-info {
@@ -962,6 +962,16 @@ h1 {
 	gap: 6px;
 	padding: 6px;
 	flex: 1;
+}
+
+.rewards {
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+}
+
+.rewards img {
+	width: 30px;
 }
 
 .close-session {
