@@ -17,6 +17,7 @@ import {
 	imageEnemies,
 	levels,
 	loadPlayerPosition,
+	movePlayerToLevel,
 	resetPlayerPosition,
 	showFirstLevel,
 	showLeveleInfo,
@@ -128,6 +129,8 @@ const setupEventListeners = () => {
 				btn.disabled = false;
 			});
 
+			document.getElementById("rewards").innerHTML = "";
+
 			showModal("You've succesfully logout.", {
 				confirmText: "Accept",
 				isConfirmation: false,
@@ -178,6 +181,8 @@ const setupEventListeners = () => {
 				btn.disabled = false;
 			});
 
+			document.getElementById("rewards").innerHTML = "";
+
 			saveToStorage("forceBattleReset", true);
 
 			hideModal();
@@ -206,6 +211,11 @@ const loadGameState = async (currentScreen) => {
 	switch (currentScreen) {
 		case "map":
 			await loadMapState();
+			const currentLevel = loadFromStorage("currentLevel") || 1;
+			const levelElement = document.querySelector(`.level[data-level="${currentLevel}"]`);
+			if (levelElement) {
+				await movePlayerToLevel(levelElement);
+			}
 			break;
 		case "battle":
 			await loadbattleState();

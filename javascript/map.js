@@ -242,6 +242,7 @@ export const movePlayerToLevel = (targetLevel) => {
 		const targetY = targetRect.top - mapRect.top + targetRect.height / 2 - playerRect.height / 2;
 
 		saveToStorage("playerPosition", { x: targetX, y: targetY, level: targetLevel.dataset.level });
+		saveToStorage("currentLevel", targetLevel.dataset.level);
 
 		// Guardar posición inicial para la transición
 		const initialX = playerRect.left - mapRect.left;
@@ -284,11 +285,14 @@ export const loadPlayerPosition = () => {
 		player.style.top = `${savedPosition.y}px`;
 		player.style.transform = "none";
 
-		// Marcar nivel como visitado
-		const level = document.querySelector(`.level[data-level="${savedPosition.level}"]`);
-		if (level) {
-			level.classList.remove("locked");
-			level.classList.add("unlocked");
+		const currentLevel = loadFromStorage("curentLevel") || 1;
+		for (let i = 1; i <= currentLevel; i++) {
+			const level = document.querySelector(`.level[data-level="${savedPosition.level}"]`);
+			if (level) {
+				level.classList.remove("locked");
+				level.classList.add("unlocked");
+				saveToStorage(`level${i}Unlocked`, true);
+			}
 		}
 		showLeveleInfo();
 	}

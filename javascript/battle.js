@@ -1,7 +1,7 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { loadMapState, mapScreen } from "./index.js";
 import { charactersSelect, inputUserName } from "./login.js";
-import { battleScreen, enemiesInLevel, levelEnemies, showLeveleInfo } from "./map.js";
+import { battleScreen, enemiesInLevel, levelEnemies, movePlayerToLevel, showLeveleInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 import { disableButtons, hideModal, showBattleText, showBriefing } from "./utils.js";
 
@@ -1285,7 +1285,9 @@ const endBattle = (playerWon) => {
 				after: {
 					text: "Continue Your Journey",
 					action: () => {
+						const currentLevel = loadFromStorage("currentLevel") || 1;
 						const nextLevel = currentLevel + 1;
+
 						if (currentLevel < 6) {
 							const nextLevelElement = document.querySelector(`.level[data-level="${nextLevel}"]`);
 
@@ -1294,11 +1296,37 @@ const endBattle = (playerWon) => {
 								nextLevelElement.classList.add("unlocked");
 								saveToStorage(`level${nextLevel}Unlocked`, true);
 								saveToStorage("currentLevel", nextLevel);
+
+								movePlayerToLevel();
 							}
 						}
 						if (currentLevel === 6) {
 							saveToStorage(`level${nextLevel}Unlocked`, true);
 							saveToStorage("currentLevel", nextLevel);
+
+							setTimeout(() => {
+								showBriefing(
+									`${inputUserName.value} ${
+										currentSelection === "heroes"
+											? "has brought peace to the multiverse"
+											: "has plunged the multiverse into darkness"
+									}!`,
+									`All six realms have fallen before your might.\n\n` +
+										`The ${
+											currentSelection === "heroes"
+												? "light of justice shines across realities"
+												: "shadows of tyranny now rule all dimensions"
+										}.\n` +
+										`Your ${
+											currentSelection === "heroes" ? "heroic journey" : "dark crusade"
+										} has reshaped the Nexus forever.\n\n` +
+										`${
+											currentSelection === "heroes"
+												? "Hope echoes through every world you saved."
+												: "Fear and chaos spread in your unstoppable wake."
+										}`
+								);
+							}, 2000);
 						}
 
 						mapScreen.style.display = "flex";
@@ -1307,30 +1335,6 @@ const endBattle = (playerWon) => {
 						showLeveleInfo();
 						enemiesInLevel();
 						getRewards();
-
-						setTimeout(() => {
-							showBriefing(
-								`${inputUserName.value} ${
-									currentSelection === "heroes"
-										? "has brought peace to the multiverse"
-										: "has plunged the multiverse into darkness"
-								}!`,
-								`All six realms have fallen before your might.\n\n` +
-									`The ${
-										currentSelection === "heroes"
-											? "light of justice shines across realities"
-											: "shadows of tyranny now rule all dimensions"
-									}.\n` +
-									`Your ${
-										currentSelection === "heroes" ? "heroic journey" : "dark crusade"
-									} has reshaped the Nexus forever.\n\n` +
-									`${
-										currentSelection === "heroes"
-											? "Hope echoes through every world you saved."
-											: "Fear and chaos spread in your unstoppable wake."
-									}`
-							);
-						}, 2000);
 					},
 				},
 			}
@@ -1345,7 +1349,7 @@ const getRewards = () => {
 	const enemies = currentSelection === "heroes" ? levelEnemies.heroes : levelEnemies.villains;
 	const currentEnemy = enemies.find((enemy) => enemy.level === currentLevel);
 
-	containerRewards.innerHTML = "";
+	// containerRewards.innerHTML = "";
 
 	if (currentEnemy && currentEnemy.reward) {
 		const img = document.createElement("img");
