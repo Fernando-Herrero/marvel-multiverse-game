@@ -453,6 +453,15 @@ h1 {
 	transition: transform 0.3s ease;
 	box-shadow: var(--box-shadow);
 }
+.level::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+}
 
 .level[data-level="1"] {
 	top: 10%;
@@ -499,10 +508,11 @@ h1 {
 	opacity: 1;
 	cursor: pointer;
 	filter: var(--glow-effect);
+	transition: transform 0.2s;
 }
 
 .level.unlocked:hover {
-	transform: translateY(-2px) !important;
+	transform: scale(1.05);
 }
 
 .level-info {

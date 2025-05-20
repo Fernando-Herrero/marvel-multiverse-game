@@ -1294,6 +1294,17 @@ const endBattle = (playerWon) => {
 							if (nextLevelElement) {
 								nextLevelElement.classList.remove("locked");
 								nextLevelElement.classList.add("unlocked");
+
+								const rect = nextLevelElement.getBoundingClientRect();
+								const mapRect = map.getBoundingClientRect();
+								const x = rect.left - mapRect.left + rect.width / 2;
+								const y = rect.top - mapRect.top + rect.height / 2;
+
+								saveToStorage("playerPosition", {
+									x: x,
+									y: y,
+									level: nextLevel,
+								});
 								saveToStorage(`level${nextLevel}Unlocked`, true);
 								saveToStorage("currentLevel", nextLevel);
 

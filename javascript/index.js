@@ -211,15 +211,23 @@ const loadGameState = async (currentScreen) => {
 	switch (currentScreen) {
 		case "map":
 			await loadMapState();
-			const currentLevel = loadFromStorage("currentLevel") || 1;
-			const levelElement = document.querySelector(`.level[data-level="${currentLevel}"]`);
+			let playerMoved = false;
 
-			if (levelElement && levelElement.getBoundingClientRect) {
-				await movePlayerToLevel(levelElement);
-			} else {
-				console.log("Nivel actual no encontrado, posicionando en nivel 1");
-				const firstLevel = document.querySelector('.level[data-level="1"]');
-				if (firstLevel) await movePlayerToLevel(firstLevel);
+			for (let i = 6; i >= 1; i--) {
+				if (loadFromStorage(`level${i}Unlocked`)) {
+					const levelElement = document.querySelector(`.level[data-level="${i}"]`);
+					if (levelElement) {
+						await movePlayerToLevel(levelElement);
+						playerMoved = true;
+						break;
+					}
+				}
+
+				if (!playerMoved) {
+					// Fallback al primer nivel
+					const firstLevel = document.querySelector('.level[data-level="1"]');
+					if (firstLevel) await movePlayerToLevel(firstLevel);
+				}
 			}
 			break;
 		case "battle":
@@ -229,17 +237,18 @@ const loadGameState = async (currentScreen) => {
 };
 
 export const loadMapState = async () => {
-	const levelOneUnlocked = loadFromStorage("levelOneUnlocked");
-
-	if (levelOneUnlocked) {
-		for (let i = 0; i < levels.length; i++) {
-			if (levels[i].dataset.level === "1") {
-				levels[i].classList.remove("locked");
-				levels[i].classList.add("unlocked");
-				break;
+	for (let i = 1; i <= 6; i++) {
+		const isUnlocked = loadFromStorage(`level${i}Unlocked`);
+		const level = document.querySelector(`.level[data-level="${i}"]`);
+		if (level) {
+			if (isUnlocked) {
+				level.classList.remove("locked");
+				level.classList.add("unlocked");
+			} else {
+				level.classList.add("locked");
+				level.classList.remove("unlocked");
 			}
 		}
-		showFirstLevel();
 	}
 
 	await enemiesInLevel();
@@ -247,6 +256,7 @@ export const loadMapState = async () => {
 
 	navbar.style.display = "flex";
 	mapScreen.style.display = "flex";
+
 	showLeveleInfo();
 };
 
@@ -347,6 +357,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 		await imageEnemies();
 
 		if (currentScreen && gameStarted) {
+			let maxUnlockedLevel = 1;
+			for (let i = 6; i >= 1; i--) {
+				if (loadFromStorage(`level${i}Unlocked`)) {
+					maxUnlockedLevel = i;
+					break;
+				}
+			}
+
+			for (let i = 1; i <= maxUnlockedLevel; i++) {
+				const level = document.querySelector(`.level[data-level="${i}"]`);
+				if (level) {
+					level.classList.remove("locked");
+					level.classList.add("unlocked");
+				}
+			}
+
 			await loadGameState(currentScreen);
 		} else {
 			loginScreen.style.display = "flex";

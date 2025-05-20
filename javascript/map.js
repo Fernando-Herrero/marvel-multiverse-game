@@ -223,15 +223,16 @@ export const showLeveleInfo = () => {
 		saveToStorage("currentLevel", enemy.level);
 	};
 
-	levels.forEach((level) => {
-		level.replaceWith(level.cloneNode(true));
-	});
+	// levels.forEach((level) => {
+	// 	level.replaceWith(level.cloneNode(true));
+	// });
 
 	const enemies = getCurrentEnemies();
 
-	document.querySelectorAll(".level").forEach((level) => {
-		if (level.querySelector("img")) {
-			level.addEventListener("click", () => handleLevelClick(level, enemies));
+	map.addEventListener("click", (event) => {
+		const level = event.target.closest(".level");
+		if (level && !level.classList.contains("locked")) {
+			handleLevelClick(level, enemies);
 		}
 	});
 };
@@ -268,13 +269,13 @@ export const movePlayerToLevel = (targetLevel) => {
 			"transitionend",
 			function onTransitionEnd() {
 				player.removeEventListener("transitionend", onTransitionEnd);
-
-				// Establecer posición absoluta y quitar transformación
 				player.style.transition = "none";
 				player.style.transform = "none";
 				player.style.left = `${targetX}px`;
 				player.style.top = `${targetY}px`;
 
+				// Volver a asignar eventos después de mover
+				showLeveleInfo();
 				resolve();
 			},
 			{ once: true }
@@ -288,20 +289,34 @@ export const loadPlayerPosition = () => {
 	const player = document.getElementById("player");
 
 	if (savedPosition) {
+		// Asegurar que el jugador esté visible
+		player.style.display = "block";
+
+		// Calcular posición relativa al mapa
+		const mapRect = map.getBoundingClientRect();
+		const playerWidth = player.offsetWidth;
+		const playerHeight = player.offsetHeight;
+
+		// Aplicar posición
 		player.style.left = `${savedPosition.x}px`;
 		player.style.top = `${savedPosition.y}px`;
 		player.style.transform = "none";
 
-		const currentLevel = loadFromStorage("curentLevel") || 1;
-		for (let i = 1; i <= currentLevel; i++) {
-			const level = document.querySelector(`.level[data-level="${savedPosition.level}"]`);
-			if (level) {
-				level.classList.remove("locked");
-				level.classList.add("unlocked");
-				saveToStorage(`level${i}Unlocked`, true);
+		// Verificar que la posición es visible
+		setTimeout(() => {
+			const playerRect = player.getBoundingClientRect();
+			if (playerRect.right > mapRect.right || playerRect.bottom > mapRect.bottom) {
+				// Si está fuera de vista, ajustar posición
+				player.style.left = "50%";
+				player.style.top = "1%";
+				player.style.transform = "translateX(-50%)";
 			}
-		}
-		showLeveleInfo();
+		}, 100);
+	} else {
+		// Posición por defecto
+		player.style.left = "50%";
+		player.style.top = "1%";
+		player.style.transform = "translateX(-50%)";
 	}
 };
 
