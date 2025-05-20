@@ -213,8 +213,13 @@ const loadGameState = async (currentScreen) => {
 			await loadMapState();
 			const currentLevel = loadFromStorage("currentLevel") || 1;
 			const levelElement = document.querySelector(`.level[data-level="${currentLevel}"]`);
-			if (levelElement) {
+
+			if (levelElement && levelElement.getBoundingClientRect) {
 				await movePlayerToLevel(levelElement);
+			} else {
+				console.log("Nivel actual no encontrado, posicionando en nivel 1");
+				const firstLevel = document.querySelector('.level[data-level="1"]');
+				if (firstLevel) await movePlayerToLevel(firstLevel);
 			}
 			break;
 		case "battle":

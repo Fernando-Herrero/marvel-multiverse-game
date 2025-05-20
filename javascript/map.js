@@ -3,7 +3,7 @@ import { fetchCharactersByName } from "./character.js";
 import { mapScreen } from "./index.js";
 import { charactersSelect } from "./login.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
-import { hideModal, showBriefing } from "./utils.js";
+import { hideModal, showBriefing, showModal } from "./utils.js";
 
 export const levelEnemies = {
 	heroes: [
@@ -174,6 +174,13 @@ export const showLeveleInfo = () => {
 	};
 
 	const handleLevelClick = async (level, enemies) => {
+		if (level.classList.contains("locked")) {
+			showModal("Level Locked! You must complete previous levels before unlocking this one!", {
+				confirmText: "OK",
+			});
+			return;
+		}
+
 		const levelNumber = parseInt(level.dataset.level);
 		const enemy = enemies.find((enemy) => enemy.level === levelNumber);
 
@@ -222,7 +229,7 @@ export const showLeveleInfo = () => {
 
 	const enemies = getCurrentEnemies();
 
-	document.querySelectorAll(".level.unlocked").forEach((level) => {
+	document.querySelectorAll(".level").forEach((level) => {
 		if (level.querySelector("img")) {
 			level.addEventListener("click", () => handleLevelClick(level, enemies));
 		}

@@ -1297,7 +1297,15 @@ const endBattle = (playerWon) => {
 								saveToStorage(`level${nextLevel}Unlocked`, true);
 								saveToStorage("currentLevel", nextLevel);
 
-								movePlayerToLevel();
+								showLeveleInfo();
+								enemiesInLevel();
+								getRewards();
+
+								if (nextLevelElement && nextLevelElement.getBoundingClientRect) {
+									movePlayerToLevel(nextLevelElement);
+								} else {
+									console.error("Elemento de nivel no encontrado o inválido:", nextLevelElement);
+								}
 							}
 						}
 						if (currentLevel === 6) {
