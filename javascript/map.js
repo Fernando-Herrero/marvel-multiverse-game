@@ -174,13 +174,6 @@ export const showLeveleInfo = () => {
 	};
 
 	const handleLevelClick = async (level, enemies) => {
-		if (level.classList.contains("locked")) {
-			showModal("Level Locked! You must complete previous levels before unlocking this one!", {
-				confirmText: "OK",
-			});
-			return;
-		}
-
 		const levelNumber = parseInt(level.dataset.level);
 		const enemy = enemies.find((enemy) => enemy.level === levelNumber);
 
@@ -223,17 +216,26 @@ export const showLeveleInfo = () => {
 		saveToStorage("currentLevel", enemy.level);
 	};
 
-	// levels.forEach((level) => {
-	// 	level.replaceWith(level.cloneNode(true));
-	// });
-
 	const enemies = getCurrentEnemies();
 
-	map.addEventListener("click", (event) => {
-		const level = event.target.closest(".level");
-		if (level && !level.classList.contains("locked")) {
-			handleLevelClick(level, enemies);
-		}
+	const unlockedLevels = document.querySelectorAll(".level.unlocked");
+	unlockedLevels.forEach((level) => {
+		level.addEventListener("click", async (event) => {
+			event.stopPropagation();
+			console.log("Clicked unlocked level:", level.dataset.level, level.className);
+			await handleLevelClick(level, enemies);
+		});
+	});
+
+	const lockedLevels = document.querySelectorAll(".level.locked");
+	lockedLevels.forEach((level) => {
+		level.addEventListener("click", (event) => {
+			event.stopPropagation();
+			console.log("Clicked locked level:", level.dataset.level, level.className);
+			showModal("Level Locked! You must complete previous levels before unlocking this one!", {
+				confirmText: "OK",
+			});
+		});
 	});
 };
 

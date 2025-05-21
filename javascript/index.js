@@ -122,6 +122,7 @@ const setupEventListeners = () => {
 			battleScreen.style.display = "none";
 
 			inputUserName.value = " ";
+			document.getElementById("characters-selector").value = "heroes";
 			const selectedCard = document.querySelector(".character-card.selected-card");
 			selectedCard?.classList.remove("selected-card");
 
@@ -130,6 +131,8 @@ const setupEventListeners = () => {
 			});
 
 			document.getElementById("rewards").innerHTML = "";
+
+			document.getElementById("difficulty").value = "1";
 
 			showModal("You've succesfully logout.", {
 				confirmText: "Accept",
@@ -174,6 +177,7 @@ const setupEventListeners = () => {
 			battleScreen.style.display = "none";
 
 			inputUserName.value = " ";
+			document.getElementById("characters-selector").value = "heroes";
 			const selectedCard = document.querySelector(".character-card.selected-card");
 			selectedCard?.classList.remove("selected-card");
 
@@ -182,6 +186,8 @@ const setupEventListeners = () => {
 			});
 
 			document.getElementById("rewards").innerHTML = "";
+
+			document.getElementById("difficulty").value = "1";
 
 			saveToStorage("forceBattleReset", true);
 

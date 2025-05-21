@@ -124,7 +124,7 @@ export const setupGameListeners = () => {
 
 			const difficulty = parseInt(document.getElementById("difficulty").value);
 			if (difficulty === 3) {
-				for (const stat of characterData.powerstats) {
+				for (const stat in characterData.powerstats) {
 					characterData.powerstats[stat] = Math.max(10, Math.floor(characterData.powerstats[stat] * 0.6));
 				}
 
