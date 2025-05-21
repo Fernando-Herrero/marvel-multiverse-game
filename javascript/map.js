@@ -239,7 +239,6 @@ export const showLeveleInfo = () => {
 	});
 };
 
-//Absolutamente no se como coño va esto de las coordenadas me gustaria una clase rapida:)
 export const movePlayerToLevel = (targetLevel) => {
 	return new Promise((resolve) => {
 		const player = document.getElementById("player");

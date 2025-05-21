@@ -368,10 +368,10 @@ const handleBothAttack = (battleState) => {
 	}
 
 	if (processStatusEffect("player", battleState.player, "demoralized")) {
-		enemyFinalDamage -= 10;
+		playerFinalDamage -= 10;
 	}
 	if (processStatusEffect("enemy", battleState.enemy, "demoralized")) {
-		playerFinalDamage -= 10;
+		enemyFinalDamage -= 10;
 	}
 
 	if (processStatusEffect("player", battleState.player, "doubleStrike")) {

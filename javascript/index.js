@@ -122,7 +122,10 @@ const setupEventListeners = () => {
 			battleScreen.style.display = "none";
 
 			inputUserName.value = " ";
-			document.getElementById("characters-selector").value = "heroes";
+			const charSelector = document.getElementById("characters-selector");
+			charSelector.value = "heroes";
+			charSelector.dispatchEvent(new Event("change"));
+
 			const selectedCard = document.querySelector(".character-card.selected-card");
 			selectedCard?.classList.remove("selected-card");
 
@@ -177,7 +180,10 @@ const setupEventListeners = () => {
 			battleScreen.style.display = "none";
 
 			inputUserName.value = " ";
-			document.getElementById("characters-selector").value = "heroes";
+			const charSelector = document.getElementById("characters-selector");
+			charSelector.value = "heroes";
+			charSelector.dispatchEvent(new Event("change"));
+
 			const selectedCard = document.querySelector(".character-card.selected-card");
 			selectedCard?.classList.remove("selected-card");
 
