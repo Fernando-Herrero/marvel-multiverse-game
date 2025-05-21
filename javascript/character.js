@@ -83,6 +83,7 @@ export const fetchCharactersByName = async (name) => {
 
 		if (name === "Black Widow") character.powerstats.strength = 70;
 		if (name === "Captain America") character.powerstats.strength = 95;
+		if (name === "Spider-Man") character.powerstats.strength = 80;
 
 		if (!character.stats) {
 			character.stats = [

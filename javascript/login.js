@@ -33,39 +33,27 @@ export const checkValidStartGame = () => {
 	startGameBtn.disabled = !(name && selectedCard && validation.valid);
 };
 
-export const renderCardInfohero = (characterData) => {
-	const card = document.createElement("div");
-	card.classList.add("info-hero-card");
+const applyDifficulty = (characterData, difficulty) => {
+	const multipliers = {
+		1: 1,
+		2: 0.8,
+		3: 0.6,
+	};
 
-	const imgCard = document.createElement("img");
-	imgCard.classList.add("info-hero-card-img");
-	imgCard.src = characterData.imageUrl;
-	imgCard.alt = characterData.name;
+	const multiplier = multipliers[difficulty] || 1;
 
-	const infoHero = document.createElement("div");
-	infoHero.classList.add("info-hero-card-info");
+	for (const stat in characterData.powerstats) {
+		characterData.powerstats[stat] = Math.max(10, Math.floor(characterData.powerstats[stat] * multiplier));
+	}
 
-	const h3Card = document.createElement("h3");
-	h3Card.textContent = characterData.name;
-
-	const statsCard = document.createElement("div");
-	statsCard.classList.add("stats-info-hero-card");
-
-	characterData.stats.forEach((stat) => {
-		const p = document.createElement("p");
-		p.textContent = stat;
-		statsCard.appendChild(p);
-	});
-
-	infoHero.appendChild(h3Card);
-	infoHero.appendChild(statsCard);
-
-	card.appendChild(imgCard);
-	card.appendChild(infoHero);
-
-	card.style.pointerEvents = "none";
-
-	return card;
+	characterData.stats = [
+		`Intelligence: ${characterData.powerstats.Intelligence}`,
+		`Strength: ${characterData.powerstats.Strength}`,
+		`Speed: ${characterData.powerstats.Speed}`,
+		`Durability: ${characterData.powerstats.Durability}`,
+		`Power: ${characterData.powerstats.Power}`,
+		`Combat: ${characterData.powerstats.Combat}`,
+	];
 };
 
 const getStatValue = (selectedCard, statName) => {
@@ -123,6 +111,7 @@ export const setupGameListeners = () => {
 			};
 
 			const difficulty = parseInt(document.getElementById("difficulty").value);
+			saveToStorage("difficulty", difficulty);
 
 			applyDifficulty(characterData, difficulty);
 
@@ -177,27 +166,39 @@ export const setupGameListeners = () => {
 	});
 };
 
-const applyDifficulty = (characterData, difficulty) => {
-	const multipliers = {
-		1: 1,
-		2: 0.8,
-		3: 0.6,
-	};
+export const renderCardInfohero = (characterData) => {
+	const card = document.createElement("div");
+	card.classList.add("info-hero-card");
 
-	const multiplier = multipliers[difficulty] || 1;
+	const imgCard = document.createElement("img");
+	imgCard.classList.add("info-hero-card-img");
+	imgCard.src = characterData.imageUrl;
+	imgCard.alt = characterData.name;
 
-	for (const stat in characterData.powerstats) {
-		characterData.powerstats[stat] = Math.max(10, Math.floor(characterData.powerstats[stat] * multiplier));
-	}
+	const infoHero = document.createElement("div");
+	infoHero.classList.add("info-hero-card-info");
 
-	characterData.stats = [
-		`Intelligence: ${characterData.powerstats.Intelligence}`,
-		`Strength: ${characterData.powerstats.Strength}`,
-		`Speed: ${characterData.powerstats.Speed}`,
-		`Durability: ${characterData.powerstats.Durability}`,
-		`Power: ${characterData.powerstats.Power}`,
-		`Combat: ${characterData.powerstats.Combat}`,
-	];
+	const h3Card = document.createElement("h3");
+	h3Card.textContent = characterData.name;
+
+	const statsCard = document.createElement("div");
+	statsCard.classList.add("stats-info-hero-card");
+
+	characterData.stats.forEach((stat) => {
+		const p = document.createElement("p");
+		p.textContent = stat;
+		statsCard.appendChild(p);
+	});
+
+	infoHero.appendChild(h3Card);
+	infoHero.appendChild(statsCard);
+
+	card.appendChild(imgCard);
+	card.appendChild(infoHero);
+
+	card.style.pointerEvents = "none";
+
+	return card;
 };
 
 export const setupLoginListeners = () => {

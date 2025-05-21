@@ -41,13 +41,10 @@ const setupUiListeners = () => {
 		aside.classList.toggle("show");
 
 		if (aside.classList.contains("show")) {
-			const selectedCard = document.querySelector(".character-card.selected-card");
-			if (selectedCard) {
-				const cardClone = selectedCard.cloneNode(true);
-				cardClone.classList.remove("selected-card");
-				cardClone.style.pointerEvents = "none";
+			const playerData = loadFromStorage("playerCharacter");
+			if (playerData) {
 				infoHeroContainer.innerHTML = "";
-				infoHeroContainer.appendChild(cardClone);
+				infoHeroContainer.appendChild(renderCardInfohero(playerData));
 			}
 		}
 	});

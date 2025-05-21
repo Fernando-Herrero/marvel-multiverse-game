@@ -1203,6 +1203,20 @@ const checkBattleEnd = (battleState) => {
 				action: () => {
 					mapScreen.style.display = "flex";
 					battleScreen.style.display = "none";
+
+					const currentLevel = loadFromStorage("currentLevel") || 1;
+
+					for (let level = 1; level <= currentLevel; level++) {
+						saveToStorage(`level${level}Unlocked`, true);
+						const levelElement = document.querySelector(`.level[data-level="${level}"]`);
+						if (levelElement) {
+							levelElement.classList.remove("locked");
+							levelElement.classList.add("unlocked");
+						}
+					}
+
+					showLeveleInfo();
+					enemiesInLevel();
 					loadMapState();
 					hideModal();
 				},
@@ -1210,16 +1224,22 @@ const checkBattleEnd = (battleState) => {
 			after: {
 				text: "Retry",
 				action: () => {
-					battleState.player.currentHp = battleState.player.character.powerstats.durability;
-					battleState.enemy.currentHp = battleState.enemy.character.powerstats.durability;
+					battleState.player.currentHp = 100;
+					battleState.enemy.currentHp = 100;
 
+					battleState.winner = null;
+					battleState.turn = 0;
 					battleState.player.statusEffects = [];
 					battleState.enemy.statusEffects = [];
-
 					battleState.player.specialUsed = false;
 					battleState.enemy.specialUsed = false;
 
-					updateBattleUI(battleState);
+					saveToStorage("battleState", battleState);
+					resetHealthBars();
+					disableButtons(false);
+					renderPlayerCard(battleState.player.character);
+					renderEnemyCard(battleState.enemy.character);
+					setupBattleActions();
 					showBattleText("player", "The battle restarts!");
 					hideModal();
 				},
@@ -1238,6 +1258,20 @@ const checkBattleEnd = (battleState) => {
 				action: () => {
 					mapScreen.style.display = "flex";
 					battleScreen.style.display = "none";
+
+					const currentLevel = loadFromStorage("currentLevel") || 1;
+
+					for (let level = 1; level <= currentLevel; level++) {
+						saveToStorage(`level${level}Unlocked`, true);
+						const levelElement = document.querySelector(`.level[data-level="${level}"]`);
+						if (levelElement) {
+							levelElement.classList.remove("locked");
+							levelElement.classList.add("unlocked");
+						}
+					}
+
+					showLeveleInfo();
+					enemiesInLevel();
 					loadMapState();
 					hideModal();
 				},
@@ -1245,16 +1279,22 @@ const checkBattleEnd = (battleState) => {
 			after: {
 				text: "Retry",
 				action: () => {
-					battleState.player.currentHp = battleState.player.character.powerstats.durability;
-					battleState.enemy.currentHp = battleState.enemy.character.powerstats.durability;
+					battleState.player.currentHp = 100;
+					battleState.enemy.currentHp = 100;
 
+					battleState.winner = null;
+					battleState.turn = 0;
 					battleState.player.statusEffects = [];
 					battleState.enemy.statusEffects = [];
-
 					battleState.player.specialUsed = false;
 					battleState.enemy.specialUsed = false;
 
-					updateBattleUI(battleState);
+					saveToStorage("battleState", battleState);
+					resetHealthBars();
+					disableButtons(false);
+					renderPlayerCard(battleState.player.character);
+					renderEnemyCard(battleState.enemy.character);
+					setupBattleActions();
 					showBattleText("player", "The battle restarts!");
 					hideModal();
 				},
@@ -1286,6 +1326,9 @@ const endBattle = (playerWon) => {
 	const currentEnemy = enemies.find((enemy) => enemy.level === currentLevel);
 
 	setTimeout(() => {
+		showLeveleInfo();
+		enemiesInLevel();
+		getRewards();
 		showBriefing(
 			`${inputUserName.value} ${currentSelection === "heroes" ? "triumphs" : "dominates"} against ${
 				currentEnemy.name
@@ -1323,10 +1366,6 @@ const endBattle = (playerWon) => {
 								});
 								saveToStorage(`level${nextLevel}Unlocked`, true);
 								saveToStorage("currentLevel", nextLevel);
-
-								// showLeveleInfo();
-								// enemiesInLevel();
-								// getRewards();
 
 								if (nextLevelElement && nextLevelElement.getBoundingClientRect) {
 									movePlayerToLevel(nextLevelElement);
@@ -1367,9 +1406,6 @@ const endBattle = (playerWon) => {
 						mapScreen.style.display = "flex";
 						battleScreen.style.display = "none";
 						hideModal();
-						showLeveleInfo();
-						enemiesInLevel();
-						getRewards();
 					},
 				},
 			}
