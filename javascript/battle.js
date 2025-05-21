@@ -1099,16 +1099,32 @@ const addBattleEffect = (target, action, success = true) => {
 };
 
 const chooseEnemyAction = (battleState) => {
-	const baseActions = ["attack", "defence", "dodge"];
+	const difficulty = loadFromStorage("difficulty") || 1;
 
-	if (battleState.turn > 1 && !battleState.enemy.specialUsed) {
-		const actionsWithSpecial = [...baseActions, "special", "special"];
-		const randomIndex = Math.floor(Math.random() * actionsWithSpecial.length);
-		return actionsWithSpecial[randomIndex];
+	let attackProb = 0.4;
+	let defenceProb = 0.3;
+	let dodgeProb = 0.3;
+
+	if (difficulty === 2 || difficulty === 3) {
+		attackProb = 0.7;
+		defenceProb = 0.2;
+		dodgeProb = 0.1;
 	}
 
-	const randomIndex = Math.floor(Math.random() * baseActions.length);
-	return baseActions[randomIndex];
+	if (battleState.turn > 1 && !battleState.enemy.specialUsed) {
+		const specialProb = 0.85;
+		attackProb *= 1 - specialProb;
+		defenceProb *= 1 - specialProb;
+		dodgeProb *= 1 - specialProb;
+
+		const random = Math.random();
+		if (random < specialProb) return "special";
+	}
+
+	const random = Math.random();
+	if (random < attackProb) return "attack";
+	if (random < attackProb + defenceProb) return "defence";
+	return "dodge";
 };
 
 export let playerHealthBar, enemyHealthBar;

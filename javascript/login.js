@@ -122,6 +122,22 @@ export const setupGameListeners = () => {
 				},
 			};
 
+			const difficulty = parseInt(document.getElementById("difficulty").value);
+			if (difficulty === 3) {
+				for (const stat of characterData.powerstats) {
+					characterData.powerstats[stat] = Math.max(10, Math.floor(characterData.powerstats[stat] * 0.6));
+				}
+
+				characterData.stats = [
+					`Intelligence: ${characterData.powerstats.Intelligence}`,
+					`Strength: ${characterData.powerstats.Strength}`,
+					`Speed: ${characterData.powerstats.Speed}`,
+					`Durability: ${characterData.powerstats.Durability}`,
+					`Power: ${characterData.powerstats.Power}`,
+					`Combat: ${characterData.powerstats.Combat}`,
+				];
+			}
+
 			saveToStorage("playerCharacter", characterData);
 
 			infoHeroContainer.innerHTML = "";
