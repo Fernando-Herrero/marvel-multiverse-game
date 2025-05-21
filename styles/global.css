@@ -910,7 +910,7 @@ h1 {
 	color: var(--text-color);
 	padding: 12px;
 	z-index: 10000 !important;
-	top: 60px;
+	top: 52px;
 	right: 0px;
 	width: 100%;
 	gap: 8px;
@@ -918,6 +918,18 @@ h1 {
 
 .aside.show {
 	display: flex !important;
+}
+
+.content-hero {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.elements-hero {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
 .info-player {

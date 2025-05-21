@@ -36,6 +36,15 @@ export const logout = document.getElementById("close-session");
 export const reset = document.getElementById("reset");
 export const title = document.getElementById("h1");
 
+const handleAsideVisibility = () => {
+	const currentScreen = loadFromStorage("currentScreen");
+	if ((currentScreen === "map" || currentScreen === "battle") && window.innerWidth >= 780) {
+		aside.classList.add("show");
+	} else {
+		aside.classList.remove("show");
+	}
+};
+
 const setupUiListeners = () => {
 	settingsIcon.addEventListener("click", () => {
 		aside.classList.toggle("show");
@@ -389,6 +398,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 			}
 
 			await loadGameState(currentScreen);
+			handleAsideVisibility();
+			window.addEventListener("resize", () => {
+				handleAsideVisibility();
+			});
 		} else {
 			loginScreen.style.display = "flex";
 			title.style.display = "flex";

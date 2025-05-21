@@ -1,20 +1,50 @@
 /* Media query para dispositivos tablet (mayores a 480px y hasta 1023px) */
 @media (min-width: 481px) {
-    :root {
-        --container-width: 85%;
-    }
+	:root {
+		--container-width: 85%;
+	}
+
+	.user-login,
+	.start-game-btn {
+		align-self: center;
+		min-width: 300px;
+	}
+
+	.cards-player-container {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (min-width: 780px) {
+	:root {
+		--container-width: 85%;
+	}
+
+	.cards-player-container {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.aside {
+		width: 250px;
+		height: 100vh;
+		border-left: 1px solid var(--contrast-color);
+	}
+
+	.map-screen {
+		width: calc(100vw - 250px);
+	}
 }
 
 /* Media query para dispositivos de escritorio (mayores a 1024px y hasta 1439px) */
 @media (min-width: 1024px) {
-    :root {
-        --container-width: 75%;
-    }
+	:root {
+		--container-width: 75%;
+	}
 }
 
 /* Media query para dispositivos de escritorio XXL (mayores a 1440px) */
 @media (min-width: 1440px) {
 	:root {
-        --container-width: 75%;
-    }
+		--container-width: 75%;
+	}
 }

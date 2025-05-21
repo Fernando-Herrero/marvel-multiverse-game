@@ -1,7 +1,7 @@
 import { handleCharacterSelection } from "./character.js";
 import { loginScreen, mapScreen, navbar, title } from "./index.js";
 import { showFirstLevel, showLeveleInfo } from "./map.js";
-import { saveToStorage } from "./storage.js";
+import { loadFromStorage, saveToStorage } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, showBriefing, showModal } from "./utils.js";
 
 export const inputUserName = document.getElementById("username");
@@ -133,6 +133,11 @@ export const setupGameListeners = () => {
 		imgPlayer.src = imgElement.src;
 
 		saveToStorage("currentScreen", "map");
+		if (loadFromStorage("currentScreen") === "map" && window.innerWidth >= 780) {
+			console.log("Mostrando aside");
+			aside.style.display = "flex";
+		}
+
 		saveToStorage("gameStarted", true);
 		saveToStorage("playerName", inputUserName.value);
 		saveToStorage("playerImg", imgElement.src);
