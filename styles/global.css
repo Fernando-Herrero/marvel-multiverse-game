@@ -258,7 +258,7 @@ h1 {
 	font-size: 12px;
 }
 
-.characters-selector {
+.selector-type {
 	padding: 6px;
 	font-size: 12px;
 	background-color: var(--primary-color);
@@ -269,7 +269,7 @@ h1 {
 	max-width: 100px;
 }
 
-.character-select:focus {
+.selector-type:focus {
 	outline: none;
 	border-color: var(--text-secondary-color);
 }
@@ -452,15 +452,6 @@ h1 {
 	font-weight: bold;
 	transition: transform 0.3s ease;
 	box-shadow: var(--box-shadow);
-}
-.level::after {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 1;
 }
 
 .level[data-level="1"] {

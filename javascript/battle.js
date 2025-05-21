@@ -1308,9 +1308,9 @@ const endBattle = (playerWon) => {
 								saveToStorage(`level${nextLevel}Unlocked`, true);
 								saveToStorage("currentLevel", nextLevel);
 
-								showLeveleInfo();
-								enemiesInLevel();
-								getRewards();
+								// showLeveleInfo();
+								// enemiesInLevel();
+								// getRewards();
 
 								if (nextLevelElement && nextLevelElement.getBoundingClientRect) {
 									movePlayerToLevel(nextLevelElement);

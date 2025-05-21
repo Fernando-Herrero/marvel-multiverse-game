@@ -81,6 +81,8 @@ export const setupGameListeners = () => {
 		const currentName = inputUserName.value.trim();
 		const validation = validateUsername(currentName);
 		const selectedCard = document.querySelector(".character-card.selected-card");
+		const difficulty = document.getElementById("difficulty");
+		saveToStorage("difficulty", difficulty);
 
 		if (startGameBtn.disabled) {
 			e.preventDefault();
