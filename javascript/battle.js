@@ -1201,6 +1201,8 @@ const checkBattleEnd = (battleState) => {
 			before: {
 				text: "Back to map",
 				action: () => {
+					saveToStorage("currentScreen", "map");
+					clearStorageKey("battleState");
 					mapScreen.style.display = "flex";
 					battleScreen.style.display = "none";
 
@@ -1256,6 +1258,8 @@ const checkBattleEnd = (battleState) => {
 			before: {
 				text: "Back to map",
 				action: () => {
+					saveToStorage("currentScreen", "map");
+					clearStorageKey("battleState");
 					mapScreen.style.display = "flex";
 					battleScreen.style.display = "none";
 

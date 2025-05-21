@@ -366,6 +366,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 		await imageEnemies();
 
 		if (currentScreen && gameStarted) {
+			const currentLevel = loadFromStorage("currentLevel") || 1;
+
+			for (let level = 1; level <= currentLevel; level++) {
+				saveToStorage(`level${level}Unlocked`, true);
+			}
+
 			let maxUnlockedLevel = 1;
 			for (let i = 6; i >= 1; i--) {
 				if (loadFromStorage(`level${i}Unlocked`)) {
