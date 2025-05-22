@@ -39,9 +39,51 @@ export const title = document.getElementById("h1");
 const handleAsideVisibility = () => {
 	const currentScreen = loadFromStorage("currentScreen");
 	if ((currentScreen === "map" || currentScreen === "battle") && window.innerWidth >= 780) {
+		console.log(currentScreen)
 		aside.classList.add("show");
+		settingsIcon.style.display = "none";
 	} else {
 		aside.classList.remove("show");
+		settingsIcon.style.display = "none";
+	}
+
+	if (currentScreen === "battle" && window.innerWidth >= 1024) {
+		battleScreen.classList.remove("battle-screen-bg");
+
+		const currentLevel = loadFromStorage("currentLevel");
+		console.log(currentLevel);
+
+		if (!currentLevel) return;
+
+		if (currentLevel === 1) {
+			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-1.jpg)";
+			battleScreen.classList.add("battle-screen-bg");
+		}
+
+		if (currentLevel === 2) {
+			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-2.jpg)";
+			battleScreen.classList.add("battle-screen-bg");
+		}
+
+		if (currentLevel === 3) {
+			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-3.jpg)";
+			battleScreen.classList.add("battle-screen-bg");
+		}
+
+		if (currentLevel === 4) {
+			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-4.avif)";
+			battleScreen.classList.add("battle-screen-bg");
+		}
+
+		if (currentLevel === 5) {
+			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/background-level-5.jpg)";
+			battleScreen.classList.add("battle-screen-bg");
+		}
+
+		if (currentLevel === 6) {
+			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/background-level-6.webp)";
+			battleScreen.classList.add("battle-screen-bg");
+		}
 	}
 };
 
