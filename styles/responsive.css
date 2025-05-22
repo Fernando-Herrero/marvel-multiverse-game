@@ -63,11 +63,21 @@
 		height: 83vh;
 	}
 
-	.battle-screen-bg {
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-position: center;
+	.background-battle-img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		opacity: 0.4;
+		z-index: 0;
 	}
+
+	/* .background-battle-img img {
+		opacity: 0.4;
+	} */
 }
 
 /* Media query para dispositivos de escritorio XXL (mayores a 1440px) */

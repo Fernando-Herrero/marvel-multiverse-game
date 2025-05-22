@@ -39,7 +39,6 @@ export const title = document.getElementById("h1");
 const handleAsideVisibility = () => {
 	const currentScreen = loadFromStorage("currentScreen");
 	if ((currentScreen === "map" || currentScreen === "battle") && window.innerWidth >= 780) {
-		console.log(currentScreen)
 		aside.classList.add("show");
 		settingsIcon.style.display = "none";
 	} else {
@@ -48,42 +47,23 @@ const handleAsideVisibility = () => {
 	}
 
 	if (currentScreen === "battle" && window.innerWidth >= 1024) {
-		battleScreen.classList.remove("battle-screen-bg");
-
 		const currentLevel = loadFromStorage("currentLevel");
-		console.log(currentLevel);
-
 		if (!currentLevel) return;
 
-		if (currentLevel === 1) {
-			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-1.jpg)";
-			battleScreen.classList.add("battle-screen-bg");
-		}
+		const imgBg = document.createElement("img");
+		imgBg.classList.add("background-battle-img");
+		battleScreen.appendChild(imgBg);
 
-		if (currentLevel === 2) {
-			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-2.jpg)";
-			battleScreen.classList.add("battle-screen-bg");
-		}
+		const levelImages = {
+			1: "/media/images/backgrounds/backgroung-level-1.jpg",
+			2: "/media/images/backgrounds/backgroung-level-2.jpg",
+			3: "/media/images/backgrounds/backgroung-level-3.jpg",
+			4: "/media/images/backgrounds/backgroung-level-4.avif",
+			5: "/media/images/backgrounds/background-level-5.jpg",
+			6: "/media/images/backgrounds/background-level-6.webp",
+		};
 
-		if (currentLevel === 3) {
-			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-3.jpg)";
-			battleScreen.classList.add("battle-screen-bg");
-		}
-
-		if (currentLevel === 4) {
-			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/backgroung-level-4.avif)";
-			battleScreen.classList.add("battle-screen-bg");
-		}
-
-		if (currentLevel === 5) {
-			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/background-level-5.jpg)";
-			battleScreen.classList.add("battle-screen-bg");
-		}
-
-		if (currentLevel === 6) {
-			battleScreen.style.backgroundImage = "url(/media/images/backgrounds/background-level-6.webp)";
-			battleScreen.classList.add("battle-screen-bg");
-		}
+		imgBg.src =levelImages[currentLevel];
 	}
 };
 
