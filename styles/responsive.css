@@ -45,6 +45,18 @@
 	.battle-screen {
 		width: calc(100vw - 250px);
 	}
+
+	.background-battle-img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		opacity: 0.4;
+		z-index: 0;
+	}
 }
 
 /* Media query para dispositivos de escritorio (mayores a 1024px y hasta 1439px) */
@@ -66,18 +78,6 @@
 
 	.aside {
 		height: 83vh;
-	}
-
-	.background-battle-img {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		object-position: center;
-		opacity: 0.4;
-		z-index: 0;
 	}
 
 	.vs-logo {

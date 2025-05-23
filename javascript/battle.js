@@ -1383,6 +1383,7 @@ const endBattle = (playerWon) => {
 							}
 						}
 						if (currentLevel === 6) {
+							playMusicForScreen("final");
 							saveToStorage(`level${nextLevel}Unlocked`, true);
 							saveToStorage("currentLevel", nextLevel);
 

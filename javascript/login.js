@@ -138,7 +138,7 @@ export const setupGameListeners = () => {
 		saveToStorage("currentScreen", "map");
 		if (loadFromStorage("currentScreen") === "map" && window.innerWidth >= 780) {
 			console.log("Mostrando aside");
-			aside.style.display = "flex";
+			aside.classList.add("show");
 		}
 
 		saveToStorage("gameStarted", true);

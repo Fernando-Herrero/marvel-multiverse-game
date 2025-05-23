@@ -5,6 +5,7 @@ const songs = {
 	login: "/media/audio/intro-music.mp3",
 	map: "/media/audio/map-music.mp3",
 	battle: "/media/audio/battle-music.mp3",
+	final: "/media/audio/final/music.mp3",
 };
 
 export const playMusicForScreen = async (screen) => {

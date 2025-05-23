@@ -157,14 +157,13 @@ export const enemiesInLevel = async () => {
 };
 
 export const showFirstLevel = () => {
-	for (let i = 0; i < levels.length; i++) {
-		if (levels[i].dataset.level === "1") {
-			levels[i].classList.remove("locked");
-			levels[i].classList.add("unlocked");
-			break;
-		}
+	const levelOne = document.querySelector(`.level[data-level="1"]`);
+	if (levelOne) {
+		levelOne.classList.remove("locked");
+		levelOne.classList.add("unlocked");
+
+		saveToStorage("levelOneUnlocked", true);
 	}
-	saveToStorage("levelOneUnlocked", true);
 };
 
 export const showLevelInfo = () => {

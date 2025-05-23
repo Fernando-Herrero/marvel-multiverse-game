@@ -21,6 +21,7 @@ import {
 	loadPlayerPosition,
 	movePlayerToLevel,
 	resetPlayerPosition,
+	showFirstLevel,
 	showLevelInfo,
 } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
@@ -41,13 +42,13 @@ const updateAsideVisibility = () => {
 		settingsIcon.style.display = "none";
 	} else {
 		aside.classList.remove("show");
-		settingsIcon.style.display = "flex";
+		settingsIcon.style.display = "block";
 	}
 };
 
 const updateBattleBackground = () => {
 	const currentScreen = loadFromStorage("currentScreen");
-	if (currentScreen === "battle" && window.innerWidth >= 1024) {
+	if (currentScreen === "battle" && window.innerWidth >= 780) {
 		const currentLevel = loadFromStorage("currentLevel");
 		if (!currentLevel) return;
 
@@ -296,6 +297,7 @@ export const loadMapState = async () => {
 
 	await enemiesInLevel();
 	loadPlayerPosition();
+	showFirstLevel();
 	showLevelInfo();
 
 	navbar.style.display = "flex";
