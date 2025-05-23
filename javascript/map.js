@@ -166,7 +166,7 @@ export const showFirstLevel = () => {
 	saveToStorage("levelOneUnlocked", true);
 };
 
-export const showLeveleInfo = () => {
+export const showLevelInfo = () => {
 	const getCurrentEnemies = () => {
 		const charactersSelect = document.getElementById("characters-selector");
 		const currentSelection = charactersSelect.value;
@@ -276,7 +276,7 @@ export const movePlayerToLevel = (targetLevel) => {
 				player.style.top = `${targetY}px`;
 
 				// Volver a asignar eventos después de mover
-				showLeveleInfo();
+				showLevelInfo();
 				resolve();
 			},
 			{ once: true }

@@ -1,7 +1,7 @@
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { loadMapState, mapScreen } from "./index.js";
 import { charactersSelect, inputUserName } from "./login.js";
-import { battleScreen, enemiesInLevel, levelEnemies, movePlayerToLevel, showLeveleInfo } from "./map.js";
+import { battleScreen, enemiesInLevel, levelEnemies, movePlayerToLevel, showLevelInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 import { disableButtons, hideModal, showBattleText, showBriefing } from "./utils.js";
 
@@ -1217,7 +1217,7 @@ const checkBattleEnd = (battleState) => {
 						}
 					}
 
-					showLeveleInfo();
+					showLevelInfo();
 					enemiesInLevel();
 					loadMapState();
 					hideModal();
@@ -1274,7 +1274,7 @@ const checkBattleEnd = (battleState) => {
 						}
 					}
 
-					showLeveleInfo();
+					showLevelInfo();
 					enemiesInLevel();
 					loadMapState();
 					hideModal();
@@ -1330,7 +1330,7 @@ const endBattle = (playerWon) => {
 	const currentEnemy = enemies.find((enemy) => enemy.level === currentLevel);
 
 	setTimeout(() => {
-		showLeveleInfo();
+		showLevelInfo();
 		enemiesInLevel();
 		getRewards();
 		showBriefing(

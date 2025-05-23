@@ -34,6 +34,7 @@
 		height: 88vh;
 		justify-content: space-between;
 		border-left: 1px solid var(--contrast-color);
+		border-bottom: 1px solid var(--accent-color);
 	}
 
 	.map-screen,
@@ -75,9 +76,9 @@
 		z-index: 0;
 	}
 
-	/* .background-battle-img img {
-		opacity: 0.4;
-	} */
+	.vs-logo {
+		font-size: 100px;
+	}
 }
 
 /* Media query para dispositivos de escritorio XXL (mayores a 1440px) */

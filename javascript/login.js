@@ -1,6 +1,6 @@
 import { handleCharacterSelection } from "./character.js";
 import { loginScreen, mapScreen, navbar, title } from "./index.js";
-import { showFirstLevel, showLeveleInfo } from "./map.js";
+import { showFirstLevel, showLevelInfo } from "./map.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, showBriefing, showModal } from "./utils.js";
 
@@ -160,7 +160,7 @@ export const setupGameListeners = () => {
 		);
 
 		showFirstLevel();
-		showLeveleInfo();
+		showLevelInfo();
 
 		saveToStorage("mainBriefing", {
 			briefingShow: true,

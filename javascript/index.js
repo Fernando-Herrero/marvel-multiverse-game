@@ -7,6 +7,7 @@ import {
 	imgPlayer,
 	infoHeroContainer,
 	inputUserName,
+	namePlayer,
 	renderCardInfohero,
 	setupGameListeners,
 	setupLoginListeners,
@@ -20,7 +21,7 @@ import {
 	movePlayerToLevel,
 	resetPlayerPosition,
 	showFirstLevel,
-	showLeveleInfo,
+	showLevelInfo,
 } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalCloseBtn, showBriefing, showModal } from "./utils.js";
@@ -36,7 +37,7 @@ export const logout = document.getElementById("close-session");
 export const reset = document.getElementById("reset");
 export const title = document.getElementById("h1");
 
-const handleAsideVisibility = () => {
+const updateAsideVisibility = () => {
 	const currentScreen = loadFromStorage("currentScreen");
 	if ((currentScreen === "map" || currentScreen === "battle") && window.innerWidth >= 780) {
 		aside.classList.add("show");
@@ -45,14 +46,19 @@ const handleAsideVisibility = () => {
 		aside.classList.remove("show");
 		settingsIcon.style.display = "none";
 	}
+};
 
+const updateBattleBackground = () => {
+	const currentScreen = loadFromStorage("currentScreen");
 	if (currentScreen === "battle" && window.innerWidth >= 1024) {
 		const currentLevel = loadFromStorage("currentLevel");
 		if (!currentLevel) return;
 
+		const existingBg = battleScreen.querySelector(".background-battle-img");
+		if (existingBg) existingBg.remove();
+
 		const imgBg = document.createElement("img");
 		imgBg.classList.add("background-battle-img");
-		battleScreen.appendChild(imgBg);
 
 		const levelImages = {
 			1: "/media/images/backgrounds/backgroung-level-1.jpg",
@@ -63,7 +69,8 @@ const handleAsideVisibility = () => {
 			6: "/media/images/backgrounds/background-level-6.webp",
 		};
 
-		imgBg.src =levelImages[currentLevel];
+		imgBg.src = levelImages[currentLevel];
+		battleScreen.appendChild(imgBg);
 	}
 };
 
@@ -264,7 +271,6 @@ const loadGameState = async (currentScreen) => {
 				}
 
 				if (!playerMoved) {
-					// Fallback al primer nivel
 					const firstLevel = document.querySelector('.level[data-level="1"]');
 					if (firstLevel) await movePlayerToLevel(firstLevel);
 				}
@@ -293,11 +299,10 @@ export const loadMapState = async () => {
 
 	await enemiesInLevel();
 	loadPlayerPosition();
+	showLevelInfo();
 
 	navbar.style.display = "flex";
 	mapScreen.style.display = "flex";
-
-	showLeveleInfo();
 };
 
 const loadbattleState = async () => {
@@ -317,6 +322,8 @@ const loadbattleState = async () => {
 const setupPlayerState = () => {
 	const savedUserName = loadFromStorage("userName") || "";
 	inputUserName.value = savedUserName;
+
+	namePlayer.textContent = savedUserName;
 
 	const savedPlayerImg = loadFromStorage("playerImg");
 	if (savedPlayerImg) {
@@ -390,6 +397,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		[loginScreen, mapScreen, battleScreen, aside, title, navbar].forEach((el) => {
 			el.style.display = "none";
 		});
+		showLevelInfo();
 
 		const currentScreen = loadFromStorage("currentScreen") || "login";
 		const gameStarted = loadFromStorage("gameStarted");
@@ -420,9 +428,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 			}
 
 			await loadGameState(currentScreen);
-			handleAsideVisibility();
+			updateAsideVisibility();
+			updateBattleBackground();
 			window.addEventListener("resize", () => {
-				handleAsideVisibility();
+				updateAsideVisibility();
+				updateBattleBackground;
 			});
 		} else {
 			loginScreen.style.display = "flex";
