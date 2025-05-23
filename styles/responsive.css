@@ -37,6 +37,10 @@
 		border-bottom: 1px solid var(--accent-color);
 	}
 
+	.volume-control {
+		margin-left: 98px;
+	}
+
 	.map-screen,
 	.battle-screen {
 		width: calc(100vw - 250px);

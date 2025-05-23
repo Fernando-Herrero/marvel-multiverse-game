@@ -1,3 +1,4 @@
+import { playMusicForScreen } from "./audio.js";
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { loadMapState, mapScreen } from "./index.js";
 import { charactersSelect, inputUserName } from "./login.js";
@@ -1201,6 +1202,7 @@ const checkBattleEnd = (battleState) => {
 			before: {
 				text: "Back to map",
 				action: () => {
+					playMusicForScreen("map");
 					saveToStorage("currentScreen", "map");
 					clearStorageKey("battleState");
 					mapScreen.style.display = "flex";
@@ -1258,6 +1260,7 @@ const checkBattleEnd = (battleState) => {
 			before: {
 				text: "Back to map",
 				action: () => {
+					playMusicForScreen("map");
 					saveToStorage("currentScreen", "map");
 					clearStorageKey("battleState");
 					mapScreen.style.display = "flex";
@@ -1348,6 +1351,7 @@ const endBattle = (playerWon) => {
 				after: {
 					text: "Continue Your Journey",
 					action: () => {
+						playMusicForScreen("map");
 						const currentLevel = loadFromStorage("currentLevel") || 1;
 						const nextLevel = currentLevel + 1;
 
