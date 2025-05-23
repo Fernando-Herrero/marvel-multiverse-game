@@ -1,30 +1,30 @@
 let audio = null; //para las funciones posteriores y el control sobre la musica
 let oldVolume = 0.3; //numero para recordar el volumen antes de silenciar
 
-const initMusic = (src = "/media/audio/intro-music.mp3", initialVolume = 0.3) => {
+export const initMusic = (src = "/media/audio/intro-music.mp3", initialVolume = 0.3) => {
+	if (audio) {
+		stopMusic();
+	}
+
 	audio = new Audio(src);
 	audio.loop = true;
 	audio.volume = initialVolume;
 	audio.autoplay = true;
 	audio.preload = "auto";
+
+	const playPromise = audio.play().catch((error) => {
+		console.warn("Autoplay bloqueado:", error);
+	});
+
+	return playPromise;
 };
 
-const volumeSlider = document.getElementById("volume-slider");
-if (volumeSlider) {
-	volumeSlider.value = initialVolume;
-	volumeSlider.addEventListener("input", () => {
-		setVolume(parseFloat(volumeSlider.value));
-	});
-}
-
-const volumeIcon = document.getElementById("volume-icon");
-if (volumeIcon) {
-	volumeIcon.addEventListener("click", toggleMute);
-}
-
-audio.play().catch(() => {
-	console.warn("Autoplay bloqueado. Esperando interacción del usuario.");
-});
+export const stopMusic = () => {
+	if (audio) {
+		audio.pause();
+		audio.currentTime = 0;
+	}
+};
 
 const setVolume = (value) => {
 	if (!audio) return;
@@ -34,7 +34,7 @@ const setVolume = (value) => {
 	const volumeIcon = document.getElementById("volume-icon");
 	if (volumeIcon) {
 		if (value === 0) {
-			volumeIcon.src = "/media-images/icons/music-mute-icon.webp";
+			volumeIcon.src = "/media/images/icons/music-mute-icon.webp";
 		} else {
 			volumeIcon.src = "/media/images/icons/music-icon.webp";
 		}
@@ -51,3 +51,18 @@ const toggleMute = () => {
 		setVolume(oldVolume || 0.3);
 	}
 };
+
+const defaultVolume = 0.3;
+
+const volumeSlider = document.getElementById("volume-slider");
+if (volumeSlider) {
+	volumeSlider.value = defaultVolume;
+	volumeSlider.addEventListener("input", () => {
+		setVolume(parseFloat(volumeSlider.value));
+	});
+}
+
+const volumeIcon = document.getElementById("volume-icon");
+if (volumeIcon) {
+	volumeIcon.addEventListener("click", toggleMute);
+}

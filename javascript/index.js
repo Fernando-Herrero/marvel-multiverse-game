@@ -1,3 +1,4 @@
+import { initMusic, stopMusic } from "./audio.js";
 import { renderBattleCards, resetHealthBars } from "./battle.js";
 import { handleCharacterSelection } from "./character.js";
 import {
@@ -20,7 +21,6 @@ import {
 	loadPlayerPosition,
 	movePlayerToLevel,
 	resetPlayerPosition,
-	showFirstLevel,
 	showLevelInfo,
 } from "./map.js";
 import { loadFromStorage, saveToStorage, clearStorageKey } from "./storage.js";
@@ -85,10 +85,6 @@ const setupUiListeners = () => {
 				infoHeroContainer.appendChild(renderCardInfohero(playerData));
 			}
 		}
-	});
-
-	volumeIcon.addEventListener("click", () => {
-		volumeSlider.classList.toggle("show-slider");
 	});
 };
 
@@ -434,9 +430,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 				updateAsideVisibility();
 				updateBattleBackground;
 			});
+
+			stopMusic();
 		} else {
 			loginScreen.style.display = "flex";
 			title.style.display = "flex";
+
+			initMusic();
 		}
 
 		setupPlayerState();
@@ -450,5 +450,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		console.error("Initialization error:", error);
 		loginScreen.style.display = "flex";
 		title.style.display = "flex";
+		initMusic();
 	}
 });

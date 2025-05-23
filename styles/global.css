@@ -1032,20 +1032,21 @@ h1 {
 	cursor: pointer;
 }
 
+.volume-control[data-screen="login"] {
+	align-self: auto;
+}
+
 .volume-slider {
-	display: none;
-	cursor: pointer;
-	opacity: 0;
-}
-
-.volume-slider:hover {
-	opacity: 1;
-}
-
-.show-slider {
 	display: block;
 	width: 100%;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
+}
+
+.volume-control:hover .volume-slider {
 	opacity: 1;
+	pointer-events: auto;
 }
 
 .about {

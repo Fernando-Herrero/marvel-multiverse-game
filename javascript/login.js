@@ -1,3 +1,4 @@
+import { stopMusic } from "./audio.js";
 import { handleCharacterSelection } from "./character.js";
 import { loginScreen, mapScreen, navbar, title } from "./index.js";
 import { showFirstLevel, showLevelInfo } from "./map.js";
@@ -125,6 +126,8 @@ export const setupGameListeners = () => {
 		mapScreen.style.display = "flex";
 		navbar.style.display = "flex";
 		title.style.display = "none";
+
+		stopMusic();
 
 		showFirstLevel();
 
