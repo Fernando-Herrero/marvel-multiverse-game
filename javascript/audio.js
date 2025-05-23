@@ -1,14 +1,25 @@
-let audio = null; //para las funciones posteriores y el control sobre la musica
-let oldVolume = 0.3; //numero para recordar el volumen antes de silenciar
+let audio = null;
+let defaultVolume = 0.3;
 
-export const initMusic = (src = "/media/audio/intro-music.mp3", initialVolume = 0.3) => {
+const songs = {
+	login: "/media/audio/intro-music.mp3",
+	map: "/media/audio/map-music.mp3",
+	battle: "/media/audio/battle-music.mp3",
+};
+
+export const playMusicForScreen = (screen) => {
+	if (!songs[screen]) {
+		console.warn(`No hay canción definida para la pantalla: ${screen}`);
+		return;
+	}
+
 	if (audio) {
 		stopMusic();
 	}
 
-	audio = new Audio(src);
+	audio = new Audio(songs[screen]);
 	audio.loop = true;
-	audio.volume = initialVolume;
+	audio.volume = defaultVolume;
 	audio.autoplay = true;
 	audio.preload = "auto";
 
@@ -29,40 +40,27 @@ export const stopMusic = () => {
 const setVolume = (value) => {
 	if (!audio) return;
 
+	defaultVolume = value;
 	audio.volume = value;
 
-	const volumeIcon = document.getElementById("volume-icon");
-	if (volumeIcon) {
-		if (value === 0) {
-			volumeIcon.src = "/media/images/icons/music-mute-icon.webp";
-		} else {
-			volumeIcon.src = "/media/images/icons/music-icon.webp";
-		}
-	}
+	document.querySelectorAll(".volume-icon").forEach((icon) => {
+		icon.src = value === 0 ? "/media/images/icons/music-mute-icon.webp" : "/media/images/icons/music-icon.webp";
+	});
 };
 
 const toggleMute = () => {
 	if (!audio) return;
 
-	if (audio.volume > 0) {
-		oldVolume = audio.volume;
-		setVolume(0);
-	} else {
-		setVolume(oldVolume || 0.3);
-	}
+	setVolume(audio.volume > 0 ? 0 : defaultVolume || 0.3);
 };
 
-const defaultVolume = 0.3;
-
-const volumeSlider = document.getElementById("volume-slider");
-if (volumeSlider) {
-	volumeSlider.value = defaultVolume;
-	volumeSlider.addEventListener("input", () => {
-		setVolume(parseFloat(volumeSlider.value));
+document.querySelectorAll(".volume-slider").forEach((slider) => {
+	slider.value = defaultVolume;
+	slider.addEventListener("input", () => {
+		setVolume(parseFloat(slider.value));
 	});
-}
+});
 
-const volumeIcon = document.getElementById("volume-icon");
-if (volumeIcon) {
-	volumeIcon.addEventListener("click", toggleMute);
-}
+document.querySelectorAll(".volume-icon").forEach((icon) => {
+	icon.addEventListener("click", toggleMute);
+});

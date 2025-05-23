@@ -1,4 +1,4 @@
-import { initMusic, stopMusic } from "./audio.js";
+import { playMusicForScreen } from "./audio.js";
 import { renderBattleCards, resetHealthBars } from "./battle.js";
 import { handleCharacterSelection } from "./character.js";
 import {
@@ -30,9 +30,6 @@ export const loginScreen = document.getElementById("login-screen");
 export const mapScreen = document.getElementById("map-screen");
 export const navbar = document.getElementById("navbar");
 export const settingsIcon = document.getElementById("navbar-settings");
-
-export const volumeIcon = document.getElementById("volume-icon");
-export const volumeSlider = document.getElementById("volume-slider");
 export const logout = document.getElementById("close-session");
 export const reset = document.getElementById("reset");
 export const title = document.getElementById("h1");
@@ -396,6 +393,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 		showLevelInfo();
 
 		const currentScreen = loadFromStorage("currentScreen") || "login";
+
+		if (currentScreen === "login") {
+			playMusicForScreen("login");
+		} else if (currentScreen === "map") {
+			playMusicForScreen("map");
+		} else if (currentScreen === "battle") {
+			playMusicForScreen("battle");
+		}
+
 		const gameStarted = loadFromStorage("gameStarted");
 
 		await imageEnemies();
@@ -430,13 +436,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 				updateAsideVisibility();
 				updateBattleBackground;
 			});
-
-			stopMusic();
 		} else {
 			loginScreen.style.display = "flex";
 			title.style.display = "flex";
-
-			initMusic();
 		}
 
 		setupPlayerState();
@@ -450,6 +452,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		console.error("Initialization error:", error);
 		loginScreen.style.display = "flex";
 		title.style.display = "flex";
-		initMusic();
+		playMusicForScreen("login");
 	}
 });
