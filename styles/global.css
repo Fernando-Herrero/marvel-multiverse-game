@@ -1020,10 +1020,10 @@ h1 {
 .volume-control {
 	display: flex;
 	align-self: center;
+	margin-left: 132px;
 }
 
 .volume-control img {
-	width: 100%;
 	width: 30px;
 	height: 30px;
 	background-color: var(--contrast-color);
@@ -1034,14 +1034,19 @@ h1 {
 
 .volume-control[data-screen="login"] {
 	align-self: auto;
+	margin-left: 0;
 }
 
 .volume-slider {
 	display: block;
-	width: 30%;
+	width: 100%;
 	opacity: 0;
 	transition: opacity 0.3s ease;
 	pointer-events: none;
+}
+
+.volume-slider[data-screen="login"] {
+	width: 30%;
 }
 
 .volume-control:hover .volume-slider {

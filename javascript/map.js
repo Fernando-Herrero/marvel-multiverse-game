@@ -1,3 +1,4 @@
+import { playMusicForScreen } from "./audio.js";
 import { renderBattleCards } from "./battle.js";
 import { fetchCharactersByName } from "./character.js";
 import { mapScreen } from "./index.js";
@@ -181,6 +182,7 @@ export const showLevelInfo = () => {
 
 		await movePlayerToLevel(level);
 		await showBattleBriefing(enemy);
+		await playMusicForScreen("battle");
 	};
 
 	const showBattleBriefing = async (enemy) => {

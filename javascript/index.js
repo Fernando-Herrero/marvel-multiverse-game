@@ -1,4 +1,4 @@
-import { playMusicForScreen } from "./audio.js";
+import { playMusicForScreen, stopMusic } from "./audio.js";
 import { renderBattleCards, resetHealthBars } from "./battle.js";
 import { handleCharacterSelection } from "./character.js";
 import {
@@ -41,7 +41,7 @@ const updateAsideVisibility = () => {
 		settingsIcon.style.display = "none";
 	} else {
 		aside.classList.remove("show");
-		settingsIcon.style.display = "none";
+		settingsIcon.style.display = "flex";
 	}
 };
 
@@ -137,6 +137,8 @@ const setupEventListeners = () => {
 			cancelText: "Cancel",
 		});
 		modalAcceptBtn.onclick = () => {
+			stopMusic();
+			playMusicForScreen("login");
 			resetGameState();
 			saveToStorage("currentScreen", "login");
 
@@ -192,6 +194,8 @@ const setupEventListeners = () => {
 		});
 
 		modalAcceptBtn.onclick = () => {
+			stopMusic();
+			playMusicForScreen("login");
 			localStorage.clear();
 			resetGameState();
 			saveToStorage("forceBattleReset", true);
@@ -394,12 +398,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 		const currentScreen = loadFromStorage("currentScreen") || "login";
 
+		await new Promise((resolve) => setTimeout(resolve, 100));
+
 		if (currentScreen === "login") {
-			playMusicForScreen("login");
+			await playMusicForScreen("login");
 		} else if (currentScreen === "map") {
-			playMusicForScreen("map");
+			await playMusicForScreen("map");
 		} else if (currentScreen === "battle") {
-			playMusicForScreen("battle");
+			await playMusicForScreen("battle");
 		}
 
 		const gameStarted = loadFromStorage("gameStarted");
@@ -452,6 +458,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		console.error("Initialization error:", error);
 		loginScreen.style.display = "flex";
 		title.style.display = "flex";
-		playMusicForScreen("login");
+		await playMusicForScreen("login");
 	}
 });

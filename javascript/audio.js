@@ -7,7 +7,7 @@ const songs = {
 	battle: "/media/audio/battle-music.mp3",
 };
 
-export const playMusicForScreen = (screen) => {
+export const playMusicForScreen = async (screen) => {
 	if (!songs[screen]) {
 		console.warn(`No hay canción definida para la pantalla: ${screen}`);
 		return;
@@ -23,11 +23,25 @@ export const playMusicForScreen = (screen) => {
 	audio.autoplay = true;
 	audio.preload = "auto";
 
-	const playPromise = audio.play().catch((error) => {
-		console.warn("Autoplay bloqueado:", error);
-	});
+	try {
+		await audio.play();
+		console.log(`Reproduciendo música para: ${screen}`);
+	} catch (error) {
+		console.warn(`Error al reproducir música (${screen}):`, error);
 
-	return playPromise;
+		const handleUserInteraction = () => {
+			audio
+				.play()
+				.then(() => {
+					document.removeEventListener("click", handleUserInteraction);
+					document.removeEventListener("keydown", handleUserInteraction);
+				})
+				.catch((e) => console.warn("Error en reproducción diferida:", e));
+		};
+
+		document.addEventListener("click", handleUserInteraction);
+		document.addEventListener("keydown", handleUserInteraction);
+	}
 };
 
 export const stopMusic = () => {

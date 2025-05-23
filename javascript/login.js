@@ -1,4 +1,4 @@
-import { stopMusic } from "./audio.js";
+import { playMusicForScreen, stopMusic } from "./audio.js";
 import { handleCharacterSelection } from "./character.js";
 import { loginScreen, mapScreen, navbar, title } from "./index.js";
 import { showFirstLevel, showLevelInfo } from "./map.js";
@@ -127,7 +127,7 @@ export const setupGameListeners = () => {
 		navbar.style.display = "flex";
 		title.style.display = "none";
 
-		stopMusic();
+		playMusicForScreen("map");
 
 		showFirstLevel();
 
