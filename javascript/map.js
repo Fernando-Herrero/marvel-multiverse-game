@@ -166,7 +166,12 @@ export const showFirstLevel = () => {
 	}
 };
 
+let levelClickListenerAdded = false;
+
 export const showLevelInfo = () => {
+	if (levelClickListenerAdded) return; // ✅ Previene múltiples bindings
+	levelClickListenerAdded = true;
+
 	const getCurrentEnemies = () => {
 		const charactersSelect = document.getElementById("characters-selector");
 		const currentSelection = charactersSelect.value;
@@ -217,27 +222,41 @@ export const showLevelInfo = () => {
 		saveToStorage("currentLevel", enemy.level);
 	};
 
-	const enemies = getCurrentEnemies();
+	mapScreen.addEventListener("click", (event) => {
+		const level = event.target.closest(".level");
+		if (!level) return;
 
-	const unlockedLevels = document.querySelectorAll(".level.unlocked");
-	unlockedLevels.forEach((level) => {
-		level.addEventListener("click", async (event) => {
-			event.stopPropagation();
-			console.log("Clicked unlocked level:", level.dataset.level, level.className);
-			await handleLevelClick(level, enemies);
-		});
-	});
+		const enemies = getCurrentEnemies();
 
-	const lockedLevels = document.querySelectorAll(".level.locked");
-	lockedLevels.forEach((level) => {
-		level.addEventListener("click", (event) => {
-			event.stopPropagation();
-			console.log("Clicked locked level:", level.dataset.level, level.className);
+		if (level.classList.contains("unlocked")) {
+			console.log("Clicked unlocked level:", level.dataset.level);
+			handleLevelClick(level, enemies);
+		} else if (level.classList.contains("locked")) {
+			console.log("Clicked locked level:", level.dataset.level);
 			showModal("Level Locked! You must complete previous levels before unlocking this one!", {
 				confirmText: "OK",
 			});
-		});
+		}
 	});
+	// const unlockedLevels = document.querySelectorAll(".level.unlocked");
+	// unlockedLevels.forEach((level) => {
+	// 	level.addEventListener("click", async (event) => {
+	// 		event.stopPropagation();
+	// 		console.log("Clicked unlocked level:", level.dataset.level, level.className);
+	// 		await handleLevelClick(level, enemies);
+	// 	});
+	// });
+
+	// const lockedLevels = document.querySelectorAll(".level.locked");
+	// lockedLevels.forEach((level) => {
+	// 	level.addEventListener("click", (event) => {
+	// 		event.stopPropagation();
+	// 		console.log("Clicked locked level:", level.dataset.level, level.className);
+	// 		showModal("Level Locked! You must complete previous levels before unlocking this one!", {
+	// 			confirmText: "OK",
+	// 		});
+	// 	});
+	// });
 };
 
 export const movePlayerToLevel = (targetLevel) => {
