@@ -1,5 +1,5 @@
 import { navbar } from "./index.js";
-import { checkValidStartGame, imgPlayer } from "./login.js";
+import { charactersSelect, checkValidStartGame, imgPlayer } from "./login.js";
 import { enemiesInLevel } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 
@@ -157,6 +157,11 @@ export const fetchCharactersByName = async (name) => {
 					description: "Gets a second attack in the same turn if the first one hits.",
 					used: false,
 				},
+				"Doctor Doom": {
+					name: "Technomagic Blast",
+					description: "Deals 45 damage and shatters enemy defenses.",
+					used: false,
+				},
 			};
 
 			character.specialAbility = specialAbilities[character.name] || {
@@ -176,6 +181,7 @@ export const fetchCharactersByName = async (name) => {
 			];
 		}
 
+		console.log(character);
 		return character;
 	} catch (error) {
 		console.error(`Error al obtener datos del personaje ${name}:`, error);
@@ -187,6 +193,9 @@ export const createCharacterCard = (character, type) => {
 	const card = document.createElement("div");
 	card.classList.add("character-card", `${type}-border`);
 	card.dataset.id = character.id;
+
+	const normalContent = document.createElement("div");
+	normalContent.classList.add("normal-content");
 
 	const imgCard = document.createElement("img");
 	imgCard.src = character.image.url;
@@ -228,11 +237,65 @@ export const createCharacterCard = (character, type) => {
 		statsCharacter.appendChild(statsP);
 	}
 
+	const expandedContent = document.createElement("div");
+	expandedContent.classList.add("expanded-content", "hidden");
+	expandedContent.appendChild(expandCharacterCard(character, type));
+
 	infoCharacter.appendChild(nameCharacter);
 	infoCharacter.appendChild(statsCharacter);
 
-	card.appendChild(imgCard);
-	card.appendChild(infoCharacter);
+	normalContent.appendChild(imgCard);
+	normalContent.appendChild(infoCharacter);
+
+	card.appendChild(normalContent);
+	card.appendChild(expandedContent);
+
+	//efecto hover
+	card.addEventListener("mouseenter", () => {
+		expandedContent.classList.remove("hidden");
+		normalContent.classList.add("hidden");
+	});
+
+	card.addEventListener("mouseleave", () => {
+		expandedContent.classList.add("hidden");
+		normalContent.classList.remove("hidden");
+	});
+
+	return card;
+};
+
+const expandCharacterCard = (character, type) => {
+	const card = document.createElement("div");
+	card.classList.add("expanded-card", `${type}-border`);
+
+	const imgCard = document.createElement("img");
+	imgCard.src = character.image.url;
+	imgCard.alt = character.name;
+
+	const infoCharacter = document.createElement("div");
+	infoCharacter.classList.add("expanded-info");
+
+	const nameCharacter = document.createElement("h3");
+	nameCharacter.textContent = character.name;
+
+	const statsCharacter = document.createElement("div");
+	statsCharacter.classList.add("expanded-stats");
+
+	Object.entries(character.powerstats).forEach(([stat, value]) => {
+		const statElement = document.createElement("p");
+		statElement.textContent = `${stat.charAt(0).toUpperCase() + stat.slice(1)}: ${value}`;;
+		statsCharacter.appendChild(statElement);
+	});
+
+	const specialAbility = document.createElement("div");
+	specialAbility.classList.add("special-ability");
+	specialAbility.innerHTML = `
+        <h4>Special Ability:</h4>
+		<p>${character.specialAbility.name}, ${character.specialAbility.description}</p>
+    `;
+
+	infoCharacter.append(nameCharacter, statsCharacter, specialAbility);
+	card.append(imgCard, infoCharacter);
 
 	return card;
 };
