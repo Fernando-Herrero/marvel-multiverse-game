@@ -1017,6 +1017,11 @@ const calculateSpecialSkill = (attacker, defender) => {
 			result.statusEffect = { type: "doubleStrike", turnsLeft: 1 };
 			result.message = "Killmonger unleashes Killer Instinct! May strike twice next turn if the first hits.";
 			break;
+
+		case "Doctor Doom":
+			result.damage = 45;
+			result.message = `Doctor Doom conjures a Technomagic Blast! Deals ${result.damage} damage!.`;
+			break;
 	}
 
 	attacker.specialUsed = true;

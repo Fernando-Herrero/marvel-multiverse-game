@@ -12,48 +12,48 @@ export const levelEnemies = {
 			name: "Loki",
 			imageUrl: "",
 			level: 1,
-			description: "Dios de las Mentiras - Nueva York",
-			powers: "Ilusiones, Dagas Mágicas",
+			description: "God of Mischief - New York",
+			special: "Multiform Illusion! 90% chance to dodge all attacks next turn.",
 			reward: "/media/images/icons/time-stone.webp",
 		},
 		{
 			name: "Red Skull",
 			imageUrl: "",
 			level: 2,
-			description: "Cráneo Rojo - Europa 1945",
-			powers: "Fuerza Mejorada, Pistolas de Energía",
+			description: "Red Skull - Europe 1945",
+			special: "Terror Domination! Enemy's attack is reduced for 2 turns.",
 			reward: "/media/images/icons/space-stone.webp",
 		},
 		{
 			name: "Ultron",
 			imageUrl: "",
 			level: 3,
-			description: "IA Despiadada - Sokovia",
-			powers: "Ejército de Drones, Vuelo",
+			description: "Ruthless AI - Sokovia",
+			special: "Regen Upgrade! Regenerate 30% HP.",
 			reward: "/media/images/icons/mind-stone.webp",
 		},
 		{
 			name: "Hela",
 			imageUrl: "",
 			level: 4,
-			description: "Diosa de la Muerte - Asgard",
-			powers: "Espadas Infinitas, Inmortalidad",
+			description: "Goddess of Death - Asgard",
+			special: "Life Drain! Deals 30 damage and heals 20 HP.",
 			reward: "/media/images/icons/soul-stone.webp",
 		},
 		{
 			name: "Thanos",
 			imageUrl: "",
 			level: 5,
-			description: "El Titán Loco - Titán",
-			powers: "Fuerza Cósmica, Guantelete",
+			description: "The Mad Titan - Titan",
+			special: "Infinity Fist! Strikes with devastating force.",
 			reward: "/media/images/icons/power-stone.webp",
 		},
 		{
 			name: "Doctor Doom",
 			imageUrl: "",
 			level: 6,
-			description: "Señor de Latveria - Dimensión Oscura",
-			powers: "Magia y Tecnología, Armadura",
+			description: "Lord of Latveria - Dark Dimension",
+			special: "Technomagic Blast! Deals 45 damage and shatters enemy defenses.",
 			reward: "/media/images/icons/reality-stone.webp",
 		},
 	],
@@ -62,48 +62,48 @@ export const levelEnemies = {
 			name: "Black Widow",
 			imageUrl: "",
 			level: 1,
-			description: "Espía Letal - Budapest",
-			powers: "Combate cuerpo a cuerpo, Sigilo",
+			description: "Lethal Spy - Budapest",
+			special: "Tactical Ambush! Deals 40 damage.",
 			reward: "/media/images/icons/space-stone.webp",
 		},
 		{
 			name: "Spider-Man",
 			imageUrl: "",
 			level: 2,
-			description: "El Hombre Araña - Queens",
-			powers: "Sentido arácnido, Telarañas",
+			description: "The Wall-Crawler - Queens",
+			special: "Paralyzing Web! The enemy cannot attack next turn.",
 			reward: "/media/images/icons/power-stone.webp",
 		},
 		{
 			name: "Iron Man",
 			imageUrl: "",
 			level: 3,
-			description: "Genio, Millonario - Torre Stark",
-			powers: "Armadura MK-50, IA Friday",
+			description: "Genius, Billionaire - Stark Tower",
+			special: "Pulse Blast! Deals 40 damage ignoring defense.",
 			reward: "/media/images/icons/mind-stone.webp",
 		},
 		{
 			name: "Captain America",
 			imageUrl: "",
 			level: 4,
-			description: "El Primer Vengador - Washington",
-			powers: "Escudo de Vibranium, Liderazgo",
+			description: "The First Avenger - Washington",
+			special: "Perfect Block! Blocks all damage for two turns.",
 			reward: "/media/images/icons/reality-stone.webp",
 		},
 		{
 			name: "Thor",
 			imageUrl: "",
 			level: 5,
-			description: "Dios del Trueno - Asgard",
-			powers: "Mjolnir, Control del Clima",
+			description: "God of Thunder - Asgard",
+			special: "Divine Thunder! Unavoidable attack deals 40 damage.",
 			reward: "/media/images/icons/soul-stone.webp",
 		},
 		{
 			name: "Hulk",
 			imageUrl: "",
 			level: 6,
-			description: "Furia Imparable - Laboratorio Gamma",
-			powers: "Fuerza Bruta, Regeneración",
+			description: "Unstoppable Rage - Gamma Lab",
+			special: "Uncontrollable Rage! Increased damage for the next two turns.",
 			reward: "/media/images/icons/time-stone.webp",
 		},
 	],
@@ -166,10 +166,11 @@ export const showFirstLevel = () => {
 	}
 };
 
+//flag que es lo mismo a un interruptor, no deja que se propague multiples veces, al suceder una vez lo para. false => true, no mas!
 let levelClickListenerAdded = false;
 
 export const showLevelInfo = () => {
-	if (levelClickListenerAdded) return; // ✅ Previene múltiples bindings
+	if (levelClickListenerAdded) return;
 	levelClickListenerAdded = true;
 
 	const getCurrentEnemies = () => {
@@ -194,7 +195,7 @@ export const showLevelInfo = () => {
 		return new Promise((resolve) => {
 			showBriefing(
 				`Level: ${enemy.level}. ${enemy.name}`,
-				`${enemy.description}<br>Powers: ${enemy.powers}<br>Reward: ${enemy.reward}`,
+				`${enemy.description}<br>Powers: ${enemy.powers}<br>Reward: Piedra del Infinito<br>Special Attack: ${enemy.special}`,
 				{
 					after: {
 						text: "Start Battle",
