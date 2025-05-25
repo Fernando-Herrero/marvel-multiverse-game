@@ -30,7 +30,6 @@
 	}
 
 	.expanded-card img {
-
 		border-top-left-radius: 12px;
 		border-top-right-radius: 12px;
 		max-height: 130px;
@@ -44,6 +43,10 @@
 		justify-content: space-between;
 		border-left: 1px solid var(--contrast-color);
 		border-bottom: 1px solid var(--accent-color);
+	}
+
+	.aside-battle-large {
+		height: 88vh;
 	}
 
 	.volume-control {

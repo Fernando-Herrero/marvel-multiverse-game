@@ -1,6 +1,6 @@
 import { playMusicForScreen } from "./audio.js";
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
-import { loadMapState, mapScreen } from "./index.js";
+import { loadCollectedRewards, loadMapState, mapScreen } from "./index.js";
 import { inputUserName } from "./login.js";
 import { battleScreen, enemiesInLevel, levelEnemies, movePlayerToLevel, showLevelInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
@@ -1341,6 +1341,7 @@ const endBattle = (playerWon) => {
 		showLevelInfo();
 		enemiesInLevel();
 		getRewards();
+		loadCollectedRewards();
 		showBriefing(
 			`${inputUserName.value} ${currentSelection === "heroes" ? "triumphs" : "dominates"} against ${
 				currentEnemy.name
@@ -1357,6 +1358,7 @@ const endBattle = (playerWon) => {
 					text: "Continue Your Journey",
 					action: () => {
 						playMusicForScreen("map");
+						saveToStorage("currentScreen", "map");
 						const currentLevel = loadFromStorage("currentLevel") || 1;
 						const nextLevel = currentLevel + 1;
 
@@ -1418,6 +1420,7 @@ const endBattle = (playerWon) => {
 						}
 
 						mapScreen.style.display = "flex";
+						saveToStorage("currentScreen", "map");
 						battleScreen.style.display = "none";
 						hideModal();
 					},
@@ -1427,7 +1430,7 @@ const endBattle = (playerWon) => {
 	}, 2000);
 };
 
-const getRewards = () => {
+export const getRewards = () => {
 	const containerRewards = document.getElementById("rewards");
 	const currentLevel = loadFromStorage("currentLevel") || 1;
 	const currentSelection = loadFromStorage("characterType") || "heroes";
@@ -1443,5 +1446,11 @@ const getRewards = () => {
 		img.alt = "Infinity Stone";
 
 		containerRewards.appendChild(img);
+
+		const rewards = loadFromStorage("collectedRewards") || [];
+		if (!rewards.includes(currentEnemy.reward)) {
+			rewards.push(currentEnemy.reward);
+			saveToStorage("collectedRewards", rewards);
+		}
 	}
 };

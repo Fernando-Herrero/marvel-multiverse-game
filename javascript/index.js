@@ -37,6 +37,11 @@ export const title = document.getElementById("h1");
 
 export const updateAsideVisibility = () => {
 	const currentScreen = loadFromStorage("currentScreen");
+	if (currentScreen === "battle" && window.innerWidth >= 780) {
+		aside.classList.add("aside-battle-large");
+	} else {
+		aside.classList.remove("aside-battle-large");
+	}
 	if ((currentScreen === "map" || currentScreen === "battle") && window.innerWidth >= 780) {
 		aside.classList.add("show");
 		settingsIcon.style.display = "none";
@@ -48,11 +53,17 @@ export const updateAsideVisibility = () => {
 
 export const updateBattleBackground = () => {
 	const currentScreen = loadFromStorage("currentScreen");
+	const existingBg = battleScreen.querySelector(".background-battle-img");
+
+	if (window.innerWidth < 780 && existingBg) {
+		existingBg.remove();
+		return;
+	}
+
 	if (currentScreen === "battle" && window.innerWidth >= 780) {
 		const currentLevel = loadFromStorage("currentLevel");
 		if (!currentLevel) return;
 
-		const existingBg = battleScreen.querySelector(".background-battle-img");
 		if (existingBg) existingBg.remove();
 
 		const imgBg = document.createElement("img");
@@ -69,6 +80,8 @@ export const updateBattleBackground = () => {
 
 		imgBg.src = levelImages[currentLevel];
 		battleScreen.appendChild(imgBg);
+	} else if (existingBg) {
+		existingBg.remove();
 	}
 };
 
@@ -99,6 +112,7 @@ const resetGameState = () => {
 		"currentEnemy",
 		"mainBriefing",
 		"characterType",
+		"collectedRewards",
 	];
 
 	clearKeys.forEach((key) => clearStorageKey(key));
@@ -252,10 +266,26 @@ const setupEventListeners = () => {
 	});
 };
 
+export const loadCollectedRewards = () => {
+	const containerRewards = document.getElementById("rewards");
+	const rewards = loadFromStorage("collectedRewards") || [];
+
+	containerRewards.innerHTML = "";
+
+	rewards.forEach((reward) => {
+		const img = document.createElement("img");
+		img.classList.add("reward-img");
+		img.src = reward;
+		img.alt = "Infinity Stone";
+		containerRewards.appendChild(img);
+	});
+};
+
 const loadGameState = async (currentScreen) => {
 	switch (currentScreen) {
 		case "map":
 			await loadMapState();
+			loadCollectedRewards();
 			let playerMoved = false;
 
 			for (let i = 6; i >= 1; i--) {

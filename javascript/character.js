@@ -81,6 +81,12 @@ export const fetchCharactersByName = async (name) => {
 		if (name === "Black Widow") character.powerstats.Strength = 70;
 		if (name === "Captain America") character.powerstats.Strength = 95;
 		if (name === "Spider-Man") character.powerstats.Strength = 80;
+		if (name === "Red Skull") character.powerstats.Strength = 80;
+		if (name === "Red Skull") character.powerstats.Speed = 60;
+		if (name === "Red Skull") character.powerstats.Durability = 80;
+		if (name === "Red Skull") character.powerstats.Power = 80;
+
+		
 
 		if (!character.stats) {
 			character.stats = [

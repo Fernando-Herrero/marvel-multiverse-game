@@ -203,6 +203,7 @@ export const showLevelInfo = () => {
 						action: async () => {
 							await startBattleFlow(enemy);
 							updateBattleBackground();
+							saveToStorage("currentScreen", "battle");
 							resolve();
 						},
 					},
