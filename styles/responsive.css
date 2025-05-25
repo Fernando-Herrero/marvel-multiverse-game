@@ -119,4 +119,8 @@
 	:root {
 		--container-width: 75%;
 	}
+
+	.cards-player-container {
+		grid-template-columns: repeat(6, 1fr);
+	}
 }
