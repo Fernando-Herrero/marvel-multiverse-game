@@ -252,7 +252,7 @@ h1 {
 	border-top-right-radius: 12px;
 	border-top-left-radius: 12px;
 	object-fit: cover;
-	/* object-position: center -35px; */
+	object-position: center -10px;
 	transition: transform 0.3s ease;
 }
 

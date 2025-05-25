@@ -29,6 +29,15 @@
 		grid-template-columns: repeat(3, 1fr);
 	}
 
+	.expanded-card img {
+
+		border-top-left-radius: 12px;
+		border-top-right-radius: 12px;
+		max-height: 130px;
+		object-fit: cover;
+		object-position: center -10px;
+	}
+
 	.aside {
 		width: 250px;
 		height: 100vh;
@@ -96,6 +105,7 @@
 		border-radius: 12px;
 		object-fit: cover;
 		object-position: center;
+		max-height: none;
 	}
 
 	.expanded-info h3 {

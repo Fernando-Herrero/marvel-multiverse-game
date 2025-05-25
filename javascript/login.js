@@ -100,7 +100,6 @@ export const setupGameListeners = () => {
 				id: selectedCard.dataset.id,
 				name: selectedCard.querySelector("h3").textContent,
 				imageUrl: selectedCard.querySelector("img").src,
-				stats: Array.from(selectedCard.querySelectorAll(".character-stats p")).map((p) => p.textContent),
 				powerstats: {
 					Intelligence: getStatValue(selectedCard, "Intelligence"),
 					Strength: getStatValue(selectedCard, "Strength"),
@@ -109,6 +108,14 @@ export const setupGameListeners = () => {
 					Power: getStatValue(selectedCard, "Power"),
 					Combat: getStatValue(selectedCard, "Combat"),
 				},
+				stats: [
+					`Intelligence: ${getStatValue(selectedCard, "Intelligence")}`,
+					`Strength: ${getStatValue(selectedCard, "Strength")}`,
+					`Speed: ${getStatValue(selectedCard, "Speed")}`,
+					`Durability: ${getStatValue(selectedCard, "Durability")}`,
+					`Power: ${getStatValue(selectedCard, "Power")}`,
+					`Combat: ${getStatValue(selectedCard, "Combat")}`,
+				],
 			};
 
 			const difficulty = parseInt(document.getElementById("difficulty").value);

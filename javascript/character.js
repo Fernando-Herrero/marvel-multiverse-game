@@ -1,5 +1,5 @@
 import { navbar } from "./index.js";
-import { checkValidStartGame, imgPlayer } from "./login.js";
+import { charactersSelect, checkValidStartGame, imgPlayer } from "./login.js";
 import { enemiesInLevel } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 
@@ -70,24 +70,26 @@ export const fetchCharactersByName = async (name) => {
 		}
 
 		character.powerstats = {
-			strength: parseInt(character.powerstats.strength) || 50,
-			speed: parseInt(character.powerstats.speed) || 50,
-			durability: parseInt(character.powerstats.durability) || 50,
-			intelligence: parseInt(character.powerstats.intelligence) || 50,
-			combat: parseInt(character.powerstats.combat) || 50,
+			Intelligence: parseInt(character.powerstats.intelligence || character.powerstats.Intelligence) || 50,
+			Strength: parseInt(character.powerstats.strength || character.powerstats.Strength) || 50,
+			Speed: parseInt(character.powerstats.speed || character.powerstats.Speed) || 50,
+			Durability: parseInt(character.powerstats.durability || character.powerstats.Durability) || 50,
+			Power: parseInt(character.powerstats.power || character.powerstats.Power) || 50,
+			Combat: parseInt(character.powerstats.combat || character.powerstats.Combat) || 50,
 		};
 
-		if (name === "Black Widow") character.powerstats.strength = 70;
-		if (name === "Captain America") character.powerstats.strength = 95;
-		if (name === "Spider-Man") character.powerstats.strength = 80;
+		if (name === "Black Widow") character.powerstats.Strength = 70;
+		if (name === "Captain America") character.powerstats.Strength = 95;
+		if (name === "Spider-Man") character.powerstats.Strength = 80;
 
 		if (!character.stats) {
 			character.stats = [
-				`Strength: ${character.powerstats.strength}`,
-				`Speed: ${character.powerstats.speed}`,
-				`Defence: ${character.powerstats.durability}`,
-				`Intelligence: ${character.powerstats.intelligence}`,
-				`Strategy: ${character.powerstats.combat}`,
+				`Intelligence: ${character.powerstats.Intelligence}`,
+				`Strength: ${character.powerstats.Strength}`,
+				`Speed: ${character.powerstats.Speed}`,
+				`Durability: ${character.powerstats.Durability}`,
+				`Power: ${character.powerstats.Power}`,
+				`Combat: ${character.powerstats.Combat}`,
 			];
 		}
 
@@ -167,15 +169,16 @@ export const fetchCharactersByName = async (name) => {
 			};
 		}
 
-		if (!character.stats) {
-			character.stats = [
-				`Strength: ${character.powerstats.strength}`,
-				`Speed: ${character.powerstats.speed}`,
-				`Defence: ${character.powerstats.durability}`,
-				`Intelligence: ${character.powerstats.intelligence}`,
-				`Strategy: ${character.powerstats.combat}`,
-			];
-		}
+		// if (!character.stats) {
+		// 	character.stats = [
+		// 		`Intelligence: ${character.powerstats.intelligence}`,
+		// 		`Strength: ${character.powerstats.strength}`,
+		// 		`Speed: ${character.powerstats.speed}`,
+		// 		`Durability: ${character.powerstats.durability}`,
+		// 		`Power: ${character.powerstats.power}`,
+		// 		`Combat: ${character.powerstats.combat}`,
+		// 	];
+		// }
 
 		console.log(character);
 		return character;
@@ -227,10 +230,21 @@ export const createCharacterCard = (character, type) => {
 	const statsCharacter = document.createElement("div");
 	statsCharacter.classList.add("character-stats");
 
-	for (let stat in character.powerstats) {
-		const statsP = document.createElement("p");
-		statsP.textContent = `${stat.charAt(0).toUpperCase() + stat.slice(1)}: ${character.powerstats[stat]}`;
-		statsCharacter.appendChild(statsP);
+	if (character.stats && Array.isArray(character.stats)) {
+		character.stats.forEach((statText) => {
+			const statP = document.createElement("p");
+			statP.textContent = statText;
+			statsCharacter.appendChild(statP);
+		});
+	} else {
+		const statsOrder = ["Intelligence", "Strength", "Speed", "Durability", "Power", "Combat"];
+
+		statsOrder.forEach((statName) => {
+			const statValue = character.powerstats[statName] || character.powerstats[statName.toLowerCase()] || 50;
+			const statsP = document.createElement("p");
+			statsP.textContent = `${statName}: ${statValue}`;
+			statsCharacter.appendChild(statsP);
+		});
 	}
 
 	const expandedContent = document.createElement("div");
