@@ -65,6 +65,35 @@
 		--container-width: 75%;
 	}
 
+	.expanded-content {
+		min-width: 400px;
+		max-width: 600px;
+	}
+
+	.expanded-card {
+		display: flex;
+	}
+
+	.expanded-card img {
+		width: 200px;
+		height: 380px;
+		padding: 10px;
+		border-radius: 12px;
+	}
+
+	.expanded-info h3 {
+		font-size: 22px;
+		margin-bottom: 20px;
+	}
+
+	.expanded-stats p {
+		padding-bottom: 10px;
+	}
+
+	.special-ability {
+		margin-top: 80px;
+	}
+
 	.player-enemy {
 		flex-direction: row;
 		flex: 1;

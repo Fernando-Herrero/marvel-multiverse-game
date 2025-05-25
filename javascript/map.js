@@ -195,7 +195,7 @@ export const showLevelInfo = () => {
 		return new Promise((resolve) => {
 			showBriefing(
 				`Level: ${enemy.level}. ${enemy.name}`,
-				`${enemy.description}<br>Powers: ${enemy.powers}<br>Reward: Piedra del Infinito<br>Special Attack: ${enemy.special}`,
+				`${enemy.description}<br>Special Attack: ${enemy.special}<br>Reward: Piedra del Infinito`,
 				{
 					after: {
 						text: "Start Battle",
