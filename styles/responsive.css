@@ -65,6 +65,21 @@
 		--container-width: 75%;
 	}
 
+	.player-enemy {
+		flex-direction: row;
+		flex: 1;
+		width: 90%;
+	}
+
+	.player-div,
+	.enemy-div {
+		max-width: 350px;
+	}
+
+	.normal-content {
+		max-width: none;
+	}
+
 	.expanded-content {
 		min-width: 400px;
 		max-width: 600px;
@@ -76,9 +91,11 @@
 
 	.expanded-card img {
 		width: 200px;
-		height: 380px;
+		height: 360px;
 		padding: 10px;
 		border-radius: 12px;
+		object-fit: cover;
+		object-position: center;
 	}
 
 	.expanded-info h3 {
@@ -91,13 +108,7 @@
 	}
 
 	.special-ability {
-		margin-top: 80px;
-	}
-
-	.player-enemy {
-		flex-direction: row;
-		flex: 1;
-		width: 90%;
+		margin-top: 60px;
 	}
 
 	#map,

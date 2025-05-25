@@ -1,5 +1,5 @@
 import { navbar } from "./index.js";
-import { charactersSelect, checkValidStartGame, imgPlayer } from "./login.js";
+import { checkValidStartGame, imgPlayer } from "./login.js";
 import { enemiesInLevel } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 
@@ -36,7 +36,7 @@ const testImage = (url) => {
 		img.onerror = () => resolve(false);
 		img.src = url;
 
-		setTimeout(() => resolve(false), 2000);
+		setTimeout(() => resolve(false), 1000);
 	});
 };
 
@@ -61,16 +61,12 @@ export const fetchCharactersByName = async (name) => {
 
 		const imgValid = await testImage(character.image?.url);
 		if (!imgValid) {
-			const localImageValid = await testImage(localCharacterImage[name]);
-			character.image.url = localImageValid
-				? localCharacterImage[name]
-				: "/media/images/backgrounds/img-back.jpg";
-
-			const finalCheck = await testImage(character.image.url);
-			if (!finalCheck) {
-				console.error(`All image sources failed for ${name}`);
-				character.image.url = "/media/images/backgrounds/img-back.jpg";
-			}
+			console.warn(`Primary image for ${name} failed to load. Attempting local fallback...`);
+			character.image.url = localCharacterImage[name];
+			console.info(`Fallback image for ${name} loaded successfully.`);
+		} else {
+			character.image.url = "/media/images/backgrounds/img-back.jpg";
+			console.error(`All image sources failed for ${name}. Using default backup image.`);
 		}
 
 		character.powerstats = {
@@ -283,7 +279,7 @@ const expandCharacterCard = (character, type) => {
 
 	Object.entries(character.powerstats).forEach(([stat, value]) => {
 		const statElement = document.createElement("p");
-		statElement.textContent = `${stat.charAt(0).toUpperCase() + stat.slice(1)}: ${value}`;;
+		statElement.textContent = `${stat.charAt(0).toUpperCase() + stat.slice(1)}: ${value}`;
 		statsCharacter.appendChild(statElement);
 	});
 

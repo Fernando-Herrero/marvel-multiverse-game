@@ -1,6 +1,6 @@
-import { playMusicForScreen, stopMusic } from "./audio.js";
+import { playMusicForScreen } from "./audio.js";
 import { handleCharacterSelection } from "./character.js";
-import { loginScreen, mapScreen, navbar, title } from "./index.js";
+import { loginScreen, mapScreen, navbar, title, updateAsideVisibility } from "./index.js";
 import { showFirstLevel, showLevelInfo } from "./map.js";
 import { loadFromStorage, saveToStorage } from "./storage.js";
 import { hideModal, modalAcceptBtn, modalBackdrop, showBriefing, showModal } from "./utils.js";
@@ -128,6 +128,7 @@ export const setupGameListeners = () => {
 		title.style.display = "none";
 
 		playMusicForScreen("map");
+		updateAsideVisibility();
 
 		showFirstLevel();
 
@@ -139,6 +140,7 @@ export const setupGameListeners = () => {
 		if (loadFromStorage("currentScreen") === "map" && window.innerWidth >= 780) {
 			console.log("Mostrando aside");
 			aside.classList.add("show");
+			updateAsideVisibility();
 		}
 
 		saveToStorage("gameStarted", true);

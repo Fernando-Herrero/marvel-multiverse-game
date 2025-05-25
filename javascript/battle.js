@@ -1,7 +1,7 @@
 import { playMusicForScreen } from "./audio.js";
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
 import { loadMapState, mapScreen } from "./index.js";
-import { charactersSelect, inputUserName } from "./login.js";
+import { inputUserName } from "./login.js";
 import { battleScreen, enemiesInLevel, levelEnemies, movePlayerToLevel, showLevelInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 import { disableButtons, hideModal, showBattleText, showBriefing } from "./utils.js";

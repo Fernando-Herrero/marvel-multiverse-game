@@ -35,7 +35,7 @@ export const logout = document.getElementById("close-session");
 export const reset = document.getElementById("reset");
 export const title = document.getElementById("h1");
 
-const updateAsideVisibility = () => {
+export const updateAsideVisibility = () => {
 	const currentScreen = loadFromStorage("currentScreen");
 	if ((currentScreen === "map" || currentScreen === "battle") && window.innerWidth >= 780) {
 		aside.classList.add("show");
@@ -46,7 +46,7 @@ const updateAsideVisibility = () => {
 	}
 };
 
-const updateBattleBackground = () => {
+export const updateBattleBackground = () => {
 	const currentScreen = loadFromStorage("currentScreen");
 	if (currentScreen === "battle" && window.innerWidth >= 780) {
 		const currentLevel = loadFromStorage("currentLevel");
@@ -299,6 +299,8 @@ export const loadMapState = async () => {
 	loadPlayerPosition();
 	showFirstLevel();
 	showLevelInfo();
+	updateAsideVisibility();
+	updateBattleBackground();
 
 	navbar.style.display = "flex";
 	mapScreen.style.display = "flex";
@@ -311,6 +313,8 @@ const loadbattleState = async () => {
 	const battleState = loadFromStorage("battleState");
 	if (battleState?.enemy) {
 		await renderBattleCards(battleState.enemy.character.name);
+		updateAsideVisibility();
+		updateBattleBackground();
 	} else {
 		saveToStorage("currentScreen", "map");
 		mapScreen.style.display = "flex";
@@ -396,7 +400,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		[loginScreen, mapScreen, battleScreen, aside, title, navbar].forEach((el) => {
 			el.style.display = "none";
 		});
-		showLevelInfo();
 
 		const currentScreen = loadFromStorage("currentScreen") || "login";
 
