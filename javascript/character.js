@@ -1,5 +1,5 @@
 import { navbar } from "./index.js";
-import { charactersSelect, checkValidStartGame, imgPlayer } from "./login.js";
+import { checkValidStartGame, imgPlayer } from "./login.js";
 import { enemiesInLevel } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 
@@ -36,7 +36,7 @@ const testImage = (url) => {
 		img.onerror = () => resolve(false);
 		img.src = url;
 
-		setTimeout(() => resolve(false), 1000);
+		setTimeout(() => resolve(false), 2000);
 	});
 };
 
@@ -62,11 +62,14 @@ export const fetchCharactersByName = async (name) => {
 		const imgValid = await testImage(character.image?.url);
 		if (!imgValid) {
 			console.warn(`Primary image for ${name} failed to load. Attempting local fallback...`);
-			character.image.url = localCharacterImage[name];
-			console.info(`Fallback image for ${name} loaded successfully.`);
-		} else {
-			character.image.url = "/media/images/backgrounds/img-back.jpg";
-			console.error(`All image sources failed for ${name}. Using default backup image.`);
+			const localImg = localCharacterImage[name];
+			if (localImg) {
+				character.image.url = localImg;
+				console.info(`Fallback image for ${name} loaded successfully.`);
+			} else {
+				character.image.url = "/media/images/backgrounds/img-back.jpg";
+				console.error(`All image sources failed for ${name}. Using default backup image.`);
+			}
 		}
 
 		character.powerstats = {
@@ -85,8 +88,6 @@ export const fetchCharactersByName = async (name) => {
 		if (name === "Red Skull") character.powerstats.Speed = 60;
 		if (name === "Red Skull") character.powerstats.Durability = 80;
 		if (name === "Red Skull") character.powerstats.Power = 80;
-
-		
 
 		if (!character.stats) {
 			character.stats = [

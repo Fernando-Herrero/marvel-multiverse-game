@@ -25,6 +25,10 @@
 		--container-width: 85%;
 	}
 
+	.navbar-settings {
+		display: none;
+	}
+
 	.cards-player-container {
 		grid-template-columns: repeat(3, 1fr);
 	}
@@ -38,6 +42,7 @@
 	}
 
 	.aside {
+		display: flex;
 		width: 250px;
 		height: 100vh;
 		justify-content: space-between;

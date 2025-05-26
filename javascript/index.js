@@ -44,10 +44,8 @@ export const updateAsideVisibility = () => {
 	}
 	if ((currentScreen === "map" || currentScreen === "battle") && window.innerWidth >= 780) {
 		aside.classList.add("show");
-		settingsIcon.style.display = "none";
 	} else {
 		aside.classList.remove("show");
-		settingsIcon.style.display = "block";
 	}
 };
 
@@ -286,6 +284,7 @@ const loadGameState = async (currentScreen) => {
 		case "map":
 			await loadMapState();
 			loadCollectedRewards();
+			updateAsideVisibility();
 			let playerMoved = false;
 
 			for (let i = 6; i >= 1; i--) {
@@ -306,6 +305,7 @@ const loadGameState = async (currentScreen) => {
 			break;
 		case "battle":
 			await loadbattleState();
+			updateBattleBackground();
 			break;
 	}
 };
@@ -330,7 +330,6 @@ export const loadMapState = async () => {
 	showFirstLevel();
 	showLevelInfo();
 	updateAsideVisibility();
-	updateBattleBackground();
 
 	navbar.style.display = "flex";
 	mapScreen.style.display = "flex";
@@ -446,6 +445,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		const gameStarted = loadFromStorage("gameStarted");
 
 		await imageEnemies();
+		updateAsideVisibility();
 
 		if (currentScreen && gameStarted) {
 			const currentLevel = loadFromStorage("currentLevel") || 1;
@@ -475,7 +475,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			updateBattleBackground();
 			window.addEventListener("resize", () => {
 				updateAsideVisibility();
-				updateBattleBackground;
+				updateBattleBackground();
 			});
 		} else {
 			loginScreen.style.display = "flex";
