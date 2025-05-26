@@ -33,14 +33,6 @@
 		grid-template-columns: repeat(3, 1fr);
 	}
 
-	.expanded-card img {
-		border-top-left-radius: 12px;
-		border-top-right-radius: 12px;
-		max-height: 130px;
-		object-fit: cover;
-		object-position: center -10px;
-	}
-
 	.aside {
 		display: flex;
 		width: 250px;
@@ -51,7 +43,7 @@
 	}
 
 	.aside-battle-large {
-		height: 88vh;
+		height: 86.7vh;
 	}
 
 	.volume-control {

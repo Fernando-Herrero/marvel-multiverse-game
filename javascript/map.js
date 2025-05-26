@@ -1,7 +1,7 @@
 import { playMusicForScreen } from "./audio.js";
 import { renderBattleCards } from "./battle.js";
 import { fetchCharactersByName } from "./character.js";
-import { mapScreen, updateBattleBackground } from "./index.js";
+import { mapScreen, updateAsideVisibility, updateBattleBackground } from "./index.js";
 import { charactersSelect } from "./login.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
 import { hideModal, showBriefing, showModal } from "./utils.js";
@@ -185,6 +185,7 @@ export const showLevelInfo = () => {
 
 		if (!enemy) return;
 
+		debugger;
 		await movePlayerToLevel(level);
 		await showBattleBriefing(enemy);
 		await playMusicForScreen("battle");
@@ -203,6 +204,7 @@ export const showLevelInfo = () => {
 						action: async () => {
 							await startBattleFlow(enemy);
 							updateBattleBackground();
+							updateAsideVisibility();
 							saveToStorage("currentScreen", "battle");
 							resolve();
 						},

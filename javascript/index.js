@@ -250,18 +250,18 @@ const setupEventListeners = () => {
 		};
 	});
 
-	levels.forEach((level) => {
-		if (level.classList.contains("locked")) {
-			level.addEventListener("click", () => {
-				showBriefing("This Level is not available", "This level is still blocked", {
-					after: {
-						text: "Accept",
-						action: () => hideModal(),
-					},
-				});
-			});
-		}
-	});
+	// levels.forEach((level) => {
+	// 	if (level.classList.contains("locked")) {
+	// 		level.addEventListener("click", () => {
+	// 			showBriefing("This Level is not available", "This level is still blocked", {
+	// 				after: {
+	// 					text: "Accept",
+	// 					action: () => hideModal(),
+	// 				},
+	// 			});
+	// 		});
+	// 	}
+	// });
 };
 
 export const loadCollectedRewards = () => {
