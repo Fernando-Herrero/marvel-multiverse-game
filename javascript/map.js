@@ -185,7 +185,7 @@ export const showLevelInfo = () => {
 
 		if (!enemy) return;
 
-		debugger;
+	
 		await movePlayerToLevel(level);
 		await showBattleBriefing(enemy);
 		await playMusicForScreen("battle");

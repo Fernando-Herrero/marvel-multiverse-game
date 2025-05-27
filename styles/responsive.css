@@ -144,4 +144,8 @@
 	.cards-player-container {
 		grid-template-columns: repeat(6, 1fr);
 	}
+
+	.card-info-character h3 {
+    font-size: 16px;
+}
 }

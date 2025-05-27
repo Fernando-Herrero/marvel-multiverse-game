@@ -12,6 +12,7 @@ import {
 	renderCardInfohero,
 	setupGameListeners,
 	setupLoginListeners,
+	startGameBtn,
 } from "./login.js";
 import {
 	battleScreen,
@@ -180,6 +181,8 @@ const setupEventListeners = () => {
 
 			document.getElementById("difficulty").value = "1";
 
+			startGameBtn.disabled = true;
+
 			showModal("You've succesfully logout.", {
 				confirmText: "Accept",
 				isConfirmation: false,
@@ -239,6 +242,8 @@ const setupEventListeners = () => {
 			document.getElementById("rewards").innerHTML = "";
 
 			document.getElementById("difficulty").value = "1";
+
+			startGameBtn.disabled = true;
 
 			saveToStorage("forceBattleReset", true);
 

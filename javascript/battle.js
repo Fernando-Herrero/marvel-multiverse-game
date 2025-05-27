@@ -1,6 +1,6 @@
 import { playMusicForScreen } from "./audio.js";
 import { createCharacterCard, fetchCharactersByName } from "./character.js";
-import { loadCollectedRewards, loadMapState, mapScreen } from "./index.js";
+import { loadCollectedRewards, loadMapState, mapScreen, updateAsideVisibility } from "./index.js";
 import { inputUserName } from "./login.js";
 import { battleScreen, enemiesInLevel, levelEnemies, movePlayerToLevel, showLevelInfo } from "./map.js";
 import { clearStorageKey, loadFromStorage, saveToStorage } from "./storage.js";
@@ -1207,6 +1207,7 @@ const checkBattleEnd = (battleState) => {
 			before: {
 				text: "Back to map",
 				action: () => {
+					updateAsideVisibility();
 					playMusicForScreen("map");
 					saveToStorage("currentScreen", "map");
 					clearStorageKey("battleState");
@@ -1265,6 +1266,7 @@ const checkBattleEnd = (battleState) => {
 			before: {
 				text: "Back to map",
 				action: () => {
+					updateAsideVisibility();
 					playMusicForScreen("map");
 					saveToStorage("currentScreen", "map");
 					clearStorageKey("battleState");
@@ -1357,6 +1359,7 @@ const endBattle = (playerWon) => {
 				after: {
 					text: "Continue Your Journey",
 					action: () => {
+						updateAsideVisibility();
 						playMusicForScreen("map");
 						saveToStorage("currentScreen", "map");
 						const currentLevel = loadFromStorage("currentLevel") || 1;
@@ -1423,6 +1426,7 @@ const endBattle = (playerWon) => {
 						saveToStorage("currentScreen", "map");
 						battleScreen.style.display = "none";
 						hideModal();
+						updateAsideVisibility();
 					},
 				},
 			}
