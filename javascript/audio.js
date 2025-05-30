@@ -78,4 +78,5 @@ document.querySelectorAll(".volume-slider").forEach((slider) => {
 
 document.querySelectorAll(".volume-icon").forEach((icon) => {
 	icon.addEventListener("click", toggleMute);
+	icon.addEventListener("touchstart", toggleMute);
 });
